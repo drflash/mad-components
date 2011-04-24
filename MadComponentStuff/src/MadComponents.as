@@ -161,8 +161,12 @@ package
 		protected var _popUp:UIWindow;
 		
 		
-		public function MadComponents() {
+		public function MadComponents(screen:Sprite = null) {
 			var i:int;
+			
+			if (screen)
+				screen.addChild(this);
+			
 			stage.align = StageAlign.TOP_LEFT;  
 			stage.scaleMode = StageScaleMode.NO_SCALE;
 			

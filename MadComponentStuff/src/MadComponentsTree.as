@@ -91,8 +91,10 @@ package
 		protected var _detail:UILabel;
 		
 		
-		public function MadComponentsTree() {
-			var i:int;
+		public function MadComponentsTree(screen:Sprite = null) {
+			if (screen)
+				screen.addChild(this);
+			
 			stage.align = StageAlign.TOP_LEFT;  
 			stage.scaleMode = StageScaleMode.NO_SCALE;
 			
