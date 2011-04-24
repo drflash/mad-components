@@ -1,27 +1,3 @@
-/**
- * <p>Original Author: Daniel Freeman</p>
- *
- * <p>Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:</p>
- *
- * <p>The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.</p>
- *
- * <p>THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.</p>
- *
- * <p>Licensed under The MIT License</p>
- * <p>Redistributions of files must retain the above copyright notice.</p>
- */
 package
 {
 	import com.danielfreeman.madcomponents.*;
@@ -36,6 +12,23 @@ package
 
 	
 	public class MadComponents extends Sprite {
+		
+		protected static const FRUIT_DATA:XML = <data>
+											<Apple/>
+											<Orange/>
+											<Banana/>
+											<Pineapple/>
+											<Lemon/>
+											<Mango/>
+											<Plum/>
+											<Cherry/>
+											<Lime/>
+											<Peach/>
+											<Pomegranate/>
+											<Grapefruit/>
+											<Strawberry/>
+											<Melon/>
+										</data>;
 
 		protected static const COLUMNS:XML = <columns alignH="fill">
 												<button>one</button><button>two</button><button>three</button>
@@ -61,20 +54,39 @@ package
 											</vertical>;
 		
 		protected static const LIST0:XML = <list id="list0" colour="#FFFFFF" background="#CCCCCC,#FFFFFF">
+												{FRUIT}
 												<horizontal><image id="image">48</image><vertical><label id="label"/><label id="label2"/></vertical></horizontal>
 											</list>;
 		
 		protected static const LIST1:XML = <list id="list1" gapV="16" background="#EEFFEE,#778877" colour="#000000">
-												<horizontal><label id="label"/><arrow colour="#FFDDCC" alignH="right"/></horizontal>
+												<horizontal><label id="label"/><arrow colour="#FFDDCC" alignH="right"/></horizontal>								
 											</list>;
 		
-		protected static const LIST2:XML = <list id="list2" background="#BBBBFF,#BBBBFF,#CCCCFF" colour="#BBBBFF"/>;
+		protected static const LIST2:XML = <list id="list2" background="#BBBBFF,#BBBBFF,#CCCCFF" colour="#BBBBFF">
+												{FRUIT_DATA}
+												<font color="#333366"/>											
+											</list>;
 		
 		protected static const LIST_GROUPS:XML = <groupedList id="list4" background="#333333,#FF9999,#FF9966,#FFFF99,#99FF99,#9999FF" gapH="64" gapV="10"/>;
 		
-		protected static const TICK_LIST:XML = <tickList gapV="6" id="tickList" colour="#333333" background="#EEEEEE"/>;
+		protected static const TICK_LIST:XML = <tickOneList gapV="6" id="tickList" colour="#333333" background="#EEEEEE">{FRUIT_DATA}</tickOneList>;
 		
-		protected static const FLIPPER:XML = <viewFlipper background="#CCCC00,#CCCC33" scrollBarColour="#FFFFFF">{LAYOUT0}{LAYOUT1}{LIST_GROUPS}</viewFlipper>;
+		protected static const DATA_GRID:XML = <dataGrid colour="#999999" background="#888899,#EEEEFF,#DDDDEE">
+												<widths>30,30,40</widths>
+												<data>
+													<header>one,two,three</header>
+													<row>1,2,3</row>
+													<row>4,5,6</row>
+													<row>7,8,9</row>
+													<row>2,7,5</row>
+													<row>1,2,3</row>
+													<row>4,5,6</row>
+													<row>7,8,9</row>
+													<row>2,7,5</row>
+												</data>
+											</dataGrid>;
+		
+		protected static const FLIPPER:XML = <viewFlipper background="#CCCC00,#CCCC33" scrollBarColour="#FFFFFF">{LAYOUT0}{LAYOUT1}{DATA_GRID}</viewFlipper>;
 
 		protected static const LIST_GROUPS_RENDERER:XML = <groupedList id="list3" background="#C6CCD6,#FFFFFF" colour="#CCCC66" gapH="32" gapV="4">
 															<horizontal><label id="label"/><switch id="switch" colour="#996600" alignH="right"/></horizontal>
@@ -153,34 +165,10 @@ package
 			}
 			var uiList:UIList = UIList(UI.findViewById("list1"));
 			uiList.data = data1;
-
-			//Populate the third list
-			var data2:Array = [];
-			for (i=0; i<FRUIT.length; i++) {
-				data2.push({label:'<font color="#333366">'+FRUIT[i]+"</font>"});
-			}
-			var uiList2:UIList = UIList(UI.findViewById("list2"));
-			uiList2.data = data2;
 			
 			//Populate the grouped list
 			var uiGroupedList:UIGroupedList = UIGroupedList(UI.findViewById("list3"));
 			uiGroupedList.data = [[{label:FONT+"zero"+END_FONT}],[{label:FONT+"one"+END_FONT},{label:FONT+"two"+END_FONT},{label:FONT+"three"+END_FONT}],[{label:FONT+"four"+END_FONT},{label:FONT+"five"+END_FONT},{label:FONT+"six"+END_FONT}],[{label:FONT+"seven"+END_FONT},{label:FONT+"eight"+END_FONT},{label:FONT+"nine"+END_FONT},{label:FONT+"ten"+END_FONT}]];
-
-			//Populate the tick list
-			var data3:Array = [];
-			for (i=0; i<FRUIT.length; i++) {
-				data3.push({label:FRUIT[i]});
-			}
-			var uiTickList:UITickList = UITickList(UI.findViewById("tickList"));
-			uiTickList.data = data3;
-			
-			//Populate the colourful grouped list in views		
-			var uiGroupedListV:UIGroupedList = UIGroupedList(UI.findViewById("list4"));
-			var data4:Array = [];
-			for (i=0; i<5; i++) {
-				data4.push({label:'<font color="#663333"><b>'+FRUIT[i]+'</b></font>'});
-			}
-			uiGroupedListV.data = [data4];
 			
 			//Set up an images
 			var image0:UIImage = UIImage(UI.findViewById("image0"));
