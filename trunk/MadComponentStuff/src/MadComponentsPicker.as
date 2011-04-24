@@ -67,8 +67,10 @@ package
 		protected var _picker2:UIPicker;
 		
 		
-		public function MadComponentsPicker() {
-			var i:int;
+		public function MadComponentsPicker(screen:Sprite = null) {
+			if (screen)
+				screen.addChild(this);
+
 			stage.align = StageAlign.TOP_LEFT;  
 			stage.scaleMode = StageScaleMode.NO_SCALE;
 			
