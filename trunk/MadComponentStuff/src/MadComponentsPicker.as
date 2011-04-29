@@ -29,14 +29,9 @@ package
 	import flash.display.Sprite;
 	import flash.display.StageAlign;
 	import flash.display.StageScaleMode;
-	import flash.events.MouseEvent;
 
 	
 	public class MadComponentsPicker extends Sprite {
-
-		protected static const START:XML = <vertical>
-												<button id="popup" alignH="centre" alignV="centre">picker pop-up</button>
-											</vertical>;
 		
 		protected static const DATA:XML = <data>
 	    									<Red/>
@@ -48,23 +43,18 @@ package
 										 </data>;
 		
 		protected static const PICKER_EXAMPLE:XML = <vertical alignH="fill">
-											<columns gapH="0">
-												<picker id="picker1" background="#FFFFFF">
-													{DATA}
-												</picker>
-												<picker id="picker2" background="#FFFFFF">
-													{DATA}
-												</picker>
-											</columns>
-											<columns>
-												<button colour="#66CC66" id="cancel">cancel</button>
-												<button colour="#CC6666" id="ok">ok</button>
-											</columns>
-										</vertical>;
-
-		protected var _popUp:UIWindow;
-		protected var _picker1:UIPicker;
-		protected var _picker2:UIPicker;
+														<columns gapH="0">
+															<picker id="picker1" background="#FFFFFF">
+																{DATA}
+															</picker>
+															<picker id="picker2" background="#FFFFFF">
+																{DATA}
+															</picker>
+															<picker id="picker3" background="#FFFFFF">
+																{DATA}
+															</picker>
+														</columns>
+													</vertical>;
 		
 		
 		public function MadComponentsPicker(screen:Sprite = null) {
@@ -74,42 +64,7 @@ package
 			stage.align = StageAlign.TOP_LEFT;  
 			stage.scaleMode = StageScaleMode.NO_SCALE;
 			
-			UI.create(this, START);
-			
-			//Set up a pop-up window
-			_popUp = UI.createPopUp(PICKER_EXAMPLE,180.0,200.0);
-			UI.hidePopUp(_popUp);
-			
-			//references to picker1 and picker2
-			_picker1 = UIPicker(_popUp.findViewById("picker1"));
-			_picker2 = UIPicker(_popUp.findViewById("picker2"));
-
-			
-			//Listeners for showing and hiding pop-up
-			var showPopUpButton:UIButton = UIButton(UI.findViewById("popup"));
-			showPopUpButton.addEventListener(MouseEvent.MOUSE_UP,showPopUp);
-			
-			var okButton:UIButton = UIButton(_popUp.findViewById("ok"));
-			okButton.addEventListener(MouseEvent.MOUSE_UP,popUpOk);
-
-			var cancelButton:UIButton = UIButton(_popUp.findViewById("cancel"));
-			cancelButton.addEventListener(MouseEvent.MOUSE_UP,popUpCancel);
-		}
-		
-		
-		protected function showPopUp(event:MouseEvent):void {
-			UI.showPopUp(_popUp);
-		}
-		
-		
-		protected function popUpOk(event:MouseEvent):void {
-			trace("picker1.index="+_picker1.index+" picker2.index="+_picker2.index);
-			UI.hidePopUp(_popUp);
-		}
-		
-		
-		protected function popUpCancel(event:MouseEvent):void {
-			UI.hidePopUp(_popUp);
+			UI.create(this, PICKER_EXAMPLE);
 		}
 
 	}
