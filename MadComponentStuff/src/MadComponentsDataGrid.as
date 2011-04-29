@@ -29,7 +29,7 @@ package
 	import flash.display.Sprite;
 	import flash.display.StageAlign;
 	import flash.display.StageScaleMode;
-	import flash.events.MouseEvent;
+	import flash.events.Event;
 
 	
 	public class MadComponentsDataGrid extends Sprite {
@@ -37,8 +37,8 @@ package
 		protected static const DATA_GRID:XML = <vertical background="#FFCC33,#FFDD00">
 												<dataGrid id="grid" editable="true" background="#663300,#cc9900,#ff9933">
 												<widths>20,20,60</widths>
-												<data>
-													<header>one,two,three</header>
+												<header>one,two,three</header>
+												<data>										
 													<row>1,2,3</row>
 													<row>4,5,6</row>
 													<row>7,8,9</row>
@@ -62,11 +62,11 @@ package
 			UI.create(this, DATA_GRID);
 
 			var button:UIButton = UIButton(UI.findViewById("reload"));
-			button.addEventListener(MouseEvent.MOUSE_UP,reload);
+			button.addEventListener(UIButton.CLICKED,reload);
 		}
 
 		
-		protected function reload(event:MouseEvent):void {
+		protected function reload(event:Event):void {
 			var dataGrid:UIDataGrid = UIDataGrid(UI.findViewById("grid"));
 			dataGrid.dataProvider = _testData;
 			_testData[1][1] = 1;

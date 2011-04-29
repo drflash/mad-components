@@ -30,7 +30,6 @@ package
 	import flash.display.StageAlign;
 	import flash.display.StageScaleMode;
 	import flash.events.Event;
-	import flash.events.MouseEvent;
 	import flash.text.TextFormat;
 	import flash.utils.getQualifiedClassName;
 
@@ -53,15 +52,24 @@ package
 											<Strawberry/>
 											<Melon/>
 										</data>;
+		
+		protected static const DATA:XML = <data>
+											<Red/>
+											<Orange/>
+											<Yellow/>
+											<Green/>
+											<Blue/>
+											<Indigo/>
+										 </data>;
 
 		protected static const COLUMNS:XML = <columns alignH="fill">
 												<button>one</button><button>two</button><button>three</button>
 											</columns>;
 		
 		protected static const LAYOUT0:XML = <vertical>
-												<frame colour="#CC3333">{COLUMNS}</frame>
-												<frame colour="#33CC33">{COLUMNS}</frame>
-												<frame colour="#3333CC">{COLUMNS}</frame>
+												<frame colour="#993333">{COLUMNS}</frame>
+												<frame colour="#339933">{COLUMNS}</frame>
+												<frame colour="#333399">{COLUMNS}</frame>
 												<image/>
 												<button id="popup" alignH="centre">show pop-up</button>
 											</vertical>;
@@ -96,8 +104,8 @@ package
 		
 		protected static const DATA_GRID:XML = <dataGrid colour="#999999" background="#888899,#EEEEFF,#DDDDEE">
 												<widths>30,30,40</widths>
-												<data>
-													<header>one,two,three</header>
+												<header>one,two,three</header>
+												<data>	
 													<row>1,2,3</row>
 													<row>4,5,6</row>
 													<row>7,8,9</row>
@@ -119,9 +127,19 @@ package
 		
 		protected static const TAB_NAVIGATOR:XML = <tabPages id="tabPages" background="#333366,#333333" colour="#111122">{NAVIGATOR}{FLIPPER}</tabPages>;
 		
-		protected static const POPUP_WINDOW:XML = <vertical alignH="centre">
-													<label><font color="#FFFFFF">This is a pop-up</font></label>
-													<button id="ok"> cancel </button>
+		protected static const POPUP_WINDOW:XML = <vertical alignH="fill">
+													<columns gapH="0">
+														<picker id="picker1" background="#FFFFFF">
+															{DATA}
+														</picker>
+														<picker id="picker1" background="#FFFFFF">
+															{DATA}
+														</picker>
+													</columns>
+													<columns>
+														<button colour="#669966" id="cancel">cancel</button>
+														<button colour="#996666" id="ok">ok</button>
+													</columns>
 												</vertical>;
 
 		protected static const FONT:String = '<font size="20">';
@@ -211,24 +229,26 @@ package
 			navigator.text = "lists";
 			
 			//Set up a pop-up window
-			_popUp = UI.createPopUp(POPUP_WINDOW,128.0,64.0);
+			_popUp = UI.createPopUp(POPUP_WINDOW,180.0,200.0);
 			UI.hidePopUp(_popUp);
 			
 			var showPopUpButton:UIButton = UIButton(UI.findViewById("popup"));
-			showPopUpButton.addEventListener(MouseEvent.MOUSE_UP,showPopUp);
+			showPopUpButton.addEventListener(UIButton.CLICKED,showPopUp);
 			
 			var hidePopUpButton:UIButton = UIButton(_popUp.findViewById("ok"));
-			hidePopUpButton.addEventListener(MouseEvent.MOUSE_UP,hidePopUp);
+			hidePopUpButton.addEventListener(UIButton.CLICKED,hidePopUp);
 			
+			var cancelPopUpButton:UIButton = UIButton(_popUp.findViewById("cancel"));
+			cancelPopUpButton.addEventListener(UIButton.CLICKED,hidePopUp);
 		}
 		
 		
-		protected function showPopUp(event:MouseEvent):void {
+		protected function showPopUp(event:Event):void {
 			UI.showPopUp(_popUp);
 		}
 		
 		
-		protected function hidePopUp(event:MouseEvent):void {
+		protected function hidePopUp(event:Event):void {
 			UI.hidePopUp(_popUp);
 		}
 
