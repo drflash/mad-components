@@ -81,7 +81,7 @@ package
 													<vertical colour="#0000ff"><button alignH="fill">vertical1</button><button>vertical2</button></vertical>
 												</horizontal>
 												<horizontal>
-													<switch colour="#999999"/><switch colour="#FF8000">YES,NO</switch><image id="image0" alignH="right">48</image>
+													<switch colour="#666699"/><switch colour="#FF8000">YES,NO</switch><image id="image0" alignH="right">48</image>
 												</horizontal>
 											</vertical>;
 		
@@ -90,7 +90,8 @@ package
 											</list>;
 		
 		protected static const LIST1:XML = <list id="list1" gapV="16" background="#EEFFEE,#778877" colour="#000000">
-												<horizontal><label id="label"/><arrow colour="#FFDDCC" alignH="right"/></horizontal>								
+												{FRUIT_DATA}												
+												<horizontal><label id="label"><font color="#FFDDCC"/></label><arrow colour="#FFDDCC" alignH="right"/></horizontal>								
 											</list>;
 		
 		protected static const LIST2:XML = <list id="list2" background="#BBBBFF,#BBBBFF,#CCCCFF" colour="#BBBBFF">
@@ -202,14 +203,6 @@ package
 			}
 			var uiList1:UIList = UIList(UI.findViewById("list0"));
 			uiList1.data = data0;
-			
-			//Populate the second list
-			var data1:Array = [];
-			for (i=0; i<FRUIT.length; i++) {
-				data1.push({label:'<font color="#FFDDCC">'+FRUIT[i]+'</font>'});
-			}
-			var uiList:UIList = UIList(UI.findViewById("list1"));
-			uiList.data = data1;
 			
 			//Populate the grouped list
 			var uiGroupedList:UIGroupedList = UIGroupedList(UI.findViewById("list3"));
