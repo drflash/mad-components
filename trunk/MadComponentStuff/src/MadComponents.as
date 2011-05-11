@@ -30,6 +30,8 @@ package
 	import flash.display.StageAlign;
 	import flash.display.StageScaleMode;
 	import flash.events.Event;
+	import flash.events.FocusEvent;
+	import flash.events.MouseEvent;
 	import flash.text.TextFormat;
 	import flash.utils.getQualifiedClassName;
 
@@ -61,6 +63,24 @@ package
 											<Blue/>
 											<Indigo/>
 										 </data>;
+		
+		protected static const GROUPED_DATA:XML = <data>
+													<group label="one">
+														<Red/>
+														<Orange/>
+														<Yellow/>														
+													</group>
+													<group label="two">
+														<Green/>
+														<Blue/>
+														<Indigo/>
+													</group>
+													<group label="three">
+														<Pink/>
+														<Tangerine/>
+														<Purple/>
+													</group>
+												</data>;
 
 		protected static const COLUMNS:XML = <columns alignH="fill">
 												<button>one</button><button>two</button><button>three</button>
@@ -81,7 +101,7 @@ package
 													<vertical colour="#0000ff"><button alignH="fill">vertical1</button><button>vertical2</button></vertical>
 												</horizontal>
 												<horizontal>
-													<switch colour="#666699"/><switch colour="#FF8000">YES,NO</switch><image id="image0" alignH="right">48</image>
+													<switch id="switch" colour="#666699"/><switch colour="#FF8000">YES,NO</switch><image id="image0" alignH="right">48</image>
 												</horizontal>
 											</vertical>;
 		
@@ -99,9 +119,7 @@ package
 												<font color="#333366"/>											
 											</list>;
 		
-		protected static const LIST_GROUPS:XML = <groupedList id="list4" background="#333333,#FF9999,#FF9966,#FFFF99,#99FF99,#9999FF" gapH="64" gapV="10"/>;
-		
-		protected static const TICK_LIST:XML = <tickOneList gapV="6" id="tickList" colour="#333333" background="#EEEEEE">{FRUIT_DATA}</tickOneList>;
+		protected static const TICK_LIST:XML = <tickOneList gapV="6" id="tickList" colour="#BBBBCC" background="#FFFFFF,#FFFFFF,#F3F3FF">{FRUIT_DATA}</tickOneList>;
 		
 		protected static const DATA_GRID:XML = <dataGrid colour="#999999" background="#888899,#EEEEFF,#DDDDEE">
 												<widths>30,30,40</widths>
@@ -119,12 +137,19 @@ package
 											</dataGrid>;
 		
 		protected static const FLIPPER:XML = <viewFlipper background="#CCCC00,#CCCC33" scrollBarColour="#FFFFFF">{LAYOUT0}{LAYOUT1}{DATA_GRID}</viewFlipper>;
-
-		protected static const LIST_GROUPS_RENDERER:XML = <groupedList id="list3" background="#C6CCD6,#FFFFFF" colour="#CCCC66" gapH="32" gapV="4">
-															<horizontal><label id="label"/><switch id="switch" colour="#996600" alignH="right"/></horizontal>
+		
+		protected static const LIST_GROUPS_RENDERER:XML = <groupedList id="list3" background="#C6CCD6,#FFFFFF" colour="#CCCCCC" gapH="32" gapV="4">
+															<horizontal><label id="label"><font size="20"/></label><switch id="switch" colour="#996600" alignH="right"/></horizontal>
 														</groupedList>;
 		
-		protected static const NAVIGATOR:XML = <navigation background="#FFFFFF" id="navigator">{LIST0}{LIST1}{LIST2}{LIST_GROUPS_RENDERER}{TICK_LIST}</navigation>;
+		protected static const DIVIDED_LIST:XML = 	<frame colour="#9999AA" >
+														<search id="search"/>
+														<dividedList background="#FCFCFF">
+															{GROUPED_DATA}
+														</dividedList>
+													</frame>;
+		
+		protected static const NAVIGATOR:XML = <navigation background="#FFFFFF" colour="#9999AA" id="navigator">{LIST0}{LIST1}{LIST2}{DIVIDED_LIST}{LIST_GROUPS_RENDERER}{TICK_LIST}</navigation>;
 		
 		protected static const TAB_NAVIGATOR:XML = <tabPages id="tabPages" background="#333366,#333333" colour="#111122">{NAVIGATOR}{FLIPPER}</tabPages>;
 		
@@ -142,9 +167,14 @@ package
 														<button colour="#996666" id="ok">ok</button>
 													</columns>
 												</vertical>;
-
-		protected static const FONT:String = '<font size="20">';
-		protected static const END_FONT:String = "</font>";
+															
+		protected static const POPUP_MESSAGE:XML = <vertical alignH="fill">
+														<label><font color="#CCCCCC">The search isn't actually</font></label>
+														<label><font color="#CCCCCC">rigged up to anything in this</font></label>
+														<label><font color="#CCCCCC">demonstration</font></label>
+														<image/>
+														<button id="ok" background="#EEEEEE,#666666">OK</button>
+													</vertical>;
 		
 		
 		[Embed(source="images/mp3_48.png")]
@@ -178,6 +208,8 @@ package
 		protected static const FRUIT:Vector.<String> = new <String>["Apple","Orange","Banana","Pineapple","Lemon","Mango","Plum","Cherry","Lime","Peach","Pomegranate","Grapefruit","Strawberry","Melon"];
 		
 		protected var _popUp:UIWindow;
+		protected var _popUpMessage:UIWindow;
+		protected var uiSwitch:UISwitch;
 		
 		
 		public function MadComponents(screen:Sprite = null) {
@@ -204,9 +236,9 @@ package
 			var uiList1:UIList = UIList(UI.findViewById("list0"));
 			uiList1.data = data0;
 			
-			//Populate the grouped list
+			//Populate the grouped list.  (There is currently an issue doing this using XML)
 			var uiGroupedList:UIGroupedList = UIGroupedList(UI.findViewById("list3"));
-			uiGroupedList.data = [[{label:FONT+"zero"+END_FONT}],[{label:FONT+"one"+END_FONT},{label:FONT+"two"+END_FONT},{label:FONT+"three"+END_FONT}],[{label:FONT+"four"+END_FONT},{label:FONT+"five"+END_FONT},{label:FONT+"six"+END_FONT}],[{label:FONT+"seven"+END_FONT},{label:FONT+"eight"+END_FONT},{label:FONT+"nine"+END_FONT},{label:FONT+"ten"+END_FONT}]];
+			uiGroupedList.data = [[{label:"zero"}],[{label:"one"},{label:"two"},{label:"three"}],[{label:"four"},{label:"five"},{label:"six"}],[{label:"seven"},{label:"eight"},{label:"nine"},{label:"ten"}]];
 			
 			//Set up an images
 			var image0:UIImage = UIImage(UI.findViewById("image0"));
@@ -221,6 +253,21 @@ package
 			var navigator:UINavigation = UINavigation(UI.findViewById("navigator"));
 			navigator.text = "lists";
 			
+			//Listen for switch
+			uiSwitch = UISwitch(UI.findViewById("switch"));
+			uiSwitch.addEventListener(Event.CHANGE,toggleActivity);
+			
+			//Listen for search
+			var uiSearch:UISearch = UISearch(UI.findViewById("search"));
+			uiSearch.addEventListener(FocusEvent.FOCUS_OUT,showPopUpMessage);
+
+			//Set up a pop-up message		
+			_popUpMessage = UI.createPopUp(POPUP_MESSAGE,200.0,90.0);
+			UI.hidePopUp(_popUpMessage);
+			var okBtn:UIButton = UIButton(_popUpMessage.findViewById("ok"));
+			okBtn.addEventListener(UIButton.CLICKED,hidePopUpMessage);
+			
+			
 			//Set up a pop-up window
 			_popUp = UI.createPopUp(POPUP_WINDOW,180.0,200.0);
 			UI.hidePopUp(_popUp);
@@ -233,6 +280,27 @@ package
 			
 			var cancelPopUpButton:UIButton = UIButton(_popUp.findViewById("cancel"));
 			cancelPopUpButton.addEventListener(UIButton.CLICKED,hidePopUp);
+		}
+		
+		
+		protected function showPopUpMessage(event:FocusEvent):void {
+			if (!_popUpMessage.visible)
+				UI.showPopUp(_popUpMessage);
+		}
+		
+		
+		protected function hidePopUpMessage(event:Event):void {
+			UI.hidePopUp(_popUpMessage);
+		}		
+		
+		
+		protected function toggleActivity(event:Event):void {
+			if (uiSwitch.state) {
+				UI.showActivityIndicator();
+			}
+			else {
+				UI.hideActivityIndicator();
+			}
 		}
 		
 		
