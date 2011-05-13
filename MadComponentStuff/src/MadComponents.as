@@ -22,6 +22,7 @@
  * <p>Licensed under The MIT License</p>
  * <p>Redistributions of files must retain the above copyright notice.</p>
  */
+
 package
 {
 	import com.danielfreeman.madcomponents.*;
@@ -139,13 +140,14 @@ package
 		protected static const FLIPPER:XML = <viewFlipper background="#CCCC00,#CCCC33" scrollBarColour="#FFFFFF">{LAYOUT0}{LAYOUT1}{DATA_GRID}</viewFlipper>;
 		
 		protected static const LIST_GROUPS_RENDERER:XML = <groupedList id="list3" background="#C6CCD6,#FFFFFF" colour="#CCCCCC" gapH="32" gapV="4">
-															<horizontal><label id="label"><font size="20"/></label><switch id="switch" colour="#996600" alignH="right"/></horizontal>
+			{GROUPED_DATA}															
+<horizontal><label id="label"><font size="18"/></label><switch id="switch" colour="#996600" alignH="right"/></horizontal>
 														</groupedList>;
 		
-		protected static const DIVIDED_LIST:XML = 	<frame colour="#9999AA" >
-														<search id="search"/>
-														<dividedList background="#FCFCFF">
+		protected static const DIVIDED_LIST:XML = 	<frame>
+														<dividedList>
 															{GROUPED_DATA}
+															<search id="search"/>
 														</dividedList>
 													</frame>;
 		
@@ -225,8 +227,8 @@ package
 
 			//Set up the tab buttons
 			var uiTabPages:UITabPages = UITabPages(UI.findViewById("tabPages"));
-			uiTabPages.setTab(0, "lists", LIST_ICON, LIST_ICON_HIGHLIGHT);
-			uiTabPages.setTab(1,"view flipper", VIEWS_ICON, VIEWS_ICON_HIGHLIGHT);
+			uiTabPages.setTab(0, "lists", LIST_ICON);
+			uiTabPages.setTab(1,"view flipper", VIEWS_ICON);
 			
 			//Populate the first list
 			var data0:Array = [];
@@ -235,11 +237,7 @@ package
 			}
 			var uiList1:UIList = UIList(UI.findViewById("list0"));
 			uiList1.data = data0;
-			
-			//Populate the grouped list.  (There is currently an issue doing this using XML)
-			var uiGroupedList:UIGroupedList = UIGroupedList(UI.findViewById("list3"));
-			uiGroupedList.data = [[{label:"zero"}],[{label:"one"},{label:"two"},{label:"three"}],[{label:"four"},{label:"five"},{label:"six"}],[{label:"seven"},{label:"eight"},{label:"nine"},{label:"ten"}]];
-			
+
 			//Set up an images
 			var image0:UIImage = UIImage(UI.findViewById("image0"));
 			image0.imageClass = PALM;
