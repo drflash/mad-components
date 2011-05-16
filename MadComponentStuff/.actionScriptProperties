@@ -24,13 +24,12 @@
           <libraryPathEntry kind="3" linkType="1" path="${PROJECT_FRAMEWORKS}/libs/automation_agent.swc" useDefaultLinkType="false"/>
         </excludedEntries>
       </libraryPathEntry>
-      <libraryPathEntry kind="3" linkType="1" path="lib/MadComponentsLib0_3_5.swc" useDefaultLinkType="false"/>
+      <libraryPathEntry kind="3" linkType="1" path="lib/MadComponentsLib0_3_6.swc" useDefaultLinkType="false"/>
     </libraryPath>
     <sourceAttachmentPath/>
   </compiler>
   <applications>
     <application path="MadComponentsPicker.as"/>
-    <application path="MadComponentsDataGrid.as"/>
     <application path="MadComponents.as"/>
     <application path="MadComponentsTree.as"/>
   </applications>

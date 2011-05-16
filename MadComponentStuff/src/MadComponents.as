@@ -35,6 +35,7 @@ package
 	import flash.events.MouseEvent;
 	import flash.text.TextFormat;
 	import flash.utils.getQualifiedClassName;
+	import flash.system.Capabilities;
 
 	
 	public class MadComponents extends Sprite {
@@ -82,12 +83,15 @@ package
 														<Purple/>
 													</group>
 												</data>;
-
+		
 		protected static const COLUMNS:XML = <columns alignH="fill">
-												<button>one</button><button>two</button><button>three</button>
-											</columns>;
+												<button>one</button>
+												<button>two</button>
+												<button>three</button>
+											</columns>
 		
 		protected static const LAYOUT0:XML = <vertical>
+												<label id="player"><font color="#FFFFFF"/></label>
 												<frame colour="#993333">{COLUMNS}</frame>
 												<frame colour="#339933">{COLUMNS}</frame>
 												<frame colour="#333399">{COLUMNS}</frame>
@@ -96,71 +100,105 @@ package
 											</vertical>;
 		
 		protected static const LAYOUT1:XML = <vertical background="#EEEEEE,#FFFFFF" colour="#99CC99">
-												<button alignH="fill" colour="#00ff00">a button</button>
-												<horizontal><button>hello</button><input alignH="fill" background="#7777AA,#555588"/></horizontal>
-												<horizontal><label id="label0">hello world</label><button colour="#ff9000">hi</button>
-													<vertical colour="#0000ff"><button alignH="fill">vertical1</button><button>vertical2</button></vertical>
+												<button alignH="fill" colour="#990000"><font size="50" color="#FFCC66"><b>big button</b></font></button>
+												<horizontal>
+													<button>hello</button>
+													<input alignH="fill" background="#667766,#EEEEEE"/>
 												</horizontal>
 												<horizontal>
-													<switch id="switch" colour="#666699"/><switch colour="#FF8000">YES,NO</switch><image id="image0" alignH="right">48</image>
+													<label id="label0">hello world</label>
+													<button colour="#ff9000">hi</button>
+													<vertical colour="#0000ff">
+														<button alignH="fill">vertical1</button>
+														<button>vertical2</button>
+													</vertical>
+												</horizontal>
+												<horizontal>
+													<switch id="switch" colour="#666699"/>
+													<switch colour="#FF8000">YES,NO</switch>
+													<image id="image0" alignH="right">48</image>
 												</horizontal>
 											</vertical>;
 		
-		protected static const LIST0:XML = <list id="list0" colour="#FFFFFF" background="#CCCCCC,#FFFFFF">
-												<horizontal><image id="image">48</image><vertical><label id="label"/><label id="label2"/></vertical></horizontal>
+		protected static const LIST0:XML = <list id="list0" colour="#FFFFFF" background="#CCCCCC,#FFFFFF">												
+												<horizontal>
+													<image id="image">48</image>
+													<vertical>
+														<label id="label"/>
+														<label id="label2"/>
+													</vertical>
+												</horizontal>
 											</list>;
 		
-		protected static const LIST1:XML = <list id="list1" gapV="16" background="#EEFFEE,#778877" colour="#000000">
+		protected static const LIST1:XML = <list id="list1" gapV="16" background="#EEFFEE,#778877" colour="#000000">	
 												{FRUIT_DATA}												
-												<horizontal><label id="label"><font color="#FFDDCC"/></label><arrow colour="#FFDDCC" alignH="right"/></horizontal>								
+												<horizontal>
+													<label id="label"><font color="#FFDDCC"/></label>
+													<arrow colour="#FFDDCC" alignH="right"/>
+												</horizontal>								
 											</list>;
 		
-		protected static const LIST2:XML = <list id="list2" background="#BBBBFF,#BBBBFF,#CCCCFF" colour="#BBBBFF">
+		protected static const LIST2:XML = <list id="list2" background="#AAAACC,#AAAACC,#9999CC" colour="#AAAACC">
 												{FRUIT_DATA}
-												<font color="#333366"/>											
+												<font color="#FFFFFF"/>											
 											</list>;
 		
-		protected static const TICK_LIST:XML = <tickOneList gapV="6" id="tickList" colour="#BBBBCC" background="#FFFFFF,#FFFFFF,#F3F3FF">{FRUIT_DATA}</tickOneList>;
+		protected static const TICK_LIST:XML = <tickOneList gapV="6" id="tickList" colour="#BBBBCC" tickColour="#333344" background="#FFFFFF,#FFFFFF,#F3F3FF">
+													{FRUIT_DATA}
+												</tickOneList>;
 		
-		protected static const DATA_GRID:XML = <dataGrid colour="#999999" background="#888899,#EEEEFF,#DDDDEE">
-												<widths>30,30,40</widths>
-												<header>one,two,three</header>
-												<data>	
-													<row>1,2,3</row>
-													<row>4,5,6</row>
-													<row>7,8,9</row>
-													<row>2,7,5</row>
-													<row>1,2,3</row>
-													<row>4,5,6</row>
-													<row>7,8,9</row>
-													<row>2,7,5</row>
-												</data>
-											</dataGrid>;
+		protected static const PICKER:XML = <columns gapH="0" background="#9999AA">
+														<picker id="picker1" colour="#FFFFFF" background="#CC9999">
+															<font color="#FFFFFF"/>
+															{DATA}
+														</picker>
+														<picker>
+															{DATA}
+														</picker>
+														<picker>
+															{DATA}
+														</picker>
+													</columns>;
 		
-		protected static const FLIPPER:XML = <viewFlipper background="#CCCC00,#CCCC33" scrollBarColour="#FFFFFF">{LAYOUT0}{LAYOUT1}{DATA_GRID}</viewFlipper>;
+		protected static const FLIPPER:XML = <viewFlipper background="#CCCC00,#CCCC33" scrollBarColour="#FFFFFF">
+												{LAYOUT0}
+												{PICKER}
+												{LAYOUT1}
+											</viewFlipper>;
 		
-		protected static const LIST_GROUPS_RENDERER:XML = <groupedList id="list3" background="#C6CCD6,#FFFFFF" colour="#CCCCCC" gapH="32" gapV="4">
-			{GROUPED_DATA}															
-<horizontal><label id="label"><font size="18"/></label><switch id="switch" colour="#996600" alignH="right"/></horizontal>
+		protected static const LIST_GROUPS_RENDERER:XML = <groupedList id="list3" background="#C6CCD6,#FFFFFF" colour="#CCCCCC" gapH="32" gapV="4" alignV="centre">
+															{GROUPED_DATA}															
+															<horizontal>
+																<label id="label"><font size="18"/></label>
+																<switch id="switch" colour="#996600" alignH="right"/>
+															</horizontal>
 														</groupedList>;
 		
-		protected static const DIVIDED_LIST:XML = 	<frame>
-														<dividedList>
-															{GROUPED_DATA}
-															<search id="search"/>
-														</dividedList>
-													</frame>;
+		protected static const DIVIDED_LIST:XML = 	<dividedList>
+														<search id="search"/>
+														{GROUPED_DATA}
+													</dividedList>;
 		
-		protected static const NAVIGATOR:XML = <navigation background="#FFFFFF" colour="#9999AA" id="navigator">{LIST0}{LIST1}{LIST2}{DIVIDED_LIST}{LIST_GROUPS_RENDERER}{TICK_LIST}</navigation>;
+		protected static const NAVIGATOR:XML = <navigation background="#FFFFFF" colour="#666677" id="navigator">
+													{LIST0}
+													{LIST1}
+													{LIST2}
+													{DIVIDED_LIST}
+													{LIST_GROUPS_RENDERER}
+													{TICK_LIST}
+												</navigation>;
 		
-		protected static const TAB_NAVIGATOR:XML = <tabPages id="tabPages" background="#333366,#333333" colour="#111122">{NAVIGATOR}{FLIPPER}</tabPages>;
+		protected static const TAB_NAVIGATOR:XML = <tabPages id="tabPages" background="#99AA99,#999999" colour="#111122">
+														{NAVIGATOR}
+														{FLIPPER}
+													</tabPages>;
 		
 		protected static const POPUP_WINDOW:XML = <vertical alignH="fill">
 													<columns gapH="0">
-														<picker id="picker1" background="#FFFFFF">
+														<picker id="picker1" background="#FFFFEE">
 															{DATA}
 														</picker>
-														<picker id="picker1" background="#FFFFFF">
+														<picker id="picker1" background="#EEEEFF">
 															{DATA}
 														</picker>
 													</columns>
@@ -169,15 +207,12 @@ package
 														<button colour="#996666" id="ok">ok</button>
 													</columns>
 												</vertical>;
-															
-		protected static const POPUP_MESSAGE:XML = <vertical alignH="fill">
-														<label><font color="#CCCCCC">The search isn't actually</font></label>
-														<label><font color="#CCCCCC">rigged up to anything in this</font></label>
-														<label><font color="#CCCCCC">demonstration</font></label>
-														<image/>
-														<button id="ok" background="#EEEEEE,#666666">OK</button>
-													</vertical>;
 		
+		protected static const POPUP_MESSAGE:XML = <vertical alignH="fill">
+														<label><font color="#CCCCCC">The search isn't actually rigged up to anything in this demonstration</font></label>
+														<image/>
+														<button id="ok" background="#9999AA">OK</button>
+													</vertical>;		
 		
 		[Embed(source="images/mp3_48.png")]
 		protected static const MP3:Class;
@@ -200,11 +235,6 @@ package
 		[Embed(source="images/views.png")]
 		protected static const VIEWS_ICON:Class;
 		
-		[Embed(source="images/list_highlight.png")]
-		protected static const LIST_ICON_HIGHLIGHT:Class;
-		
-		[Embed(source="images/views_highlight.png")]
-		protected static const VIEWS_ICON_HIGHLIGHT:Class;
 		
 		protected static const PICTURES:Vector.<Class> = new <Class>[MP3, MP4, PALM, PSP, USB];
 		protected static const FRUIT:Vector.<String> = new <String>["Apple","Orange","Banana","Pineapple","Lemon","Mango","Plum","Cherry","Lime","Peach","Pomegranate","Grapefruit","Strawberry","Melon"];
@@ -224,6 +254,9 @@ package
 			stage.scaleMode = StageScaleMode.NO_SCALE;
 			
 			UI.create(this, TAB_NAVIGATOR);
+			
+			var player:UILabel = UILabel(UI.findViewById("player"));
+			player.text = "playerType="+Capabilities.playerType;
 
 			//Set up the tab buttons
 			var uiTabPages:UITabPages = UITabPages(UI.findViewById("tabPages"));
@@ -264,7 +297,6 @@ package
 			UI.hidePopUp(_popUpMessage);
 			var okBtn:UIButton = UIButton(_popUpMessage.findViewById("ok"));
 			okBtn.addEventListener(UIButton.CLICKED,hidePopUpMessage);
-			
 			
 			//Set up a pop-up window
 			_popUp = UI.createPopUp(POPUP_WINDOW,180.0,200.0);
