@@ -100,7 +100,7 @@ package
 											</vertical>;
 		
 		protected static const LAYOUT1:XML = <vertical background="#EEEEEE,#FFFFFF" colour="#99CC99">
-												<button alignH="fill" colour="#990000"><font size="50" color="#FFCC66"><b>big button</b></font></button>
+												<button alignH="fill" colour="#990000"><font size="50" color="#FF3333"><b>big button</b></font></button>
 												<horizontal>
 													<button>hello</button>
 													<input alignH="fill" background="#667766,#EEEEEE"/>

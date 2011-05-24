@@ -43,14 +43,25 @@ package
 										 </data>;
 		
 		protected static const PICKER_EXAMPLE:XML = <vertical alignH="fill">
-														<columns gapH="0">
-															<picker id="picker1" background="#FFFFFF">
+														<columns gapH="0" widths="40,50%,50%">
+															<picker alignH="centre">
+																<data>
+																	<item label="0"/>
+																	<item label="1"/>
+																	<item label="2"/>
+																	<item label="3"/>
+																	<item label="4"/>
+																	<item label="5"/>
+																	<item label="6"/>
+																	<item label="7"/>
+																	<item label="8"/>
+																	<item label="9"/>
+																</data>
+															</picker>
+															<picker>
 																{DATA}
 															</picker>
-															<picker id="picker2" background="#FFFFFF">
-																{DATA}
-															</picker>
-															<picker id="picker3" background="#FFFFFF">
+															<picker>
 																{DATA}
 															</picker>
 														</columns>
