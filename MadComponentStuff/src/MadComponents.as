@@ -33,9 +33,9 @@ package
 	import flash.events.Event;
 	import flash.events.FocusEvent;
 	import flash.events.MouseEvent;
+	import flash.system.Capabilities;
 	import flash.text.TextFormat;
 	import flash.utils.getQualifiedClassName;
-	import flash.system.Capabilities;
 
 	
 	public class MadComponents extends Sprite {
@@ -159,10 +159,16 @@ package
 															{DATA}
 														</picker>
 													</columns>;
+															
+		protected static const PICKER_SLIDER:XML = <vertical>
+														{PICKER}
+														<slider id="slider1" value="0.2" alignH="fill"/>
+														<slider id="slider2" value="0.2" width="130" background="#CCCC00,#999933,#AAAA99"/>	
+													</vertical>
 		
 		protected static const FLIPPER:XML = <viewFlipper background="#CCCC00,#CCCC33" scrollBarColour="#FFFFFF">
 												{LAYOUT0}
-												{PICKER}
+												{PICKER_SLIDER}
 												{LAYOUT1}
 											</viewFlipper>;
 		
@@ -243,6 +249,9 @@ package
 		protected var _popUpMessage:UIWindow;
 		protected var uiSwitch:UISwitch;
 		
+		protected var _slider1:UISlider;
+		protected var _slider2:UISlider;
+		
 		
 		public function MadComponents(screen:Sprite = null) {
 			var i:int;
@@ -298,6 +307,12 @@ package
 			var okBtn:UIButton = UIButton(_popUpMessage.findViewById("ok"));
 			okBtn.addEventListener(UIButton.CLICKED,hidePopUpMessage);
 			
+			//Listen to slider
+			_slider1 = UISlider(UI.findViewById("slider1"));
+			_slider1.addEventListener(Event.CHANGE,change);
+			
+			_slider2 = UISlider(UI.findViewById("slider2"));
+			
 			//Set up a pop-up window
 			_popUp = UI.createPopUp(POPUP_WINDOW,180.0,200.0);
 			UI.hidePopUp(_popUp);
@@ -341,6 +356,11 @@ package
 		
 		protected function hidePopUp(event:Event):void {
 			UI.hidePopUp(_popUp);
+		}
+		
+		
+		protected function change(event:Event):void {
+			_slider2.value = _slider1.value;
 		}
 
 	}

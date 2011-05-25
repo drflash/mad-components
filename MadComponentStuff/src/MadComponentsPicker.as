@@ -42,8 +42,7 @@ package
 											<Indigo/>
 										 </data>;
 		
-		protected static const PICKER_EXAMPLE:XML = <vertical alignH="fill">
-														<columns gapH="0" widths="40,50%,50%">
+		protected static const PICKER_EXAMPLE:XML = <columns gapH="0" widths="40,50%,50%">
 															<picker alignH="centre">
 																<data>
 																	<item label="0"/>
@@ -58,14 +57,13 @@ package
 																	<item label="9"/>
 																</data>
 															</picker>
-															<picker>
+															<picker index="1">
 																{DATA}
 															</picker>
-															<picker>
+															<picker index="4">
 																{DATA}
 															</picker>
-														</columns>
-													</vertical>;
+														</columns>;
 		
 		
 		public function MadComponentsPicker(screen:Sprite = null) {
