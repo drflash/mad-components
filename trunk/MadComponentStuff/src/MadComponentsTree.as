@@ -79,7 +79,7 @@ package
 			
 		protected static const DETAIL:XML = <vertical>
 												<label id="detail" alignH="centre" alignV="centre">ggg</label>
-											</vertical>
+											</vertical>;
 							
 	
 		protected static const TREE_NAVIGATOR:XML = <treeNavigation id="tree">
