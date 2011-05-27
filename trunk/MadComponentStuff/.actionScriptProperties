@@ -24,14 +24,17 @@
           <libraryPathEntry kind="3" linkType="1" path="${PROJECT_FRAMEWORKS}/libs/automation_agent.swc" useDefaultLinkType="false"/>
         </excludedEntries>
       </libraryPathEntry>
-      <libraryPathEntry kind="3" linkType="1" path="lib/MadComponentsLib0_3_8.swc" useDefaultLinkType="false"/>
+      <libraryPathEntry kind="1" linkType="1" path="lib"/>
     </libraryPath>
     <sourceAttachmentPath/>
   </compiler>
   <applications>
+    <application path="MadComponentsPurePicker.as"/>
     <application path="MadComponentsPicker.as"/>
+    <application path="MadComponentsPure.as"/>
     <application path="MadComponents.as"/>
     <application path="MadComponentsTree.as"/>
+    <application path="MadComponentsPureList.as"/>
   </applications>
   <modules/>
   <buildCSSFiles/>
