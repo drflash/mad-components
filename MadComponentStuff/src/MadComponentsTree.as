@@ -30,7 +30,7 @@ package
 	import flash.display.StageAlign;
 	import flash.display.StageScaleMode;
 	import flash.events.Event;
-
+	
 	
 	public class MadComponentsTree extends Sprite {
 		
@@ -68,27 +68,28 @@ package
 												</Lounge>
 											</Household>
 											<Colours>
-    											<Red/>
-        										<Orange/>
-        										<Yellow/>
-        										<Green/>
-        										<Blue/>
+												<Red/>
+												<Orange/>
+												<Yellow/>
+												<Green/>
+												<Blue/>
 												<Indigo/>
 											</Colours>
 										</data>;
-			
+		
 		protected static const DETAIL:XML = <vertical>
-												<label id="detail" alignH="centre" alignV="centre">ggg</label>
+												<label id="detail" width="100" alignH="centre" alignV="centre"/>
 											</vertical>;
-							
-	
-		protected static const TREE_NAVIGATOR:XML = <treeNavigation id="tree">
-														{DATA}
-														{DETAIL}
-													</treeNavigation>;
+		
+		
+		protected static const TREE_NAVIGATOR:XML = <treeNavigation id="tree" title="categories">
+			{DATA}
+			{DETAIL}
+		</treeNavigation>;
 		
 		
 		protected var _detail:UILabel;
+		protected var _uiTreeNavigation:UITreeNavigation;
 		
 		
 		public function MadComponentsTree(screen:Sprite = null) {
@@ -99,17 +100,28 @@ package
 			stage.scaleMode = StageScaleMode.NO_SCALE;
 			
 			UI.create(this, TREE_NAVIGATOR);
-
-			var uiTreeNavigation:UITreeNavigation = UITreeNavigation(UI.findViewById("tree"));
-			uiTreeNavigation.addEventListener(Event.COMPLETE,treeComplete);
+			
+			_uiTreeNavigation = UITreeNavigation(UI.findViewById("tree"));
+			_uiTreeNavigation.addEventListener(Event.CHANGE,treeChange);
+			_uiTreeNavigation.addEventListener(Event.COMPLETE,treeComplete);
 			
 			_detail = UILabel(UI.findViewById("detail"));
 		}
-
+		
+		
+		protected function treeChange(event:Event):void {
+			if (_uiTreeNavigation.pageNumber == 0) {
+				_uiTreeNavigation.text = "categories";
+			}
+			else {
+				_uiTreeNavigation.text = _uiTreeNavigation.label;
+			}
+		}
+		
 		
 		protected function treeComplete(event:Event):void {
 			_detail.text = UITreeNavigation(event.target).label;
 		}
-
+		
 	}
 }

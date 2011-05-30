@@ -64,6 +64,7 @@ package
 											<Green/>
 											<Blue/>
 											<Indigo/>
+											<Violet/>
 										 </data>;
 		
 		protected static const GROUPED_DATA:XML = <data>
@@ -148,14 +149,14 @@ package
 												</tickOneList>;
 		
 		protected static const PICKER:XML = <columns gapH="0" background="#9999AA">
-														<picker id="picker1" colour="#FFFFFF" background="#CC9999">
+														<picker id="picker1" colour="#FFFFFF" background="#CC9999" index="1">
 															<font color="#FFFFFF"/>
 															{DATA}
 														</picker>
-														<picker>
+														<picker index="3">
 															{DATA}
 														</picker>
-														<picker>
+														<picker index="5">
 															{DATA}
 														</picker>
 													</columns>;
@@ -185,7 +186,7 @@ package
 														{GROUPED_DATA}
 													</dividedList>;
 		
-		protected static const NAVIGATOR:XML = <navigation background="#FFFFFF" colour="#666677" id="navigator">
+		protected static const NAVIGATOR:XML = <navigation title="lists" background="#FFFFFF" colour="#666677" id="navigator">
 													{LIST0}
 													{LIST1}
 													{LIST2}
@@ -194,7 +195,7 @@ package
 													{TICK_LIST}
 												</navigation>;
 		
-		protected static const TAB_NAVIGATOR:XML = <tabPages id="tabPages" background="#99AA99,#999999" colour="#111122">
+		protected static const TAB_NAVIGATOR:XML = <tabPages id="tabPages" stageColour="#99AA99,#999999" colour="#111122">
 														{NAVIGATOR}
 														{FLIPPER}
 													</tabPages>;
@@ -218,7 +219,8 @@ package
 														<label><font color="#CCCCCC">The search isn't actually rigged up to anything in this demonstration</font></label>
 														<image/>
 														<button id="ok" background="#9999AA">OK</button>
-													</vertical>;		
+													</vertical>;
+		
 		
 		[Embed(source="images/mp3_48.png")]
 		protected static const MP3:Class;
@@ -251,6 +253,8 @@ package
 		
 		protected var _slider1:UISlider;
 		protected var _slider2:UISlider;
+		
+		protected var _navigator:UINavigation;
 		
 		
 		public function MadComponents(screen:Sprite = null) {
@@ -289,9 +293,12 @@ package
 			label0.defaultTextFormat = new TextFormat("Arial",14,0xFFFFFF);
 			label0.text = "White text";
 			
-			//Set up navigation title
-			var navigator:UINavigation = UINavigation(UI.findViewById("navigator"));
-			navigator.text = "lists";
+			//Set up navigation right buttons and listeners
+			_navigator = UINavigation(UI.findViewById("navigator"));
+			_navigator.addEventListener(Event.CHANGE,navigatorChange);
+			_navigator.navigationBar.rightArrow.visible = true;
+			_navigator.navigationBar.rightArrow.addEventListener(MouseEvent.MOUSE_UP,nextList);
+			_navigator.navigationBar.rightButton.addEventListener(UIButton.CLICKED,goBack);
 			
 			//Listen for switch
 			uiSwitch = UISwitch(UI.findViewById("switch"));
@@ -325,6 +332,8 @@ package
 			
 			var cancelPopUpButton:UIButton = UIButton(_popUp.findViewById("cancel"));
 			cancelPopUpButton.addEventListener(UIButton.CLICKED,hidePopUp);
+			
+			
 		}
 		
 		
@@ -361,6 +370,25 @@ package
 		
 		protected function change(event:Event):void {
 			_slider2.value = _slider1.value;
+		}
+		
+		
+		protected function nextList(event:Event):void {
+			_navigator.nextPage(UIPages.SLIDE_LEFT);
+			navigatorChange();
+		}
+		
+		
+		protected function goBack(event:Event):void {
+			_navigator.previousPage(UIPages.SLIDE_RIGHT);
+			navigatorChange();
+		}
+		
+		
+		protected function navigatorChange(event:Event=null):void {
+			var lastPage:Boolean = _navigator.pageNumber == _navigator.pages.length -1;
+			_navigator.navigationBar.rightArrow.visible = !lastPage;
+			_navigator.navigationBar.rightButton.visible = lastPage;
 		}
 
 	}
