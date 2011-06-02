@@ -36,7 +36,9 @@ package
 	
 	public class MadComponentsPure extends Sprite {
 		
-		public function MadComponentsPure() {
+		public function MadComponentsPure(screen:Sprite = null) {
+			if (screen)
+				screen.addChild(this);
 			
 			stage.align = StageAlign.TOP_LEFT;  
 			stage.scaleMode = StageScaleMode.NO_SCALE;

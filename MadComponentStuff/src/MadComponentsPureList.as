@@ -36,7 +36,9 @@ package
 	
 	public class MadComponentsPureList extends Sprite {
 		
-		public function MadComponentsPureList() {
+		public function MadComponentsPureList(screen:Sprite = null) {
+			if (screen)
+				screen.addChild(this);
 			
 			stage.align = StageAlign.TOP_LEFT;  
 			stage.scaleMode = StageScaleMode.NO_SCALE;
