@@ -29,6 +29,7 @@
     <sourceAttachmentPath/>
   </compiler>
   <applications>
+    <application path="MadComponentsTree2.as"/>
     <application path="MadComponents9Patch.as"/>
     <application path="MadComponentsDividedList.as"/>
     <application path="MadComponentsPurePicker.as"/>
