@@ -125,8 +125,8 @@ package
 												<horizontal>
 													<image id="image">48</image>
 													<vertical>
-														<label id="label"/>
-														<label id="label2"/>
+														<label id="label"><font size="18"/></label>
+														<label id="label2"><font color="#666666" size="11"/></label>
 													</vertical>
 												</horizontal>
 											</list>;
@@ -279,7 +279,7 @@ package
 			//Populate the first list
 			var data0:Array = [];
 			for (i=0; i<FRUIT.length; i++) {
-				data0.push({label:'<font size="18">'+FRUIT[i]+'</font>', image:getQualifiedClassName(PICTURES[i%PICTURES.length]), label2:'<font color="#666666" size="11">here is some small text</font>'});
+				data0.push({label:FRUIT[i], image:getQualifiedClassName(PICTURES[i%PICTURES.length]), label2:"here is some small text"});
 			}
 			var uiList1:UIList = UIList(UI.findViewById("list0"));
 			uiList1.data = data0;
