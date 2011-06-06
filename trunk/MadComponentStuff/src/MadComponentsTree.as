@@ -75,6 +75,7 @@ package
 												<Blue/>
 												<Indigo/>
 											</Colours>
+											<Nothing/>
 										</data>;
 		
 		protected static const DETAIL:XML = <vertical>
