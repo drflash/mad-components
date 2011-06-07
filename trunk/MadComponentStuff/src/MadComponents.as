@@ -104,7 +104,7 @@ package
 												<button alignH="fill" colour="#990000"><font size="50" color="#FF3333"><b>big button</b></font></button>
 												<horizontal>
 													<button>hello</button>
-													<input alignH="fill" background="#667766,#EEEEEE"/>
+													<input alignH="fill" background="#445544,#EEFFEE,#889988"/>
 												</horizontal>
 												<horizontal>
 													<label id="label0">hello world</label>
@@ -219,8 +219,7 @@ package
 														<label><font color="#CCCCCC">The search isn't actually rigged up to anything in this demonstration</font></label>
 														<image/>
 														<button id="ok" background="#9999AA">OK</button>
-													</vertical>;
-		
+													</vertical>;		
 		
 		[Embed(source="images/mp3_48.png")]
 		protected static const MP3:Class;
@@ -279,7 +278,7 @@ package
 			//Populate the first list
 			var data0:Array = [];
 			for (i=0; i<FRUIT.length; i++) {
-				data0.push({label:FRUIT[i], image:getQualifiedClassName(PICTURES[i%PICTURES.length]), label2:"here is some small text"});
+				data0.push({label:FRUIT[i], image:getQualifiedClassName(PICTURES[i%PICTURES.length]), label2:'here is some small text'});
 			}
 			var uiList1:UIList = UIList(UI.findViewById("list0"));
 			uiList1.data = data0;
