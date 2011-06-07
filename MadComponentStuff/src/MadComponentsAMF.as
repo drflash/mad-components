@@ -35,7 +35,6 @@ package
 	import flash.display.StageAlign;
 	import flash.display.StageScaleMode;
 	import flash.events.Event;
-	import flash.events.FocusEvent;
 	
 	public class MadComponentsAMF extends Sprite {
 
@@ -113,7 +112,6 @@ package
 		
 		protected function pageChange(event:Event):void {
 			if (_navigator.pageNumber == 1) {
-			//	_navigator.title = _navigator.row.label;
 				_detail.data = {image:null};
 				_detail.model.loadAMF("","",[_navigator.row.id]);
 			}
