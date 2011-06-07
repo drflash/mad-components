@@ -110,7 +110,7 @@ package
 														{GROUPED_DATA}
 													</dividedList>;
 		
-		protected static const NAVIGATOR:XML = <navigation title="lists" background="#FFFFFF" colour="#666677" id="navigator" rightButton="next">
+		protected static const NAVIGATOR:XML = <navigation title="lists" background="#FFFFFF" colour="#666677" id="navigator" rightButton="next" autoTitle="label">
 													{LIST1}
 													{LIST2}
 													{DIVIDED_LIST}
