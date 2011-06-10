@@ -31,7 +31,6 @@ package
 	import flash.display.StageAlign;
 	import flash.display.StageScaleMode;
 	import flash.events.Event;
-	import flash.events.FocusEvent;
 	import flash.events.MouseEvent;
 	import flash.system.Capabilities;
 	import flash.text.TextFormat;
@@ -39,6 +38,11 @@ package
 
 	
 	public class MadComponents extends Sprite {
+		
+		[Embed(source="images/red.png",
+				scaleGridTop="40", scaleGridBottom="200",
+				scaleGridLeft="40", scaleGridRight="200")]
+		protected static const RED:Class;
 		
 		protected static const FRUIT_DATA:XML = <data>
 											<Apple/>
@@ -100,8 +104,8 @@ package
 												<button id="popup" alignH="centre">show pop-up</button>
 											</vertical>;
 		
-		protected static const LAYOUT1:XML = <vertical background="#EEEEEE,#FFFFFF" colour="#99CC99">
-												<button alignH="fill" colour="#990000"><font size="50" color="#FF3333"><b>big button</b></font></button>
+		protected static const LAYOUT1:XML = <vertical colour="#99CC99" background="#AAAAAA,#BBBBBB,6">
+												<button alignH="fill" colour="#990000" id="bigButton"><font size="50" color="#FF3333"><b>drawer</b></font></button>
 												<horizontal>
 													<button>hello</button>
 													<input alignH="fill" background="#445544,#EEFFEE,#889988"/>
@@ -140,6 +144,7 @@ package
 											</list>;
 		
 		protected static const LIST2:XML = <list id="list2" background="#AAAACC,#AAAACC,#9999CC" colour="#AAAACC">
+												<search field="label"/>
 												{FRUIT_DATA}
 												<font color="#FFFFFF"/>											
 											</list>;
@@ -149,8 +154,8 @@ package
 												</tickOneList>;
 		
 		protected static const PICKER:XML = <columns gapH="0" background="#9999AA">
-														<picker id="picker1" colour="#FFFFFF" background="#CC9999" index="1">
-															<font color="#FFFFFF"/>
+														<picker id="picker1" colour="#FFFFFF" background="#EECC66" index="1">
+															<font color="#996633"/>
 															{DATA}
 														</picker>
 														<picker index="3">
@@ -161,15 +166,23 @@ package
 														</picker>
 													</columns>;
 															
-		protected static const PICKER_SLIDER:XML = <vertical>
+		protected static const PICKER_SLIDER:XML = <vertical background="#999999,#BBBBBB">
 														{PICKER}
 														<slider id="slider1" value="0.2" alignH="fill"/>
-														<slider id="slider2" value="0.2" width="130" background="#CCCC00,#999933,#AAAA99"/>	
-													</vertical>
+														<horizontal>
+															<slider id="slider2" value="0.2" width="130" background="#CCCC00,#999933,#AAAA99"/>
+															<button id="slideDown" colour="#CC9933" alignH="right" alt="true">slide down</button>
+														</horizontal>
+													</vertical>;
+		
+		protected static const NINE_PATCH:XML = <vertical background="#FFCC33">
+					<button skin={getQualifiedClassName(RED)} height="200" alignH="fill"><font size="30"><b>button 1</b></font></button>
+					<button id="slideUp" skin={getQualifiedClassName(RED)} height="100" alignH="fill"><font size="30">slide up</font></button>
+				</vertical>;
 		
 		protected static const FLIPPER:XML = <viewFlipper background="#CCCC00,#CCCC33" scrollBarColour="#FFFFFF">
 												{LAYOUT0}
-												{PICKER_SLIDER}
+												{NINE_PATCH}
 												{LAYOUT1}
 											</viewFlipper>;
 		
@@ -181,8 +194,7 @@ package
 															</horizontal>
 														</groupedList>;
 		
-		protected static const DIVIDED_LIST:XML = 	<dividedList>
-														<search id="search"/>
+		protected static const DIVIDED_LIST:XML = 	<dividedList background="#DDDDDD">
 														{GROUPED_DATA}
 													</dividedList>;
 		
@@ -193,11 +205,29 @@ package
 													{DIVIDED_LIST}
 													{LIST_GROUPS_RENDERER}
 													{TICK_LIST}
-												</navigation>;
+												</navigation>;			
+													
+		protected static const DRAWER:XML = <vertical background="#333333" colour="#99AA99">
+												<columns>
+													<button alignH="fill">option 1</button>
+													<button alignH="fill">option 2</button>
+												</columns>
+												<columns>
+													<button alignH="fill">option 3</button>
+													<button alignH="fill">option 4</button>
+												</columns>
+												<button id="dismiss" colour="#CC9933" alignH="fill">dismiss</button>
+											</vertical>;
+													
+		protected static const PAGES:XML =		<pages id="pages">
+													{FLIPPER}
+													{DRAWER}
+													{PICKER_SLIDER}
+												</pages>
 		
 		protected static const TAB_NAVIGATOR:XML = <tabPages id="tabPages" stageColour="#99AA99,#999999" colour="#111122">
 														{NAVIGATOR}
-														{FLIPPER}
+														{PAGES}
 													</tabPages>;
 		
 		protected static const POPUP_WINDOW:XML = <vertical alignH="fill">
@@ -213,13 +243,8 @@ package
 														<button colour="#669966" id="cancel">cancel</button>
 														<button colour="#996666" id="ok">ok</button>
 													</columns>
-												</vertical>;
-		
-		protected static const POPUP_MESSAGE:XML = <vertical alignH="fill">
-														<label><font color="#CCCCCC">The search isn't actually rigged up to anything in this demonstration</font></label>
-														<image/>
-														<button id="ok" background="#9999AA">OK</button>
-													</vertical>;		
+												</vertical>;												
+
 		
 		[Embed(source="images/mp3_48.png")]
 		protected static const MP3:Class;
@@ -247,13 +272,17 @@ package
 		protected static const FRUIT:Vector.<String> = new <String>["Apple","Orange","Banana","Pineapple","Lemon","Mango","Plum","Cherry","Lime","Peach","Pomegranate","Grapefruit","Strawberry","Melon"];
 		
 		protected var _popUp:UIWindow;
-		protected var _popUpMessage:UIWindow;
 		protected var uiSwitch:UISwitch;
 		
 		protected var _slider1:UISlider;
 		protected var _slider2:UISlider;
 		
 		protected var _navigator:UINavigation;
+		protected var _pages:UIPages;
+		protected var _bigButton:UIButton;
+		protected var _dismiss:UIButton;
+		protected var _slideUp:UIButton;
+		protected var _slideDown:UIButton;
 		
 		
 		public function MadComponents(screen:Sprite = null) {
@@ -303,21 +332,32 @@ package
 			uiSwitch = UISwitch(UI.findViewById("switch"));
 			uiSwitch.addEventListener(Event.CHANGE,toggleActivity);
 			
-			//Listen for search
-			var uiSearch:UISearch = UISearch(UI.findViewById("search"));
-			uiSearch.addEventListener(FocusEvent.FOCUS_OUT,showPopUpMessage);
-
-			//Set up a pop-up message		
-			_popUpMessage = UI.createPopUp(POPUP_MESSAGE,200.0,90.0);
-			UI.hidePopUp(_popUpMessage);
-			var okBtn:UIButton = UIButton(_popUpMessage.findViewById("ok"));
-			okBtn.addEventListener(UIButton.CLICKED,hidePopUpMessage);
-			
 			//Listen to slider
 			_slider1 = UISlider(UI.findViewById("slider1"));
 			_slider1.addEventListener(Event.CHANGE,change);
 			
 			_slider2 = UISlider(UI.findViewById("slider2"));
+			
+			//Listeners for slide-up drawer
+			_pages = UIPages(UI.findViewById("pages"));
+			
+			_bigButton = UIButton(UI.findViewById("bigButton"));
+			_bigButton.addEventListener(UIButton.CLICKED, drawerUp);
+			
+			_dismiss = UIButton(UI.findViewById("dismiss"));
+			_dismiss.addEventListener(UIButton.CLICKED, drawerDown);
+			
+			//Listener for slideUp
+			_slideUp = UIButton(UI.findViewById("slideUp"));
+			_slideUp.addEventListener(UIButton.CLICKED, slideUp);
+			
+			//Listener for slideDown
+			_slideDown = UIButton(UI.findViewById("slideDown"));
+			_slideDown.addEventListener(UIButton.CLICKED, slideDown);
+
+			//Listener for big button
+			_bigButton = UIButton(UI.findViewById("bigButton"));
+			_bigButton.addEventListener(UIButton.CLICKED, drawerUp);
 			
 			//Set up a pop-up window
 			_popUp = UI.createPopUp(POPUP_WINDOW,180.0,200.0);
@@ -336,15 +376,24 @@ package
 		}
 		
 		
-		protected function showPopUpMessage(event:FocusEvent):void {
-			if (!_popUpMessage.visible)
-				UI.showPopUp(_popUpMessage);
+		protected function drawerUp(event:Event):void {
+			_pages.goToPage(1, UIPages.DRAWER_UP);
 		}
 		
 		
-		protected function hidePopUpMessage(event:Event):void {
-			UI.hidePopUp(_popUpMessage);
-		}		
+		protected function drawerDown(event:Event):void {
+			_pages.goToPage(1, UIPages.DRAWER_DOWN);
+		}	
+		
+		
+		protected function slideUp(event:Event):void {
+			_pages.goToPage(2, UIPages.SLIDE_UP);
+		}
+		
+		
+		protected function slideDown(event:Event):void {
+			_pages.goToPage(2, UIPages.SLIDE_DOWN);
+		}
 		
 		
 		protected function toggleActivity(event:Event):void {
