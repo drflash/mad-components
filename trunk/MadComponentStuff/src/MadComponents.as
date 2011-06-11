@@ -194,7 +194,7 @@ package
 															</horizontal>
 														</groupedList>;
 		
-		protected static const DIVIDED_LIST:XML = 	<dividedList background="#DDDDDD">
+		protected static const DIVIDED_LIST:XML = 	<dividedList background="#EEEEEE">
 														{GROUPED_DATA}
 													</dividedList>;
 		
