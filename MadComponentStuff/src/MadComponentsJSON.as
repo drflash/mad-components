@@ -23,7 +23,6 @@
  * <p>Redistributions of files must retain the above copyright notice.</p>
  */
 
-
 package
 {
 	import com.danielfreeman.madcomponents.*;
@@ -35,6 +34,8 @@ package
 	import flash.events.MouseEvent;
 	
 	public class MadComponentsJSON extends Sprite {
+		
+		protected static const SMALL_TEXT:XML = <font size="12"/>;
 		
 		protected static const TRENDS_VIEW:XML =
 			
@@ -54,8 +55,8 @@ package
 				<horizontal>
 					<imageLoader id="profile_image_url"/>
 					<vertical gapV="0">
-						<label id="from_user" alignH="fill"><font size="12"/></label>
-						<label id="text" alignH="fill"><font size="12"/></label>
+						<label id="from_user" alignH="fill"></label>
+						<label id="text" alignH="fill">{SMALL_TEXT}</label>
 					</vertical>
 				</horizontal>
 			</list>;
@@ -63,16 +64,16 @@ package
 		
 		protected static const USER_DETAIL:XML =
 			
-			<columns id="detail" widths="50,100%">
-				<model path="user" autoLayout="true"/>
+			<columns id="detail" widths="50,100%" autoLayout="true">
+				<model path="user"/>
 			
 				<imageLoader id="profile_image_url"/>
 				<vertical>			
 					<label id="name" alignH="fill"/>
-					<label id="screen_name"><font size="12"/></label>
-					<label id="location" alignH="fill"><font size="12"/></label>
+					<label id="screen_name">{SMALL_TEXT}</label>
+					<label id="location" alignH="fill">{SMALL_TEXT}</label>
 					<label/>
-					<label id="description" alignH="fill"><font size="12"/></label>
+					<label id="description" alignH="fill">{SMALL_TEXT}</label>
 				</vertical>
 			</columns>;
 		
