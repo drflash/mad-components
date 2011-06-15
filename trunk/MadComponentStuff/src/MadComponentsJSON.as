@@ -52,6 +52,8 @@ package
 			<list autoLayout="true" id="tweetsView">
 				<model path="results"/>
 			
+				<search field="text"/>
+			
 				<horizontal>
 					<imageLoader id="profile_image_url"/>
 					<vertical gapV="0">
