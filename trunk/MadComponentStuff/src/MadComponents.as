@@ -187,12 +187,12 @@ package
 											</viewFlipper>;
 		
 		protected static const LIST_GROUPS_RENDERER:XML = <groupedList id="list3" background="#C6CCD6,#FFFFFF" colour="#CCCCCC" gapH="32" gapV="4" alignV="centre">
-															{GROUPED_DATA}															
-															<horizontal>
-																<label id="label"><font size="18"/></label>
-																<switch id="switch" colour="#996600" alignH="right"/>
-															</horizontal>
-														</groupedList>;
+													{GROUPED_DATA}															
+												<horizontal>
+													<label alignV="centre" id="label"><font size="18"/></label>
+													<switch id="switch" colour="#996600" alignV="centre" alignH="right"/>
+												</horizontal>
+											</groupedList>;
 		
 		protected static const DIVIDED_LIST:XML = 	<dividedList background="#EEEEEE">
 														{GROUPED_DATA}
