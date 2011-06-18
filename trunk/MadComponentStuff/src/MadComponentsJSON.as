@@ -82,7 +82,7 @@ package
 		
 		protected static const NAVIGATOR:XML =
 			
-			<navigation id="navigation" rightButton="  " title="Twitter Trends">
+			<navigation id="navigation" rightButton="" title="Twitter Trends">
 				{TRENDS_VIEW}
 				{TWEETS_VIEW}
 				{USER_DETAIL}
@@ -112,6 +112,7 @@ package
 			
 			_navigation = UINavigation(UI.findViewById("navigation"));
 			_navigation.navigationBar.rightButton.skinClass = REFRESH;
+			_navigation.navigationBar.rightButtonText = "";
 			_navigation.navigationBar.rightButton.addEventListener(UIButton.CLICKED, refresh);
 			_navigation.navigationBar.backButton.addEventListener(MouseEvent.MOUSE_UP, goBack);
 		}

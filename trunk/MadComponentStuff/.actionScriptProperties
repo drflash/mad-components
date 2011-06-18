@@ -29,6 +29,7 @@
     <sourceAttachmentPath/>
   </compiler>
   <applications>
+    <application path="MadHelloWorld.as"/>
     <application path="MadComponentsJSON.as"/>
     <application path="MadComponentsAMF.as"/>
     <application path="MadComponentsNavigation.as"/>
