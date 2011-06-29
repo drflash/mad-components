@@ -95,7 +95,7 @@ package
 												<button>three</button>
 											</columns>
 		
-		protected static const LAYOUT0:XML = <vertical>
+		protected static const LAYOUT0:XML = <vertical background="#999999,#9999AA">
 												<label id="player"><font color="#FFFFFF"/></label>
 												<frame colour="#993333">{COLUMNS}</frame>
 												<frame colour="#339933">{COLUMNS}</frame>
@@ -153,7 +153,7 @@ package
 													{FRUIT_DATA}
 												</tickOneList>;
 		
-		protected static const PICKER:XML = <columns gapH="0" background="#9999AA">
+		protected static const PICKER:XML = <columns gapH="0" background="#9999AA" pickerHeight="180">
 														<picker id="picker1" colour="#FFFFFF" background="#EECC66" index="1">
 															<font color="#996633"/>
 															{DATA}
@@ -168,11 +168,11 @@ package
 															
 		protected static const PICKER_SLIDER:XML = <vertical background="#999999,#BBBBBB">
 														{PICKER}
-														<slider id="slider1" value="0.2" alignH="fill"/>
 														<horizontal>
 															<slider id="slider2" value="0.2" width="130" background="#CCCC00,#999933,#AAAA99"/>
 															<button id="slideDown" colour="#CC9933" alignH="right" alt="true">slide down</button>
 														</horizontal>
+<slider id="slider1" value="0.2" alignH="fill"/>
 													</vertical>;
 		
 		protected static const NINE_PATCH:XML = <vertical background="#FFCC33">
