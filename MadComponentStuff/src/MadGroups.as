@@ -24,30 +24,42 @@
  */
 package
 {
-	import com.danielfreeman.madcomponents.*;
-	
 	import flash.display.Sprite;
 	import flash.display.StageAlign;
 	import flash.display.StageScaleMode;
-	import flash.events.MouseEvent;
 	import flash.utils.getQualifiedClassName;
 	
-	public class MadImage extends Sprite
+	import com.danielfreeman.madcomponents.*;
+	
+	public class MadGroups extends Sprite
 	{
-		[Embed(source="images/mp3_48.png")]
-		protected static const MP3:Class;
+		[Embed(source="images/palm_48.png")]
+		protected static const PALM:Class;
+
+		protected static const CONTACTS:XML = <vertical background="#E9E9EF,#EFEFEF,8" colour="#CCCCCC">
+												<horizontal>
+													<image>{getQualifiedClassName(PALM)}</image>
+													<clickableGroup gapV="30">
+														<label>Daniel</label>
+														<label>Freeman</label>
+														<horizontal>
+															<label>Freelance Developer</label>
+															<arrow alignH="right"/>
+														</horizontal>
+													</clickableGroup>
+												</horizontal>
+													<group gapV="30">
+														<label>doc.android@gmail.com</label>
+														<label>Mobile app developer</label>
+													</group>
+													<columns alignH="fill">
+														<button/>
+														<button/>
+														<button/>
+													</columns>
+											</vertical>;
 		
-		[Embed(source="images/mp4_48.png")]
-		protected static const MP4:Class;
-		
-		protected static const IMAGE:XML = <image id="myImage" alignH="centre" alignV="centre">
-			{getQualifiedClassName(MP3)}
-		</image>;
-		
-		protected var _myImage:UIImage;
-		protected var _toggle:Boolean = true;
-		
-		public function MadImage(screen:Sprite = null)
+		public function MadGroups(screen:Sprite = null)
 		{
 			if (screen)
 				screen.addChild(this);
@@ -55,17 +67,7 @@ package
 			stage.align = StageAlign.TOP_LEFT;  
 			stage.scaleMode = StageScaleMode.NO_SCALE;
 			
-			UI.create(this, IMAGE);
-			
-			_myImage = UIImage(UI.findViewById("myImage"));
-			_myImage.addEventListener(MouseEvent.MOUSE_UP,clicked);
-			_myImage.mouseEnabled = true;
-		}
-		
-		
-		protected function clicked(event:MouseEvent):void {
-			_toggle = !_toggle;
-			_myImage.imageClass = _toggle ? MP3 : MP4;
+			UI.create(this, CONTACTS);
 		}
 	}
 }

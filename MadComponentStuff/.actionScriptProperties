@@ -29,6 +29,7 @@
     <sourceAttachmentPath/>
   </compiler>
   <applications>
+    <application path="MadGroups.as"/>
     <application path="MadComponentsScrollXY.as"/>
     <application path="MadImage.as"/>
     <application path="MadHelloWorld.as"/>
