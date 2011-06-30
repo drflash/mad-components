@@ -29,51 +29,46 @@ package
 	import flash.display.Sprite;
 	import flash.display.StageAlign;
 	import flash.display.StageScaleMode;
-
+	import flash.events.Event;
 	
-	public class MadComponentsPicker extends Sprite {
-		
+	public class MadTickList extends Sprite
+	{		
 		protected static const DATA:XML = <data>
-	    									<Red/>
-	        								<Orange/>
-	        								<Yellow/>
-	        								<Green/>
-	        								<Blue/>
-											<Indigo/>
-										 </data>;
+											<Sneezy/>
+											<Sleepy/>
+											<Dopey/>
+											<Doc/>
+											<Happy/>
+											<Bashful/>
+											<Grumpy/>
+										</data>;
 		
-		protected static const PICKER_EXAMPLE:XML = <columns gapH="0" widths="40,50%,50%" pickerHeight="180">
-															<picker alignH="centre">
-																<data>
-																	<item label="0"/>
-																	<item label="1"/>
-																	<item label="2"/>
-																	<item label="3"/>
-																	<item label="4"/>
-																	<item label="5"/>
-																	<item label="6"/>
-																	<item label="7"/>
-																	<item label="8"/>
-																	<item label="9"/>
-																</data>
-															</picker>
-															<picker index="1">
-																{DATA}
-															</picker>
-															<picker index="4">
-																{DATA}
-															</picker>
-														</columns>;
+		protected static const TICKLIST:XML = <tickList id="ticks">
+											{DATA}
+										</tickList>;
 		
+		protected var _tickList:UITickList;
 		
-		public function MadComponentsPicker(screen:Sprite = null) {
+		public function MadTickList(screen:Sprite = null)
+		{
 			if (screen)
 				screen.addChild(this);
-
+			
 			stage.align = StageAlign.TOP_LEFT;  
 			stage.scaleMode = StageScaleMode.NO_SCALE;
 			
-			UI.create(this, PICKER_EXAMPLE);
+			UI.create(this, TICKLIST);
+			
+			_tickList = UITickList(UI.findViewById("ticks"));
+			_tickList.addEventListener(Event.CHANGE, tickListChanged);
+		}
+		
+		
+		protected function tickListChanged(event:Event):void {
+			trace();
+			for each(var item:uint in _tickList.tickIndexes) {
+				trace(UILabel(_tickList.findViewById("label",item)).text);
+			}
 		}
 	}
 }

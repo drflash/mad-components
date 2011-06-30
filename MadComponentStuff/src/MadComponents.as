@@ -95,7 +95,7 @@ package
 												<button>three</button>
 											</columns>
 		
-		protected static const LAYOUT0:XML = <vertical background="#999999,#9999AA">
+		protected static const LAYOUT0:XML = <vertical background="#999999,#9999AA,6,0">
 												<label id="player"><font color="#FFFFFF"/></label>
 												<frame colour="#993333">{COLUMNS}</frame>
 												<frame colour="#339933">{COLUMNS}</frame>
@@ -186,7 +186,7 @@ package
 												{LAYOUT1}
 											</viewFlipper>;
 		
-		protected static const LIST_GROUPS_RENDERER:XML = <groupedList id="list3" background="#C6CCD6,#FFFFFF" colour="#CCCCCC" gapH="32" gapV="4" alignV="centre">
+		protected static const LIST_GROUPS_RENDERER:XML = <groupedList id="list3" background="#C6CCD6" colour="#CCCCCC" gapH="32" gapV="4" alignV="centre">
 													{GROUPED_DATA}															
 												<horizontal>
 													<label alignV="centre" id="label"><font size="18"/></label>
