@@ -29,51 +29,60 @@ package
 	import flash.display.Sprite;
 	import flash.display.StageAlign;
 	import flash.display.StageScaleMode;
-
 	
-	public class MadComponentsPicker extends Sprite {
-		
+	public class MadLists extends Sprite
+	{		
 		protected static const DATA:XML = <data>
-	    									<Red/>
-	        								<Orange/>
-	        								<Yellow/>
-	        								<Green/>
-	        								<Blue/>
-											<Indigo/>
-										 </data>;
+											<Sneezy/>
+											<Sleepy/>
+											<Dopey/>
+											<Doc/>
+											<Happy/>
+											<Bashful/>
+											<Grumpy/>
+										</data>;
 		
-		protected static const PICKER_EXAMPLE:XML = <columns gapH="0" widths="40,50%,50%" pickerHeight="180">
-															<picker alignH="centre">
-																<data>
-																	<item label="0"/>
-																	<item label="1"/>
-																	<item label="2"/>
-																	<item label="3"/>
-																	<item label="4"/>
-																	<item label="5"/>
-																	<item label="6"/>
-																	<item label="7"/>
-																	<item label="8"/>
-																	<item label="9"/>
-																</data>
-															</picker>
-															<picker index="1">
-																{DATA}
-															</picker>
-															<picker index="4">
-																{DATA}
-															</picker>
-														</columns>;
+		protected static const GROUPED_DATA:XML =
 		
+			<data>
+				<group label="dwarfs">
+					<Sneezy/>
+					<Sleepy/>
+					<Dopey/>
+					<Doc/>
+					<Happy/>
+					<Bashful/>
+					<Grumpy/>
+				</group>
+				<group label="reindeer">
+					<Dasher/>
+					<Dancer/>
+					<Prancer/>
+					<Vixen/>
+					<Comet/>
+					<Cupid/>
+					<Donder/>
+					<Blitzen/>
+				</group>
+			</data>
 		
-		public function MadComponentsPicker(screen:Sprite = null) {
+		protected static const LIST:XML = <list>
+											{DATA}
+										</list>;
+		
+		protected static const DIVIDED_LIST:XML = <dividedList>
+			{GROUPED_DATA}
+		</dividedList>;
+		
+		public function MadLists(screen:Sprite = null)
+		{
 			if (screen)
 				screen.addChild(this);
-
+			
 			stage.align = StageAlign.TOP_LEFT;  
 			stage.scaleMode = StageScaleMode.NO_SCALE;
 			
-			UI.create(this, PICKER_EXAMPLE);
+			UI.create(this, DIVIDED_LIST);
 		}
 	}
 }
