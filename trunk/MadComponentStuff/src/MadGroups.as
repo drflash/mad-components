@@ -39,20 +39,26 @@ package
 		protected static const CONTACTS:XML = <vertical background="#E9E9EF,#EFEFEF,8" colour="#CCCCCC">
 												<horizontal>
 													<image>{getQualifiedClassName(PALM)}</image>
-													<clickableGroup gapV="30">
-														<label>Daniel</label>
-														<label>Freeman</label>
+													<group>
+														<input alignH="fill" prompt="First" alt="true" background="#FFFFFF,#FFFFFF,#FFFFFF"/>
+														<input alignH="fill" prompt="Last" alt="true" background="#FFFFFF,#FFFFFF,#FFFFFF"/>
+													</group>
+												</horizontal>
+													<clickableGroup gapV="30" id="clickableGroup">
+														<horizontal lines="true">
+															<label alignV="centre"><font size="14" color="#6666CC">phone:</font></label>
+															<input alignH="fill" prompt="number" alt="true" background="#FFFFFF,#FFFFFF,#FFFFFF"/>
+														</horizontal>
 														<horizontal>
-															<label>Freelance Developer</label>
-															<arrow alignH="right"/>
+															<label alignV="centre">Freelance Developer</label>
+															<arrow alignV="centre" alignH="right"/>
 														</horizontal>
 													</clickableGroup>
-												</horizontal>
 													<group gapV="30">
 														<label>doc.android@gmail.com</label>
 														<label>Mobile app developer</label>
 													</group>
-													<columns alignH="fill">
+													<columns alignH="fill" colour="#666666">
 														<button/>
 														<button/>
 														<button/>
@@ -68,6 +74,9 @@ package
 			stage.scaleMode = StageScaleMode.NO_SCALE;
 			
 			UI.create(this, CONTACTS);
+			
+			var clickableGroup:UIForm = UIForm(UI.findViewById("clickableGroup"));
+			clickableGroup.disableClickableGroupRows([0]);
 		}
 	}
 }

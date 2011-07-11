@@ -39,7 +39,7 @@ package
 		
 		protected static const TRENDS_VIEW:XML =
 			
-			<list id="trendsView">
+			<list id="trendsView" pullDownRefresh="true" pullDownColour="#666666">
 				<model url="http://api.twitter.com/1/trends.json" path="trends" action="loadJSON">
 					<name>label</name>
 					<url/>
@@ -49,7 +49,7 @@ package
 		
 		protected static const TWEETS_VIEW:XML =
 			
-			<list autoLayout="true" id="tweetsView">
+			<list autoLayout="true" id="tweetsView" pullDownRefresh="true" pullDownColour="#666666">
 				<model path="results"/>
 			
 				<search field="text"/>
