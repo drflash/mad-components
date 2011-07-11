@@ -108,7 +108,7 @@ package
 												<button alignH="fill" colour="#990000" id="bigButton"><font size="50" color="#FF3333"><b>drawer</b></font></button>
 												<horizontal>
 													<button>hello</button>
-													<input alignH="fill" background="#445544,#EEFFEE,#889988"/>
+													<input alignH="fill" prompt="input" background="#445544,#EEFFEE,#889988"/>
 												</horizontal>
 												<horizontal>
 													<label id="label0">hello world</label>
