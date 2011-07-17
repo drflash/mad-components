@@ -98,7 +98,10 @@ package
 		protected var _detail:UIForm;
 		protected var _navigator:UINavigation;
 
-		public function MadComponentsAMF() {
+		public function MadComponentsAMF(screen:Sprite = null) {
+			if (screen)
+				screen.addChild(this);
+			
 			stage.align = StageAlign.TOP_LEFT;  
 			stage.scaleMode = StageScaleMode.NO_SCALE;
 

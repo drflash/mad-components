@@ -97,7 +97,11 @@ package
 		protected var _tweetsView:UIList;
 		protected var _detail:UIForm;
 		
-		public function MadComponentsJSON() {
+		public function MadComponentsJSON(screen:Sprite) {
+			
+			if (screen)
+				screen.addChild(this);
+			
 			stage.align = StageAlign.TOP_LEFT;  
 			stage.scaleMode = StageScaleMode.NO_SCALE;
 			UI.create(this, NAVIGATOR);
