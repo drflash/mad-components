@@ -24,12 +24,13 @@
  */
 package
 {
+	import com.danielfreeman.madcomponents.*;
+	
 	import flash.display.Sprite;
 	import flash.display.StageAlign;
 	import flash.display.StageScaleMode;
+	import flash.events.Event;
 	import flash.utils.getQualifiedClassName;
-	
-	import com.danielfreeman.madcomponents.*;
 	
 	public class MadGroups extends Sprite
 	{
@@ -65,6 +66,8 @@ package
 													</columns>
 											</vertical>;
 		
+		protected var _clickableGroup:UIForm;
+		
 		public function MadGroups(screen:Sprite = null)
 		{
 			if (screen)
@@ -75,8 +78,14 @@ package
 			
 			UI.create(this, CONTACTS);
 			
-			var clickableGroup:UIForm = UIForm(UI.findViewById("clickableGroup"));
-			clickableGroup.disableClickableGroupRows([0]);
+			_clickableGroup = UIForm(UI.findViewById("clickableGroup"));
+			_clickableGroup.disableClickableGroupRows([0]);
+			_clickableGroup.addEventListener(UIForm.CLICKED, clickHandler);
+		}
+		
+		
+		protected function clickHandler(event:Event):void {
+			trace("row clicked="+_clickableGroup.index);
 		}
 	}
 }
