@@ -25,6 +25,7 @@
 package
 {
 	import com.danielfreeman.madcomponents.*;
+	import com.danielfreeman.extendedMadness.*;
 	
 	import flash.display.Sprite;
 	import flash.display.StageAlign;
@@ -113,6 +114,7 @@ package
 			stage.align = StageAlign.TOP_LEFT;  
 			stage.scaleMode = StageScaleMode.NO_SCALE;
 			
+			UIe.activate(this); // Gives us access to extended components
 			UI.create(this, TREE_NAVIGATOR);
 			
 			_uiTreeNavigation = UITreeNavigation(UI.findViewById("tree"));

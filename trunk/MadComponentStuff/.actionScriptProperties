@@ -29,6 +29,7 @@
     <sourceAttachmentPath/>
   </compiler>
   <applications>
+    <application path="MadComponentsDesktop.as"/>
     <application path="MadComponentsViewFlipper.as"/>
     <application path="MadTickList.as"/>
     <application path="MadLists.as"/>
