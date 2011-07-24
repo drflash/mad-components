@@ -133,18 +133,27 @@ package
 		
 		//The above SVG Dog was obtained from http://www.openclipart.org
 		
+		protected static const MATRIX:XML = <data>
+			<row>1,2,3,4</row>
+			<row>3,8,4,1</row>
+			<row>4,1,5,12</row>
+			<row>7,14,0,4</row>
+			<row>6,8,3,1</row>
+			<row>5,7,9,2</row>
+		</data>;
+		
+		protected static const NUMBERS:XML = <data>3,5,4,2,1</data>;
+		
+		
+		protected static const COLOURS:XML = <colours>#99FF99,#CC9999,#9999CC,#CCCC66,#CC9966</colours>;
+		
+		
 		protected static const DATAGRID:XML = <dataGrid>
 												<widths>20,15,30,35</widths>
 												<header>name,age,aaa,bbb</header>
-													<data>
-														<row>1,2,3,4</row>
-														<row>3,8,4,1</row>
-														<row>4,1,5,9</row>
-														<row>7,9,0,4</row>
-														<row>6,8,3,1</row>
-														<row>5,7,9,2</row>
-													</data>
-												</dataGrid>;
+													{MATRIX}
+											</dataGrid>;
+		
 		
 		protected static const DATA:XML = <data>
 											<Apple/>
@@ -154,28 +163,8 @@ package
 											<Lemon/>
 										</data>;
 		
-		protected static const LAYOUT1:XML = <vertical colour="#99CC99">
-												<horizontal>
-													<button>hello</button>
-													<input alignH="fill" prompt="input" background="#445544,#EEFFEE,#889988"/>
-												</horizontal>
-												<horizontal>
-													<label id="label0">hello world</label>
-													<button colour="#ff9000">hi</button>
-													<vertical colour="#0000ff">
-														<button alignH="fill">vertical1</button>
-														<button>vertical2</button>
-													</vertical>
-												</horizontal>
-												<horizontal>
-													<switch id="switch" colour="#666699"/>
-													<switch colour="#FF8000">YES,NO</switch>
-													<image id="image0" alignH="right">48</image>
-												</horizontal>
-											</vertical>;
-			
-			
-		protected static const LAYOUT:XML = <scrollBarVertical>
+		
+		protected static const LAYOUT:XML = <scrollBarVertical height="600">
 												<columns widths="500,100%">
 													<vertical>
 														<menu id="menu" value="Apple" width="200">
@@ -183,13 +172,13 @@ package
 															{DATA}
 														</menu>
 														<menu value="Apple" alt="true">
-															{DATA}
+														{DATA}
 														</menu>
 														<segmentedControl id="segmentedControl" width="500">
-															{DATA}
+														{DATA}
 														</segmentedControl>
 														<segmentedControl alt="true" background="#EEDDCC,#AA9933">
-															{DATA}
+														{DATA}
 														</segmentedControl>
 														<checkBox id="checkBox"/>
 														<checkBox alt="true"/>
@@ -204,14 +193,23 @@ package
 															<radioButton alt="true"/>
 														</columns>
 														{DOG}
-													</vertical>
-													<vertical>
+														</vertical>
+														<rows gapV="0">
+															<columns>
 														{DATAGRID}
-														{LAYOUT1}
-													</vertical>
+														<horizontalChart id="hChart" render="2D" palette="rainbow" paletteStart="5"/>
+													</columns>
+													<columns>
+														<pieChart>{COLOURS}{NUMBERS}</pieChart>
+														<barChart stack="true" palette="subtle" order="columns">{MATRIX}</barChart>
+													</columns>
+													<columns>
+														<lineChart>{MATRIX}</lineChart>
+														<scatterChart palette="greyscale0">{NUMBERS}</scatterChart>
+													</columns>
+												</rows>
 												</columns>
-											</scrollBarVertical>;
-		
+												</scrollBarVertical>;		
 												
 		protected var _segmentedControl:UISegmentedControl;
 		protected var _checkBox:UICheckBox;
@@ -247,6 +245,11 @@ package
 
 			_radioButtons = UIPanel(UI.findViewById("radioButtons"));
 			_radioButtons.addEventListener(UIRadioButton.TOGGLE, radioButtonsChanged);
+			
+			//Assign data to a graph
+			var hGraph:UIHorizontalChart = UIHorizontalChart(UI.findViewById("hChart"));
+			hGraph.data = [[4,3,2,5,6]];
+			// hGraph.xmlData = <data>4,3,2,5,6</data>;  //<- or do this
 		}
 		
 		
