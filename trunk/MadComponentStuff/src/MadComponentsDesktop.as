@@ -197,7 +197,7 @@ package
 														<rows gapV="0">
 															<columns>
 														{DATAGRID}
-														<horizontalChart id="hChart" render="2D" palette="rainbow" paletteStart="5"/>
+														<scatterChart palette="greyscale0">{NUMBERS}</scatterChart>
 													</columns>
 													<columns>
 														<pieChart>{COLOURS}{NUMBERS}</pieChart>
@@ -205,7 +205,7 @@ package
 													</columns>
 													<columns>
 														<lineChart>{MATRIX}</lineChart>
-														<scatterChart palette="greyscale0">{NUMBERS}</scatterChart>
+														<horizontalChart id="hChart" render="2D" palette="rainbow" paletteStart="5"/>
 													</columns>
 												</rows>
 												</columns>
