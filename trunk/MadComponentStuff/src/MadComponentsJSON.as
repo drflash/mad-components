@@ -97,7 +97,7 @@ package
 		protected var _tweetsView:UIList;
 		protected var _detail:UIForm;
 		
-		public function MadComponentsJSON(screen:Sprite) {
+		public function MadComponentsJSON(screen:Sprite = null) {
 			
 			if (screen)
 				screen.addChild(this);
