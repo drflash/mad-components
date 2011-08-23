@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx" minWidth="955" minHeight="600"
+			   xmlns:mad="custom.*">
+	
+	<fx:Script>
+		<![CDATA[
+			protected static const LAYOUT:XML = <horizontal>
+														<slider id="slider2" value="0.2" width="130" background="#CCCC00,#999933,#AAAA99"/>
+														<button id="slideDown" colour="#CC9933" alt="true">button</button>
+													</horizontal>;
+			
+			protected static const GROUPED_DATA:XML = <data>
+														<group>
+															<Black/>
+															<Red/>
+															<Orange/>
+															<Yellow/>
+															<White/>
+															<Green/>
+															<Blue/>
+															<Indigo/>
+														</group>
+														<group>
+															<January/>
+															<February/>
+															<March/>
+															<April/>
+															<May/>
+															<June/>
+														</group>
+														<group>
+															<item label="1"/>
+															<item label="2"/>
+															<item label="3"/>
+															<item label="4"/>
+															<item label="5"/>
+														</group>
+													</data>;
+		
+		]]>
+	</fx:Script>
+	
+	<s:VGroup width="300" height="400">
+		<mad:FlexUISlider percentWidth="100"/>
+		<mad:FlexUISwitch/>
+		<mad:FlexUIForm xml="{LAYOUT}" percentWidth="100"/>
+		<mad:FlexUIPicker columns="3" xmlData="{GROUPED_DATA}" widths="50%,50%,40" height="200" percentWidth="100"/>
+	</s:VGroup>
+
+</s:Application>
