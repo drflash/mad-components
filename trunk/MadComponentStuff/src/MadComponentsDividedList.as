@@ -47,6 +47,15 @@ package
 													</horizontal>
 												</dividedList>;
 		
+		protected static const DETAIL_PAGE:XML = <vertical> 
+													<image id="image" alignH="centre" alignV="centre"/>
+												</vertical>;
+		
+		protected static const NAVIGATION:XML = <navigation autoFill="true">
+													{DIVIDED_LIST}
+													{DETAIL_PAGE}
+												</navigation>;
+		
 		protected static const BIG_FONT:String = '<font size="18">';
 		protected static const SMALL_FONT:String = '<font size="11">';
 		protected static const END_FONT:String = '</font>';
@@ -68,7 +77,7 @@ package
 			stage.align = StageAlign.TOP_LEFT;  
 			stage.scaleMode = StageScaleMode.NO_SCALE;
 			
-			UI.create(this, DIVIDED_LIST);
+			UI.create(this, NAVIGATION);
 			
 			var data0:Array = [{label:BIG_FONT+"mp3 player"+END_FONT, image:getQualifiedClassName(MP3), label2:SMALL_FONT+"some small text"+END_FONT, price:"$19.99"},{label:BIG_FONT+"mp4 player"+END_FONT, image:getQualifiedClassName(MP4), label2:SMALL_FONT+"more small text"+END_FONT, price:"$79.99"}];
 			// to do: make data1 and data2
