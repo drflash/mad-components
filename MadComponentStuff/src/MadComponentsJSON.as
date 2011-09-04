@@ -137,7 +137,7 @@ package
 		
 		protected function trendsViewClicked(event:Event):void {
 			var url:String = _trendsView.row.url;
-			_tweetsView.model.loadJSON("http://search.twitter.com/search.json"+url.substr(url.indexOf("?")));
+			_tweetsView.model.loadJSON("http://search.twitter.com/search.json?q="+url.substr(url.lastIndexOf("/")+1));
 			_tweetsView.scrollPositionY = 0;
 		}
 		
