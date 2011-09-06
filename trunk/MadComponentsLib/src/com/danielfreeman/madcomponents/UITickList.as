@@ -28,7 +28,13 @@ package com.danielfreeman.madcomponents {
 	import flash.display.DisplayObject;
 	import flash.display.Sprite;
 	import flash.events.Event;
+
+/**
+ * The tickIndexes have changed
+ */
+	[Event( name="change", type="flash.events.Event" )]
 	
+
 /**
  *  MadComponents tick list
  * <pre>

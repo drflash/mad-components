@@ -28,7 +28,7 @@ package com.danielfreeman.madcomponents
 	import flash.display.Sprite;
 	
 /**
- *  Return component matching id within row matching row index
+ * List with rows lazy rendered when in view
  * <pre>
  * &lt;longList
  *    id = "IDENTIFIER"

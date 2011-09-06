@@ -36,6 +36,12 @@ package com.danielfreeman.madcomponents {
 	import flash.utils.Timer;
 
 /**
+ * The switch value has changed
+ */
+	[Event( name="change", type="flash.events.Event" )]
+	
+	
+/**
  *  MadComponents switch
  * <pre>
  * &lt;slider

@@ -33,6 +33,12 @@ package com.danielfreeman.madcomponents {
 	import flash.geom.Rectangle;
 	
 /**
+ * A page has changed
+ */
+	[Event( name="change", type="flash.events.Event" )]
+
+	
+/**
  *  MadComponents pages container
  * <pre>
  * &lt;pages

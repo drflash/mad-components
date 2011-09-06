@@ -37,6 +37,17 @@ package com.danielfreeman.madcomponents {
 	import flash.net.URLRequestMethod;
 	import flash.net.URLVariables;
 	
+	
+/**
+ * The data is loaded
+ */
+	[Event( name="dataLoaded", type="flash.events.Event" )]
+	
+/**
+ * There was an error 
+ */
+	[Event( name="dataError", type="flash.events.Event" )]
+	
 /**
  * Enables connection to a webserver using XML, JSON, or AMF
  * <pre>

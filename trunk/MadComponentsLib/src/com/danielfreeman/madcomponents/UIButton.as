@@ -37,6 +37,13 @@ package com.danielfreeman.madcomponents {
 	import flash.text.TextFormat;
 	import flash.text.TextFormatAlign;
 	import flash.utils.getDefinitionByName;
+	
+/**
+  * The button was clicked
+ */
+	[Event( name="clicked", type="flash.events.Event" )]
+	
+
 
 /**
  *  Button component
@@ -55,7 +62,8 @@ package com.danielfreeman.madcomponents {
  *   clickable = "true|false"
  * /&gt;
  * </pre>
- */	
+ */
+	
 	public class UIButton extends MadSprite {
 		
 		public static const CLICKED:String = "clicked";
