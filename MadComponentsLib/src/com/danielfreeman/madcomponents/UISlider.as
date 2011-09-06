@@ -30,7 +30,13 @@ package com.danielfreeman.madcomponents
 	import flash.events.MouseEvent;
 	import flash.geom.Matrix;
 	import flash.events.Event;
+
+/**
+ * The slider value has changed
+ */
+	[Event( name="change", type="flash.events.Event" )]
 	
+
 /**
  *  MadComponent slider
  * <pre>

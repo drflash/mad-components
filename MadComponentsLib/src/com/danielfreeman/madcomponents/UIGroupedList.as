@@ -39,6 +39,12 @@ package com.danielfreeman.madcomponents {
 	import flash.utils.getDefinitionByName;
 	
 /**
+ * A heading (or an area outside a list row) was clicked
+ */
+	[Event( name="headingClicked", type="flash.events.Event" )]
+	
+
+/**
  *  MadComponents Grouped List
  * <pre>
  * &lt;groupedList

@@ -36,6 +36,16 @@ package com.danielfreeman.madcomponents {
 	import flash.geom.Rectangle;
 	import flash.text.TextFormat;
 
+/**
+ * The input has lost input focus
+ */
+	[Event( name="focusOut", type="flash.events.FocusEvent" )]
+	
+/**
+ * The text has changed
+ */
+	[Event( name="textInput", type="flash.events.TextEvent" )]
+	
 	
 /**
  *  Input component

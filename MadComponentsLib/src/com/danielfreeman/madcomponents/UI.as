@@ -40,7 +40,7 @@ package com.danielfreeman.madcomponents {
  * &lt;
  *    clickColour = "#rrggbb"
  *    dpi = "INTEGER"
- *    scaleColour = "#rrggbb,#rrggbb,..."
+ *    stageColour = "#rrggbb,#rrggbb,..."
  *    autoScale = "true|false"
  *    autoResize = "true|false"
  * /&gt;
