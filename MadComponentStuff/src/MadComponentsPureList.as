@@ -43,7 +43,9 @@ package
 			stage.align = StageAlign.TOP_LEFT;  
 			stage.scaleMode = StageScaleMode.NO_SCALE;
 			
-			var list:UIList = new UIList(this, <list/>, new Attributes(0,0,320,480));
+			var attributes:Attributes = new Attributes(0,0,320,480);
+			attributes.parse(<list background="#CCCCFF,#9999CC,#AAAACC"/>);
+			var list:UIList = new UIList(this, <list><font color="#FFFFFF"/></list>, attributes);
 		
 			list.xmlData = <data>
 								<January/>
