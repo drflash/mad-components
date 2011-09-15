@@ -29,6 +29,7 @@ package
 	import flash.display.Sprite;
 	import flash.display.StageAlign;
 	import flash.display.StageScaleMode;
+	import flash.events.Event;
 
 	
 	public class MadComponentsPicker extends Sprite {
@@ -43,7 +44,7 @@ package
 										 </data>;
 		
 		protected static const PICKER_EXAMPLE:XML = <columns gapH="0" widths="40,50%,50%" pickerHeight="180">
-															<picker alignH="centre">
+															<picker id="column0" alignH="centre" index="0">
 																<data>
 																	<item label="0"/>
 																	<item label="1"/>
@@ -57,13 +58,18 @@ package
 																	<item label="9"/>
 																</data>
 															</picker>
-															<picker index="1">
+															<picker id="column1" index="1">
 																{DATA}
 															</picker>
-															<picker index="4">
+															<picker id="column2" index="4">
 																{DATA}
 															</picker>
 														</columns>;
+																
+																
+		protected var _column0:UIPicker;
+		protected var _column1:UIPicker;
+		protected var _column2:UIPicker;
 		
 		
 		public function MadComponentsPicker(screen:Sprite = null) {
@@ -74,6 +80,19 @@ package
 			stage.scaleMode = StageScaleMode.NO_SCALE;
 			
 			UI.create(this, PICKER_EXAMPLE);
+			
+			_column0 = UIPicker(UI.findViewById("column0"));
+			_column1 = UIPicker(UI.findViewById("column1"));
+			_column2 = UIPicker(UI.findViewById("column2"));
+			
+			_column0.addEventListener(Event.CHANGE, pickersChanged);
+			_column1.addEventListener(Event.CHANGE, pickersChanged);
+			_column2.addEventListener(Event.CHANGE, pickersChanged);
+		}
+		
+		
+		protected function pickersChanged(event:Event):void {
+			trace("Picker indexes = "+_column0.index+","+_column1.index+","+_column2.index);
 		}
 	}
 }
