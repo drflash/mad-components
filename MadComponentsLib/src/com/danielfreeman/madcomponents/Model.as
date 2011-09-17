@@ -178,7 +178,7 @@ package com.danielfreeman.madcomponents {
 		}
 
 /**
- * A url request where the returned data is JSON
+ * A url request where the returned data is AMF
  */	
 		protected function loadAMFList(value:*):void {
 			dataAMF = value;
