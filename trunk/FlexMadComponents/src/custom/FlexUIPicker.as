@@ -97,7 +97,7 @@ package custom {
 			xml += '>';
 			var index:int = 0;
 			for(var i:int = 0; i<_columns; i++) {
-				xml += '<picker>' + theData(index++) + '</picker>';
+				xml += '<picker id="column'+i.toString()+'">' + theData(index++) + '</picker>';
 			}
 			_xml = XML(xml + '</columns>');
 			super.createComponent(width, height);
