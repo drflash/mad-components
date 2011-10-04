@@ -29,28 +29,25 @@
     <sourceAttachmentPath/>
   </compiler>
   <applications>
-    <application path="MadComponentsNavigationT0.as"/>
     <application path="MadComponentsJSON.as"/>
     <application path="MadComponentsDividedList.as"/>
     <application path="MadHelloWorld.as"/>
-    <application path="MadComponentsPurePicker.as"/>
+    <application path="MadComponentsNavigationT0.as"/>
     <application path="MadComponentsNavigationT1.as"/>
     <application path="MadComponents.as"/>
     <application path="MadComponentsTree.as"/>
     <application path="MadComponentsDesktop.as"/>
-    <application path="MadComponentsScrollXY.as"/>
     <application path="MadComponentsPicker.as"/>
+    <application path="MadComponentsScrollXY.as"/>
     <application path="MadLists.as"/>
-    <application path="MadComponentsViewFlipper.as"/>
+    <application path="MadComponentsPureSegmented.as"/>
     <application path="MadGroups.as"/>
+    <application path="MadComponentsViewFlipper.as"/>
     <application path="MadComponentsNavigation.as"/>
-    <application path="MadComponentsPurePicker2.as"/>
     <application path="MadComponentsAMF.as"/>
-    <application path="MadComponentsPure.as"/>
-    <application path="MadImage.as"/>
     <application path="MadComponentsTree2.as"/>
+    <application path="MadImage.as"/>
     <application path="MadTickList.as"/>
-    <application path="MadComponentsPureList.as"/>
     <application path="MadComponents9Patch.as"/>
   </applications>
   <modules/>

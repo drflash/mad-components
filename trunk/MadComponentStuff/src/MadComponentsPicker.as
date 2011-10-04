@@ -93,6 +93,7 @@ package
 		
 		protected function pickersChanged(event:Event):void {
 			trace("Picker indexes = "+_column0.index+","+_column1.index+","+_column2.index);
+			trace("Picker values = "+_column0.row.label+","+_column1.row.label+","+_column2.row.label);
 		}
 	}
 }
