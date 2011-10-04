@@ -47,6 +47,7 @@ package com.danielfreeman.madcomponents
  *    sortBy = "IDENTIFIER"
  *    index = "INTEGER"
  *    height = "NUMBER"
+ *    cursorHeight = "NUMBER"
  * /&gt;
  * </pre>
  */
