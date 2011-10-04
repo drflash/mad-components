@@ -72,12 +72,17 @@ package com.danielfreeman.madcomponents
 		protected var _left:Boolean;
 		protected var _right:Boolean;
 		protected var _pickerHeight:Number = HEIGHT;
+		protected var _cursorHeight:Number = SPINNER_CURSOR_HEIGHT;
 		
-		public function UIPicker(screen:Sprite, xml:XML, attributes:Attributes, left:Boolean =false, right:Boolean = false, pickerHeight:Number = -1) {
+		public function UIPicker(screen:Sprite, xml:XML, attributes:Attributes, left:Boolean =false, right:Boolean = false, pickerHeight:Number = -1, cursorHeight:Number = -1) {
 			if (pickerHeight>0)
 				_pickerHeight = pickerHeight;
+			if (cursorHeight>0)
+				_cursorHeight = cursorHeight;
 			if (xml.@height.length()>0)
 				_pickerHeight = parseFloat(xml.@height[0]);
+			if (xml.@cursorHeight.length()>0)
+				_cursorHeight = parseFloat(xml.@cursorHeight[0]);
 			super(screen, xml, attributes);
 			_decay = PICKER_DECAY;
 			_deltaThreshold = 4.0;
@@ -114,21 +119,21 @@ package com.danielfreeman.madcomponents
 			_spinner.graphics.drawRect(1, 0, 3, _pickerHeight);
 			_spinner.graphics.drawRect(_attributes.width-3, 0, 3, _pickerHeight);
 			
-			matr.createGradientBox(_attributes.width, SPINNER_CURSOR_HEIGHT / 2, Math.PI/2, 0, (_pickerHeight - SPINNER_CURSOR_HEIGHT)/2);
+			matr.createGradientBox(_attributes.width, _cursorHeight / 2, Math.PI/2, 0, (_pickerHeight - _cursorHeight)/2);
 			_spinner.graphics.beginGradientFill(GradientType.LINEAR, [SPINNER_CURSOR_COLOUR_HIGHLIGHT,SPINNER_CURSOR_COLOUR], [SPINNER_CURSOR_ALPHA,SPINNER_CURSOR_ALPHA], [0x00,0xff], matr);
-			_spinner.graphics.drawRect(0, (_pickerHeight - SPINNER_CURSOR_HEIGHT)/2, _attributes.width, SPINNER_CURSOR_HEIGHT / 2);
+			_spinner.graphics.drawRect(0, (_pickerHeight - _cursorHeight)/2, _attributes.width, _cursorHeight / 2);
 			
 			_spinner.graphics.beginFill( SPINNER_CURSOR_COLOUR_DARK, SPINNER_CURSOR_ALPHA );
-			_spinner.graphics.drawRect(0, _pickerHeight / 2, _attributes.width, SPINNER_CURSOR_HEIGHT / 2);
+			_spinner.graphics.drawRect(0, _pickerHeight / 2, _attributes.width, _cursorHeight / 2);
 			
 			_spinner.graphics.beginFill(SPINNER_CURSOR_COLOUR);
-			_spinner.graphics.drawRect(0, (_pickerHeight - SPINNER_CURSOR_HEIGHT)/2, _attributes.width, 1.5);
-			_spinner.graphics.drawRect(0, (_pickerHeight + SPINNER_CURSOR_HEIGHT)/2-1, _attributes.width, 1.5);
+			_spinner.graphics.drawRect(0, (_pickerHeight - _cursorHeight)/2, _attributes.width, 1.5);
+			_spinner.graphics.drawRect(0, (_pickerHeight + _cursorHeight)/2-1, _attributes.width, 1.5);
 			
 			
-			matr.createGradientBox(_attributes.width, SHADOW, Math.PI/2, 0, (_pickerHeight + SPINNER_CURSOR_HEIGHT)/2);
+			matr.createGradientBox(_attributes.width, SHADOW, Math.PI/2, 0, (_pickerHeight + _cursorHeight)/2);
 			_spinner.graphics.beginGradientFill(GradientType.LINEAR, [_spinnerColour,_spinnerColour], [SPINNER_ALPHA/3,0.0], [0x00,0xff], matr);
-			_spinner.graphics.drawRect(0, (_pickerHeight + SPINNER_CURSOR_HEIGHT)/2, _attributes.width, SPINNER_CURSOR_HEIGHT / 2);
+			_spinner.graphics.drawRect(0, (_pickerHeight + _cursorHeight)/2, _attributes.width, _cursorHeight / 2);
 
 		}
 		
@@ -187,6 +192,14 @@ package com.danielfreeman.madcomponents
 			}
 
 			return false;
+		}
+		
+		
+		/**
+		 *  Data object for last row clicked
+		 */
+		override public function get row():Object {
+			return (_pressedCell>=0) ? _filteredData[_pressedCell+1] : null;
 		}
 		
 		

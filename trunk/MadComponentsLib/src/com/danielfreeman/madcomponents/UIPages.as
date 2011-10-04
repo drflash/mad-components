@@ -177,7 +177,7 @@ package com.danielfreeman.madcomponents {
 /**
  *  Add border padding around a page
  */	
-		protected function addPadding(localName:String,newAttributes:Attributes):void {trace("localName="+localName);
+		protected function addPadding(localName:String,newAttributes:Attributes):void {
 			if (localName.toLowerCase().indexOf("pages")<0 && localName.toLowerCase().indexOf("list")<0 && localName.toLowerCase().indexOf("navigation")<0 && localName.toLowerCase().indexOf("scroll")<0 && localName!="viewFlipper" && localName!="frame") {
 				newAttributes.x+=PADDING;
 				newAttributes.y+=PADDING;

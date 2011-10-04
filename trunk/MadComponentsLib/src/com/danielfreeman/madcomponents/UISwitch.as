@@ -66,9 +66,11 @@ package com.danielfreeman.madcomponents {
 		protected static const OUTLINE:uint = 0xAAAAAA;
 		protected static const OFF_COLOUR:uint = 0x333333;
 		protected static const CURVE:Number = 8.0;
+		protected static const ALT_CURVE:Number = 32.0;
 		protected static const FORMAT_ON:TextFormat = new TextFormat("Tahoma",15, 0xFFFFFF);
 		protected static const FORMAT_OFF:TextFormat = new TextFormat("Tahoma",15, 0xFFFFFF);
 		protected static const THRESHOLD:Number = 4.0;
+		protected static const EXTRA:Number = 30.0;
 		
 		protected var _button:Sprite;
 		protected var _over:Shape;
@@ -85,11 +87,15 @@ package com.danielfreeman.madcomponents {
 		protected var _offColour:uint = OFF_COLOUR;
 		protected var _buttonColour:uint = BUTTON_COLOUR;
 		protected var _outlineColour:uint = OUTLINE;
+		protected var _curve:Number;
+		protected var _extra:Number = 0;
 		
 	
-		public function UISwitch(screen:Sprite, xx:Number, yy:Number, colour:uint = 0xcc6600, onText:String = "ON", offText:String = "OFF", colours:Vector.<uint> = null) {
+		public function UISwitch(screen:Sprite, xx:Number, yy:Number, colour:uint = 0xcc6600, onText:String = "ON", offText:String = "OFF", colours:Vector.<uint> = null, alt:Boolean = false) {
 			screen.addChild(this);
 			x=xx;y=yy;
+			_extra = alt ? 8 : 0;
+			_curve = alt ? ALT_CURVE : CURVE;
 			
 			_colour = colour;
 			if (colours) {
@@ -113,7 +119,7 @@ package com.danielfreeman.madcomponents {
 			
 			var mask:Sprite = new Sprite();
 			mask.graphics.beginFill(0);
-			mask.graphics.drawRoundRect(0, 0, WIDTH, HEIGHT, CURVE);
+			mask.graphics.drawRoundRect(0, 0, WIDTH, HEIGHT, _curve);
 			addChild(this.mask=mask);
 			buttonMode = useHandCursor = true;
 		}
@@ -123,7 +129,7 @@ package com.danielfreeman.madcomponents {
  */	
 		public function set state(value:Boolean):void {
 			_state = value;
-			_button.x = _state ? WIDTH-BUTTON_WIDTH : 0;
+			_button.x = _state ? (WIDTH-BUTTON_WIDTH + _extra) : 0;
 		}
 		
 /**
@@ -155,13 +161,13 @@ package com.danielfreeman.madcomponents {
 			addChild(_over=new Shape());
 			_over.graphics.clear();
 			_over.graphics.lineStyle(2,OUTLINE);
-			_over.graphics.drawRoundRect(0, 0, WIDTH, HEIGHT, CURVE);
+			_over.graphics.drawRoundRect(0, 0, WIDTH, HEIGHT, _curve);
 			drawButton();
 			
 			_button.addChild(_onLabel=new UILabel(this, 0, 1, onText, _formatOn));
 			_onLabel.x = (WIDTH-BUTTON_WIDTH - _onLabel.width) / 2 -WIDTH+BUTTON_WIDTH;
 			_button.addChild(_offLabel=new UILabel(this, WIDTH-BUTTON_WIDTH, 1, offText, _formatOff));
-			_offLabel.x = BUTTON_WIDTH + (WIDTH-BUTTON_WIDTH - _offLabel.width) / 2;
+			_offLabel.x = BUTTON_WIDTH + (WIDTH-BUTTON_WIDTH - _offLabel.width) / 2 -_extra;
 			_onLabel.y = _offLabel.y = ( HEIGHT - _onLabel.height) / 2 - 1;
 		}
 		
@@ -172,23 +178,23 @@ package com.danielfreeman.madcomponents {
 
 			_button.graphics.clear();
 			var matr:Matrix=new Matrix();
-			matr.createGradientBox(WIDTH, HEIGHT, Math.PI/2, 0, 0);
+			matr.createGradientBox(WIDTH+EXTRA, HEIGHT, Math.PI/2, 0, 0);
 			var gradientOn:Array = [Colour.darken(_colour, -16),Colour.lighten(_colour, 64),Colour.lighten(_colour, 64),Colour.lighten(_colour, 32)];
 			_button.graphics.beginGradientFill(GradientType.LINEAR, gradientOn, [1.0,1.0,1.0,1.0], [0x00,0x40,0x80,0xff], matr);
-			_button.graphics.drawRect(-WIDTH+BUTTON_WIDTH, 1, WIDTH - BUTTON_WIDTH + 2, HEIGHT - 2);
+			_button.graphics.drawRect(-WIDTH+BUTTON_WIDTH -_extra, 1, WIDTH - BUTTON_WIDTH + 2 + 2*_extra, HEIGHT - 2);
 			
 			var gradientOff:Array = [Colour.darken(_offColour, -16),Colour.darken(_offColour, -16),Colour.lighten(_offColour, 64),Colour.lighten(_offColour, 32)];
 			_button.graphics.beginGradientFill(GradientType.LINEAR, gradientOff, [1.0,1.0,1.0,1.0], [0x00,0x40,0x80,0xff], matr);
-			_button.graphics.drawRect(BUTTON_WIDTH-2, 1, WIDTH - BUTTON_WIDTH + 2, HEIGHT - 2);
+			_button.graphics.drawRect(BUTTON_WIDTH-2-2*_extra, 1, WIDTH - BUTTON_WIDTH + 2 + 2*_extra, HEIGHT - 2);
 			
 			matr.createGradientBox(BUTTON_WIDTH, HEIGHT, Math.PI/2, 0, 0);
 			var buttonGradient:Array = state ? [Colour.darken(_buttonColour),Colour.darken(_buttonColour, -32),Colour.lighten(_buttonColour, 32)]
 			: [_buttonColour,Colour.darken(_buttonColour, -32),Colour.lighten(_buttonColour, 32)];
 			
 			_button.graphics.beginFill(OUTLINE);
-			_button.graphics.drawRoundRect(0, 0, BUTTON_WIDTH, HEIGHT, CURVE);
+			_button.graphics.drawRoundRect(0, 0, BUTTON_WIDTH -_curve/4 +2, HEIGHT, _curve);
 			_button.graphics.beginGradientFill(GradientType.LINEAR, buttonGradient, [1.0,1.0,1.0], [0x00,0x80,0xff], matr);
-			_button.graphics.drawRoundRect(1, 1, BUTTON_WIDTH - 2, HEIGHT - 2, CURVE);
+			_button.graphics.drawRoundRect(1, 1, BUTTON_WIDTH - 2 -_curve/4 +2, HEIGHT - 2, _curve);
 			
 			_button.cacheAsBitmap = true;
 		}
@@ -207,8 +213,8 @@ package com.danielfreeman.madcomponents {
 			var position:Number = mouseX - _start;
 			if (position < 0)
 				position = 0;
-			else if (position > WIDTH - BUTTON_WIDTH)
-				position = WIDTH - BUTTON_WIDTH;
+			else if (position > WIDTH - BUTTON_WIDTH  + _extra)
+				position = WIDTH - BUTTON_WIDTH  + _extra;
 			_delta += Math.abs(_button.x - position);
 			_button.x = position;
 		}
@@ -221,7 +227,7 @@ package com.danielfreeman.madcomponents {
 			if (_delta < THRESHOLD)
 				_move = _state ? -MOVE_X : MOVE_X;
 			else
-				_move = (_button.x < (WIDTH-BUTTON_WIDTH) / 2) ? -MOVE_X : MOVE_X;
+				_move = (_button.x < (WIDTH-BUTTON_WIDTH+_extra) / 2) ? -MOVE_X : MOVE_X;
 			if (event.target==_button || event.target==this ||_delta>0) {
 				_timer.reset();
 				_timer.start();
@@ -239,7 +245,7 @@ package com.danielfreeman.madcomponents {
 				stop();
 			}
 			else if (_button.x >= WIDTH-BUTTON_WIDTH) {
-				_button.x = WIDTH-BUTTON_WIDTH;
+				_button.x = WIDTH-BUTTON_WIDTH + _extra;
 				_state = true;
 				stop();
 			}
