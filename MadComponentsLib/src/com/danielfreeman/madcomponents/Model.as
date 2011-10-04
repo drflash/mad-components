@@ -164,14 +164,15 @@ package com.danielfreeman.madcomponents {
 /**
  * Connect to an AMF service
  */	
-		public function loadAMF(url:String = "", service:String = "", parameters:Array = null):void {
-			var netConnection:NetConnection = new NetConnection();
+		public function loadAMF(url:String = "", service:String = "", parameters:Array = null, netConnection:NetConnection = null):void {
+			if (!netConnection)
+				netConnection = new NetConnection();
 			netConnection.addEventListener(NetStatusEvent.NET_STATUS, errorFn);
 			netConnection.addEventListener(SecurityErrorEvent.SECURITY_ERROR, errorFn);
 			
 			netConnection.connect(url!="" ? url : _url);
 			if (parameters && parameters.length>0)
-				netConnection.call(service!="" ? service : _service, new Responder(loadAMFList, errorFn), parameters[0], parameters[1], parameters[2]);
+				netConnection.call(service!="" ? service : _service, new Responder(loadAMFList, errorFn), parameters[0], parameters[1], parameters[2], parameters[3]);
 			else
 				netConnection.call(service!="" ? service : _service, new Responder(loadAMFList, errorFn));
 			_action="loadAMF";

@@ -79,7 +79,7 @@ package com.danielfreeman.madcomponents {
 		}
 		
 		
-		protected function mouseUp(event:MouseEvent):void {trace(event.target.name);
+		protected function mouseUp(event:MouseEvent):void {
 			if (_mouseDownTarget && event.target == _mouseDownTarget) {
 				super.goToPage(parseInt(event.target.name));
 			}

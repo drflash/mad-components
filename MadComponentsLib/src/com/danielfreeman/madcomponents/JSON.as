@@ -85,7 +85,6 @@ package com.danielfreeman.madcomponents {
 			_pos = _json.indexOf(':',_pos+1) + 1;
 			skipSpaces();
 			result[key] = parseValue();
-		//	trace(key +":"+result[key]);
 			skipSpaces();
 		}
 		
