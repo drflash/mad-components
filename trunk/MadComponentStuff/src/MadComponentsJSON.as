@@ -40,7 +40,7 @@ package
 		protected static const TRENDS_VIEW:XML =
 			
 			<list id="trendsView" pullDownRefresh="true" pullDownColour="#666666">
-				<model url="http://api.twitter.com/1/trends.json" path="trends" action="loadJSON">
+				<model url="http://api.twitter.com/1/trends/available.json" action="loadJSON">
 					<name>label</name>
 					<url/>
 				</model>
