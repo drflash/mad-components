@@ -33,7 +33,7 @@ package
 	import flash.display.StageAlign;
 	import flash.display.StageScaleMode;
 	import flash.text.TextFormat;
-	import extras.UIPickerBank;
+	import pureHelpers.UIPickerBank;
 	
 	public class MadComponentsPure extends Sprite {
 		
@@ -45,17 +45,14 @@ package
 			stage.scaleMode = StageScaleMode.NO_SCALE;
 			
 			var label:UILabel = new UILabel(this, 20, 10, "Hello World", new TextFormat("Times",24,0xCCCCCC,true));
-			var button:UIButton = new UIButton(this, 20, 50, "button", 0xCCFFCC, new <uint>[]);
+			var button:UIButton = new UIButton(this, 20, 50, "button", 0xCCFFCC);
 			button.fixwidth = 80.0;
-			var slider:UISlider = new UISlider(this, 20, 100, new <uint>[]);
+			var slider:UISlider = new UISlider(this, 20, 100);
 			slider.fixwidth = 160.0;
 			slider.value = 0.3;
 			var input:UIInput = new UIInput(this, 20, 140, "input", new <uint>[0x9999AA,0xEEEEFF], true);
 			
 			var pickerBank:UIPickerBank = new UIPickerBank(this, 20, 200, 280, 160, 2);
-		//	var picker0:UIPicker = new UIPicker(this, <picker/>, new Attributes(20,200,120,200),false,false);
-		//	var picker1:UIPicker = new UIPicker(this, <picker/>, new Attributes(140,200,40,200),false,false);
-		//	var picker2:UIPicker = new UIPicker(this, <picker><data><year label="2010"/><year label="2011"/><year label="2012"/></data></picker>, new Attributes(180,200,80,200),false,false);
 			var picker0:UIPicker = UIPicker(pickerBank.findViewById("column0"));
 			var picker1:UIPicker = UIPicker(pickerBank.findViewById("column1"));
 			var picker2:UIPicker = UIPicker(pickerBank.findViewById("column2"));

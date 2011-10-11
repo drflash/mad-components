@@ -29,7 +29,13 @@
     <sourceAttachmentPath/>
   </compiler>
   <applications>
+    <application path="MadComponentsPurePicker2.as"/>
+    <application path="MadComponentsPureListRenderer.as"/>
+    <application path="MadComponentsPureListMaker.as"/>
+    <application path="MadComponentsPureList.as"/>
+    <application path="MadComponentsPureViewFlipper.as"/>
     <application path="MadComponentsPure.as"/>
+    <application path="MadComponentsPureNavigation.as"/>
   </applications>
   <modules/>
   <buildCSSFiles/>

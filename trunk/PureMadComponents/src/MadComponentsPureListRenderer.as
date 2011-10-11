@@ -34,7 +34,7 @@ package
 	import flash.display.StageScaleMode;
 	import flash.text.TextFormat;
 	
-	import extras.UIListMaker;
+	import pureHelpers.UIListMaker;
 	import renderer.CustomRenderer;
 	
 	public class MadComponentsPureListRenderer extends Sprite {
