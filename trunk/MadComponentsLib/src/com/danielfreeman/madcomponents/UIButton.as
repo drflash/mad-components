@@ -96,15 +96,15 @@ package com.danielfreeman.madcomponents {
 		protected var _defaultWidth:Number;
 		
 	
-		public function UIButton(screen:Sprite, xx:Number, yy:Number, text:String, colour:uint, colours:Vector.<uint>, tiny:Boolean = false) {
+		public function UIButton(screen:Sprite, xx:Number, yy:Number, text:String, colour:uint = 0x9999AA, colours:Vector.<uint> = null, tiny:Boolean = false) {
 			if (tiny) {
 				_sizeY = TINY_SIZE_Y;
 				_border = 0.5;
 			}
 			screen.addChild(this);
 			x=xx;y=yy;
-			_colour = (colours.length==1) ? colours[0] : colour;
-			_colours = colours;
+			_colour = (colours && colours.length==1) ? colours[0] : colour;
+			_colours = colours ? colours : new <uint>[];
 			init();
 			_curve = (_colours.length>3) ? _colours[3] : CURVE;
 			if (_colours.length>4)
@@ -115,7 +115,6 @@ package com.danielfreeman.madcomponents {
 			_label = new UILabel(this, _gap, _sizeY-1, " ", _format);
 			_label.multiline = _shadowLabel.multiline = true;
 			this.text = text;
-		//	filters = [new DropShadowFilter(0.5, 45, Colour.darken(_colour,-128), 0.5)];
 			addEventListener(MouseEvent.MOUSE_DOWN, mouseDown);
 			buttonMode = useHandCursor = true;
 		}

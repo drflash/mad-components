@@ -83,18 +83,18 @@ package com.danielfreeman.madcomponents {
 		protected var _fixwidth:Number = WIDTH;
 		protected var _alt:Boolean;
 	
-		public function UIInput(screen:Sprite, xx:Number, yy:Number, text:String, colours:Vector.<uint>, alt:Boolean = false, prompt:String="", promptColour:uint = 0x999999) {
+		public function UIInput(screen:Sprite, xx:Number, yy:Number, text:String, colours:Vector.<uint> = null, alt:Boolean = false, prompt:String="", promptColour:uint = 0x999999) {
 			screen.addChild(this);
 			x=xx;y=yy;
 			_alt = alt;
-			_colours = colours;
+			_colours = colours ? colours : new <uint>[];
 			inputField = new UIBlueText(this, alt ? SIZE_ALT : SIZE_X, (alt ? SIZE_ALT : SIZE_Y) + 1, prompt, -1, _format, prompt!="", promptColour);
 			if (XML(text).hasSimpleContent())
 				_label.text = text;
 			else
 				_label.htmlText = XML(text).children()[0].toXMLString();
-			if (colours.length>4 && _label.hasOwnProperty("highlightColour")) {
-				_label.highlightColour = colours[4];
+			if (_colours.length>4 && _label.hasOwnProperty("highlightColour")) {
+				_label.highlightColour = _colours[4];
 			}
 			addEventListener(MouseEvent.MOUSE_DOWN, mouseDown);
 		}

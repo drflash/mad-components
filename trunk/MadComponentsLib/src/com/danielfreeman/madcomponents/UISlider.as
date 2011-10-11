@@ -67,10 +67,13 @@ package com.danielfreeman.madcomponents
 		protected var _width:Number = WIDTH;
 		protected var _value:Number = 0.5;
 		
-		public function UISlider(screen:Sprite, xx:Number, yy:Number, colours:Vector.<uint>) {
+		public function UISlider(screen:Sprite, xx:Number, yy:Number, colours:Vector.<uint> = null) {
 			screen.addChild(this);
 			x=xx; y=yy;
 
+			if (!colours)
+				colours = new <uint>[];
+			
 			_highlightColour = (colours.length>0) ? colours[0] : HIGHLIGHT_COLOUR
 			_knobColour = (colours.length>1) ? colours[1] : KNOB_COLOUR;
 			_sliderColour = (colours.length>2) ? colours[2] : SLIDER_COLOUR;
