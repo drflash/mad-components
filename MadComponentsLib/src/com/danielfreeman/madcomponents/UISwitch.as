@@ -91,7 +91,7 @@ package com.danielfreeman.madcomponents {
 		protected var _extra:Number = 0;
 		
 	
-		public function UISwitch(screen:Sprite, xx:Number, yy:Number, colour:uint = 0xcc6600, onText:String = "ON", offText:String = "OFF", colours:Vector.<uint> = null, alt:Boolean = false) {
+		public function UISwitch(screen:Sprite, xx:Number, yy:Number, colour:uint = 0xCC6600, onText:String = "ON", offText:String = "OFF", colours:Vector.<uint> = null, alt:Boolean = false) {
 			screen.addChild(this);
 			x=xx;y=yy;
 			_extra = alt ? 8 : 0;

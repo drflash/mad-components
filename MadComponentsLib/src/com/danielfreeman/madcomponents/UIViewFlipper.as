@@ -147,6 +147,7 @@ package com.danielfreeman.madcomponents {
 				position += _width;
 			}
 			_maximumSlide = (pages.length -1) * _width;
+			showScrollBar();
 		}
 
 /**

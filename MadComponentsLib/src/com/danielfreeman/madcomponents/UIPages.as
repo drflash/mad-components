@@ -220,8 +220,10 @@ package com.danielfreeman.madcomponents {
  */	
 		public function attachPages(pages:Array, alt:Boolean = false):void {
 			_pages = pages;
-			for (var i:int = 1; i<pages.length; i++)
+			for (var i:int = 1; i<pages.length; i++) {
+				addChild(pages[i]);
 				DisplayObject(pages[i]).visible = false;
+			}
 		}
 		
 /**

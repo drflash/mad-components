@@ -36,9 +36,9 @@ package com.danielfreeman.madcomponents {
  */
 	public class UINavigationBar extends Sprite {
 	
+		public static const HEIGHT:Number = 46.0;
 		protected static const FORMAT:TextFormat = new TextFormat("Tahoma",20,0xFFFFFF);
 		protected static const DARK_FORMAT:TextFormat = new TextFormat("Tahoma", 20, 0x333366);
-		protected static const HEIGHT:Number = 46.0;
 		protected static const COLOUR:uint = 0x9999BB;
 		protected static const DONECOLOUR:uint = 0xAA7777;
 		protected static const SIDES:Number = 100.0;

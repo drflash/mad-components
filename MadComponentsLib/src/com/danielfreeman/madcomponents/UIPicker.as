@@ -47,7 +47,7 @@ package com.danielfreeman.madcomponents
  *    sortBy = "IDENTIFIER"
  *    index = "INTEGER"
  *    height = "NUMBER"
- *    cursorHeight = "NUMBER"
+ *    cursorheight = "NUMBER"
  * /&gt;
  * </pre>
  */
@@ -196,9 +196,9 @@ package com.danielfreeman.madcomponents
 		}
 		
 		
-		/**
-		 *  Data object for last row clicked
-		 */
+/**
+ *  Data object for last row clicked
+ */
 		override public function get row():Object {
 			return (_pressedCell>=0) ? _filteredData[_pressedCell+1] : null;
 		}
