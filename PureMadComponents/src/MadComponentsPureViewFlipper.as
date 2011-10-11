@@ -26,27 +26,34 @@
 
 package
 {
-	
 	import com.danielfreeman.madcomponents.*;
 	
 	import flash.display.Sprite;
 	import flash.display.StageAlign;
 	import flash.display.StageScaleMode;
-	import flash.text.TextFormat;
 	
-	public class MadComponentsPureList extends Sprite {
+	import pureHelpers.UIFormMaker;
+	
+	
+	public class MadComponentsPureViewFlipper extends Sprite {
 		
-		public function MadComponentsPureList(screen:Sprite = null) {
+		protected static const WIDTH:Number = 320.0;
+		protected static const HEIGHT:Number = 434.0;
+		
+		public function MadComponentsPureViewFlipper(screen:Sprite = null) {
 			if (screen)
 				screen.addChild(this);
 			
 			stage.align = StageAlign.TOP_LEFT;  
 			stage.scaleMode = StageScaleMode.NO_SCALE;
 			
-			var attributes:Attributes = new Attributes(0,0,320,480);
-			attributes.parse(<list background="#CCCCFF,#9999CC,#AAAACC"/>);
-			var list:UIList = new UIList(this, <list><font color="#FFFFFF"/></list>, attributes);
-			list.data = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+			var viewFlipper:UIViewFlipper = new UIViewFlipper(this, <null/>, new Attributes(0, 0, WIDTH, HEIGHT));
+			
+			var page0:UIFormMaker = new UIFormMaker(viewFlipper, WIDTH, HEIGHT, 'background="#FFCCCC"');
+			var page1:UIFormMaker = new UIFormMaker(viewFlipper, WIDTH, HEIGHT, 'background="#CCFFCC"');
+			var page2:UIFormMaker = new UIFormMaker(viewFlipper, WIDTH, HEIGHT, 'background="#CCCCFF"');	
+			
+			viewFlipper.attachPages([page0, page1, page2]);
 		}
 	}
 }

@@ -34,7 +34,7 @@ package
 	import flash.display.StageScaleMode;
 	import flash.text.TextFormat;
 	
-	import extras.UIListMaker;
+	import pureHelpers.UIListMaker;
 	
 	public class MadComponentsPureListMaker extends Sprite {
 		
@@ -49,20 +49,8 @@ package
 											0, 0, 320.0, 434.0,
 											'background="#CCCCFF,#9999CC,#AAAACC" color="#FFFFFF" size="20"'
 											);
-			list.xmlData = <data>
-								<January/>
-								<February/>
-								<March/>
-								<April/>
-								<May/>
-								<June/>
-								<July/>
-								<August/>
-								<September/>
-								<October/>
-								<November/>
-								<December/>
-							</data>;
+			list.data = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
 		}
 	}
 }

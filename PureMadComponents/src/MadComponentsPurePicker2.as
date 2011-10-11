@@ -28,7 +28,7 @@ package
 {
 	import com.danielfreeman.madcomponents.*;
 	
-	import extras.UIPickerBank;
+	import pureHelpers.UIPickerBank;
 	
 	import flash.display.Sprite;
 	import flash.display.StageAlign;
