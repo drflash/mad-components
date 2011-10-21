@@ -42,7 +42,6 @@ package
 		
 		protected static const WIDTH:Number = 320.0;
 		protected static const HEIGHT:Number = 434.0;
-		protected static const BAR_HEIGHT:Number = 46.0;
 		
 		protected var _list:UIListMaker
 		protected var _label:UILabel;
@@ -59,14 +58,14 @@ package
 			navigation.title = "Pure Navigation";
 			
 			_list = new UIListMaker(navigation,
-					0, 0, 320.0, 434.0 - 46.0,
+					0, 0, 320.0, 434.0 - UINavigationBar.HEIGHT,
 					'background="#CCCCFF,#9999CC,#AAAACC" color="#FFFFFF" size="20"'
 				);
 			_list.y = 46.0;
 			_list.data = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 			_list.addEventListener(UIList.CLICKED, listClicked);
 			
-			var page:UIFormMaker = new UIFormMaker(navigation, WIDTH, HEIGHT - BAR_HEIGHT, 'background="#9999FF,#6666CC"');
+			var page:UIFormMaker = new UIFormMaker(navigation, WIDTH, HEIGHT - UINavigationBar.HEIGHT, 'background="#9999FF,#6666CC"');
 			
 			_label = new UILabel(this, 0, 0, "", new TextFormat("Arial", 32, 0xFFFFFF));
 			page.attach(_label);
@@ -78,7 +77,7 @@ package
 		protected function listClicked(event:Event):void {
 			_label.text = String(_list.row);
 			_label.x = (WIDTH - _label.width) / 2;
-			_label.y = (HEIGHT - BAR_HEIGHT - _label.height) / 2;
+			_label.y = (HEIGHT - UINavigationBar.HEIGHT - _label.height) / 2;
 		}
 	}
 }
