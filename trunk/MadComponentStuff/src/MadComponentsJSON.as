@@ -112,8 +112,6 @@ package
 			_tweetsView = UIList(UI.findViewById("tweetsView"));
 			_tweetsView.addEventListener(UIList.CLICKED, tweetsViewClicked);
 			
-			_trendsView.filteredData = _tweetsView.filteredData = [];
-			
 			_detail = UIForm(UI.findViewById("detail"));
 			
 			_navigation = UINavigation(UI.findViewById("navigation"));
