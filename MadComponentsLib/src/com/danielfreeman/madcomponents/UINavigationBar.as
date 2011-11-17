@@ -54,7 +54,7 @@ package com.danielfreeman.madcomponents {
 		
 	
 		public function UINavigationBar(screen:Sprite, attributes:Attributes) {
-			screen.addChild(this);
+			screen.addChildAt(this,0);
 			_attributes = attributes;
 			_colour = attributes.colour;
 			drawBar();

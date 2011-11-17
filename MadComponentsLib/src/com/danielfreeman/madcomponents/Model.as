@@ -81,6 +81,7 @@ package com.danielfreeman.madcomponents {
 		protected var _path:String = "";
 		protected var _amfData:Object = null;
 		protected var _action:String="";
+		protected var _filter:String="";
 		
 		
 		public function Model(parent:Sprite,xml:XML,sendXml:XML = null) {
@@ -93,6 +94,14 @@ package com.danielfreeman.madcomponents {
 					_service=xml.@service[0];
 				if (xml.@path.length()>0)
 					_path=xml.@path[0];
+				if (xml.@parse.length()>0) {
+					_path=xml.@parse[0];
+					if (_parent is UIList) {
+						var pos:int = _path.lastIndexOf(".");
+						_filter = _path.substring(pos+1);
+						_path = _path.substring(0,pos);
+					}
+				}
 				if (xml.@action.length()>0) {
 					_action = xml.@action;
 					refresh();
@@ -192,7 +201,7 @@ package com.danielfreeman.madcomponents {
 		public function set dataAMF(value:*):void {
 			_amfData = value;
 			if (_path!="" && value)
-				value = value[_path];
+				value = followPath(value, _path);
 			if (_parent is UIList) {
 				if (_schema == null) {
 					UIList(_parent).data = value;
@@ -208,6 +217,23 @@ package com.danielfreeman.madcomponents {
 			else {
 				UIForm(_parent).data = (_schema == null) ? value : parseAMFlist(value, _schema.parent(), new Object());
 			}
+		}
+		
+/**
+ * Follow a path. 
+ */	
+		protected function followPath(pointer:*,path:String):* {
+			var items:Array = path.split(".");
+			for each (var item:String in items) {
+				if (item=="") {
+					for each(var thing:* in pointer)
+						pointer = thing;
+				}
+				else {
+					pointer = pointer[item];
+				}
+			}
+			return pointer;
 		}
 
 /**
@@ -315,23 +341,26 @@ package com.danielfreeman.madcomponents {
 			var items:XMLList = xml.children();
 			if (schema == null) {
 				result = [];
-				for each (var item0:XML in items) {
-					result.push(xmlToObject(item0));
-				}
+				for each (var item0:XML in items)
+					if (_filter=="" || item0.localName()==_filter) {
+						result.push(xmlToObject(item0));
+					}
 			}
 			else {
 				var schemaName:String = schema.localName().toString();
 				var schemaChildren:XMLList = schema.children();
 				if (items.length()==1 && schemaChildren.length()==1 && schemaChildren[0].hasComplexContent()) {
-					result = listData(items[0].children(), schemaChildren[0]);
+					result = listData(items[0], schemaChildren[0]);
 					if (result)
 						return result;
 				}
 				if (items.length()>1) {
 					result = [];
-					schemaChildren = schemaChildren.children();
+					var schemaGrandChildren:XMLList = schemaChildren.children();
 					for each (var item:XML in items) {
-						result.push(listObject(item, schemaChildren));
+						if (schema.child(item.localName()).length()>0) {
+							result.push(listObject(item, schemaGrandChildren));
+						}
 					}
 				}
 			}
