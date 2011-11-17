@@ -46,6 +46,13 @@ package com.danielfreeman.madcomponents {
 			}
 			return null;
 		}
+		
+		
+		public static function clean(value:String):String {
+			value = value.replace(/[^\x{21}-\x{7E}\s\t\n\r]/,"");
+			value = escape(value);
+			return value;
+		}
 	
 	
 		protected static function parseArray():Array {
@@ -87,8 +94,8 @@ package com.danielfreeman.madcomponents {
 			result[key] = parseValue();
 			skipSpaces();
 		}
-		
-		
+
+
 		protected static function parseValue():* {
 			var result:*;
 			var nextToken:String = _json.charAt(_pos);
@@ -117,6 +124,16 @@ package com.danielfreeman.madcomponents {
 
 		protected static function stripSlashes(value:String):String {
 			value = value.replace(/\\\//g,"/");
+			value = value.replace(/&amp;/g, "&");
+			value = value.replace(/&quot;/g, "\"");
+			value = value.replace(/&apos;/g, "'");
+			value = value.replace(/&lt;/g, "<");
+			value = value.replace(/&gt;/g, ">");
+			var position:int = -1;
+			while ((position = value.indexOf("\\u",position+1)) >=0) {
+				value=value.substring(0,position)+String.fromCharCode(parseInt(value.substr(position+2,4),16))+value.substring(position+6);
+				position-=5;
+			}
 			return value;
 		}
 		
