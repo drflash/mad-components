@@ -40,9 +40,9 @@ package
 		protected static const TRENDS_VIEW:XML =
 			
 			<list id="trendsView" pullDownRefresh="true" pullDownColour="#666666">
-				<model url="http://api.twitter.com/1/trends/available.json" action="loadJSON">
+				<model url="http://api.twitter.com/1/trends/daily.json" path="trends." action="loadJSON">
 					<name>label</name>
-					<url/>
+					<query/>
 				</model>
 			</list>;
 		
@@ -136,8 +136,9 @@ package
 		
 		
 		protected function trendsViewClicked(event:Event):void {
-			var url:String = _trendsView.row.url;
-			_tweetsView.model.loadJSON("http://search.twitter.com/search.json?q="+url.substr(url.lastIndexOf("/")+1));
+			var query:String = _trendsView.row.query;
+			query = JSON.clean(query);
+			_tweetsView.model.loadJSON("http://search.twitter.com/search.json?q="+query);
 			_tweetsView.scrollPositionY = 0;
 		}
 		
