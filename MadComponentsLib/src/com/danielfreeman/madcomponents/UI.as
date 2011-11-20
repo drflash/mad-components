@@ -163,12 +163,7 @@ package com.danielfreeman.madcomponents {
  * Filter an XML String, removing odd unprintable characters.  (Unprintable characters often result from copy and paste of XML data)
  */
 		public static function clean(xml:String):XML {
-			var result:String = "";
-			for (var i:int = 0; i < xml.length; i++) {
-				var char:int = xml.charCodeAt(i);
-				if (char>0x1f && char<0x7f) result += String.fromCharCode(char);
-			}
-			return XML(result);
+			return XML(xml.replace(/[^\x{20}-\x{7E}]/g,""));
 		}
 		
 /**
