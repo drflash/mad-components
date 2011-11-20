@@ -139,10 +139,10 @@ package
 		
 		protected function treeChange(event:Event):void {
 			if (_uiTreeNavigation.pageNumber == 0) {
-				_uiTreeNavigation.text = "categories";
+				_uiTreeNavigation.title = "categories";
 			}
 			else {
-				_uiTreeNavigation.text = _uiTreeNavigation.label;
+				_uiTreeNavigation.title = _uiTreeNavigation.label;
 			}
 			
 			// We maintain _path, an array of the list items pressed.
