@@ -119,7 +119,7 @@ package
 													</vertical>
 												</horizontal>
 												<horizontal>
-													<switch id="switch" colour="#666699"/>
+													<switch id="switch" alt="true" colour="#666699"/>
 													<switch colour="#FF8000">YES,NO</switch>
 													<image id="image0" alignH="right">48</image>
 												</horizontal>

@@ -136,8 +136,7 @@ package
 		
 		
 		protected function trendsViewClicked(event:Event):void {
-			var query:String = _trendsView.row.query;
-			query = JSON.clean(query);
+			var query:String = Model.queryString(_trendsView.row.query);
 			_tweetsView.model.loadJSON("http://search.twitter.com/search.json?q="+query);
 			_tweetsView.scrollPositionY = 0;
 		}
