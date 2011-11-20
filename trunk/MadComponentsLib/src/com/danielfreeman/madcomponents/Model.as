@@ -123,6 +123,26 @@ package com.danielfreeman.madcomponents {
 		}
 		
 /**
+ * Filter and escape a string, removing odd characters.
+ */
+		public static function queryString(value:String):String {
+			value = value.replace(/[^\x{20}-\x{7E}\s\t\n\r]/g,"");
+			value = escape(value);
+			return value;
+		}
+		
+/**
+ * htmlDecode a string
+ */
+		public static function htmlDecode(value:String):String {
+			value = value.replace(/&amp;/g, "&");
+			value = value.replace(/&quot;/g, "\"");
+			value = value.replace(/&apos;/g, "'");
+			value = value.replace(/&lt;/g, "<");
+			return value.replace(/&gt;/g, ">");
+		}
+		
+/**
  * Repeat the previous server query
  */	
 		public function refresh():void {
@@ -137,13 +157,14 @@ package com.danielfreeman.madcomponents {
 /**
  * A url request where the returned data is XML
  */	
-		public function loadXML(url:String = ""):void {
+		public function loadXML(url:String = "", request:URLRequest = null):void {
 			if (url == "")
 				url = _url;
 			else
 				_url = url;
 			addEventListener(Event.COMPLETE, isLoaded);
-			var request:URLRequest = new URLRequest(url);
+			if (!request)
+				request = new URLRequest(url);
 			try {
 				load(request);
 			} catch (error:Error) {
@@ -155,13 +176,14 @@ package com.danielfreeman.madcomponents {
 /**
  * A url request where the returned data is JSON
  */	
-		public function loadJSON(url:String = ""):void {
+		public function loadJSON(url:String = "", request:URLRequest = null):void {
 			if (url == "")
 				url = _url;
 			else
 				_url = url;
 			addEventListener(Event.COMPLETE, jsonIsLoaded);
-			var request:URLRequest = new URLRequest(url);
+			if (!request)
+				request = new URLRequest(url);
 			try {
 				load(request);
 			} catch (error:Error) {
@@ -260,7 +282,7 @@ package com.danielfreeman.madcomponents {
 /**
  * Send data to the server
  */	
-		public function sendURL(url:String = "",action:String = ""):void {
+		public function sendURL(url:String = "", action:String = "", request:URLRequest = null):void {
 			if (url == "")
 				url = _sendUrl;
 			else
@@ -269,7 +291,8 @@ package com.danielfreeman.madcomponents {
 				addEventListener(Event.COMPLETE, isLoaded);
 			else if (action == "sendAndLoadJSON")
 				addEventListener(Event.COMPLETE, jsonIsLoaded);
-			var request:URLRequest = new URLRequest(url);
+			if (!request)
+				request = new URLRequest(url);
 			request.data = sendData();
 			request.method = (_sendBy=="get") ? URLRequestMethod.GET : URLRequestMethod.POST;
 			if (_sendBy=="xml")
@@ -295,7 +318,7 @@ package com.danielfreeman.madcomponents {
  * XML data loaded handler
  */	
 		protected function isLoaded(event:Event):void {
-			dataXML = XML(data);
+			dataXML = XML(htmlDecode(data));
 			dispatchEvent(new Event(LOADED));
 		}
 		
@@ -303,7 +326,7 @@ package com.danielfreeman.madcomponents {
  * JSON data loaded handler
  */	
 		protected function jsonIsLoaded(event:Event):void {
-			dataAMF = JSON.parse(data);
+			dataAMF = com.danielfreeman.madcomponents.JSON.parse(data);
 			dispatchEvent(new Event(LOADED));
 		}
 		
