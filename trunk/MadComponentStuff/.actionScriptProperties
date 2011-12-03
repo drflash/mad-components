@@ -29,6 +29,8 @@
     <sourceAttachmentPath/>
   </compiler>
   <applications>
+    <application path="MadComponentsNavigationPages.as"/>
+    <application path="MadComponentsNavigationT2.as"/>
     <application path="ExtendedMadnessTabPagesTop.as"/>
     <application path="ExtendedMadnessSplitView.as"/>
     <application path="MadComponentsLongList.as"/>
