@@ -25,66 +25,66 @@
 
 package
 {
+	import com.danielfreeman.extendedMadness.*;
 	import com.danielfreeman.madcomponents.*;
 	
 	import flash.display.Sprite;
 	import flash.display.StageAlign;
 	import flash.display.StageScaleMode;
-	import flash.utils.getQualifiedClassName;
-	
-	
-	public class MadComponentsViewFlipper extends Sprite {
-		
-		[Embed(source="images/buddha.jpg")]
-		protected static const BUDDHA:Class;
-		
-		[Embed(source="images/dragon.jpg")]
-		protected static const DRAGON:Class;
-		
-		[Embed(source="images/faces.jpg")]
-		protected static const FACES:Class;
-		
-		[Embed(source="images/monks.jpg")]
-		protected static const MONKS:Class;
-		
-		[Embed(source="images/temple.jpg")]
-		protected static const TEMPLE:Class;
+	import flash.events.Event;
 
-		//Notice three parameters for <image>.  width,height,image
+	
+	public class ExtendedMadnessSplitView extends Sprite
+	{
 		
-		protected static const VIEWFLIPPER:XML =
-		
-			<rows heights="50%,220,50%" stageColour="#223322,#112211,6,0">
-				<group background="#112211">													
-					<label alignH="centre"><font color="#99CC99" size="20">View Flipper Gallery</font></label>
-				</group>
-				<columns widths="50%,256,50%">
-					<image/>															
-					<viewFlipper scrollBarColour="#FFFFFF">
-						<image>256,192,{getQualifiedClassName(BUDDHA)}</image>
-						<image>256,192,{getQualifiedClassName(DRAGON)}</image>
-						<image>256,192,{getQualifiedClassName(FACES)}</image>
-						<image>256,192,{getQualifiedClassName(MONKS)}</image>
-						<image>256,192,{getQualifiedClassName(TEMPLE)}</image>
-					</viewFlipper>
-					<image/>
-				</columns>
-			<image/>
-		</rows>;
-		
-		
-		public function MadComponentsViewFlipper(screen:Sprite = null) {
-
-			if (screen) {
-				screen.addChild(this);
-			}
+		protected static const DATA:XML =
 			
-			stage.align = StageAlign.TOP_LEFT;
+			<data>
+				<Red/>
+				<Orange/>
+				<Yellow/>
+				<Green/>
+				<Blue/>
+				<Indigo/>
+				<Violet/>
+			 </data>;
+		
+		
+		protected static const DETAIL:XML =
+			
+			<vertical alignV="centre">
+				<label id="label" alignH="centre" width="200"/>
+			</vertical>;
+		
+
+		protected static const LAYOUT:XML =
+			
+			<splitView id="splitView" topColour="#666666">
+				{DATA}
+				{DETAIL}
+			</splitView>;
+				
+		
+		protected var _splitView:UISplitView;
+		
+		public function ExtendedMadnessSplitView(screen:Sprite = null) {
+			
+			if (screen)
+				screen.addChild(this);
+			
+			stage.align = StageAlign.TOP_LEFT;  
 			stage.scaleMode = StageScaleMode.NO_SCALE;
 			
-			UI.create(this, VIEWFLIPPER);
-	
+			UIe.createInWindow(this, LAYOUT);
+			
+			_splitView = UISplitView(UI.findViewById("splitView"));
+			_splitView.list.addEventListener(UIList.CLICKED, listClicked);
+			_splitView.navigationBar.text = "Split View";
 		}
 		
+		
+		protected function listClicked(event:Event):void {
+			UIForm(_splitView.pages[0]).data = {label:_splitView.list.row.label};
+		}
 	}
 }

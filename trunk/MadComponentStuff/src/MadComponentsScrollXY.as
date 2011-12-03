@@ -25,6 +25,7 @@
 package
 {
 	import com.danielfreeman.madcomponents.*;
+	import com.danielfreeman.extendedMadness.*;
 	
 	import flash.display.Sprite;
 	import flash.display.StageAlign;
@@ -50,7 +51,8 @@ package
 			
 			stage.align = StageAlign.TOP_LEFT;  
 			stage.scaleMode = StageScaleMode.NO_SCALE;
-			
+
+			UIe.activate(this);
 			UI.create(this, SCROLLXY);
 			
 			var scroller:UIScrollXY = UIScrollXY(UI.findViewById("scroller"));
