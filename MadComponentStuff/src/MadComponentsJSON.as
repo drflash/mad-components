@@ -25,6 +25,7 @@
 
 package
 {
+	import com.danielfreeman.extendedMadness.UIe;
 	import com.danielfreeman.madcomponents.*;
 	
 	import flash.display.Sprite;
@@ -104,6 +105,7 @@ package
 			
 			stage.align = StageAlign.TOP_LEFT;  
 			stage.scaleMode = StageScaleMode.NO_SCALE;
+
 			UI.create(this, NAVIGATOR);
 			
 			_trendsView = UIList(UI.findViewById("trendsView"));
