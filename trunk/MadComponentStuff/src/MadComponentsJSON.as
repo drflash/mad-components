@@ -25,7 +25,6 @@
 
 package
 {
-	import com.danielfreeman.extendedMadness.UIe;
 	import com.danielfreeman.madcomponents.*;
 	
 	import flash.display.Sprite;
