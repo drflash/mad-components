@@ -49,7 +49,7 @@ package com.danielfreeman.madcomponents {
 			screen.addChild(this);
 			_forward = forward;
 			_colour = colour;
-			_label = new UILabel(this, 12, 5, "", FORMAT);
+			_label = new UILabel(this, 12, 6, "", FORMAT);
 			x=xx;y=yy;
 			this.text = text;
 			buttonMode = useHandCursor = true;
