@@ -33,6 +33,7 @@ package com.danielfreeman.madcomponents
 	public class MadSprite extends Sprite
 	{
 		protected var _clickable:Boolean = true;
+		protected var _includeInLayout:Boolean = true;
 		
 		public function MadSprite() {}
 		
@@ -42,6 +43,14 @@ package com.danielfreeman.madcomponents
 		
 		public function get clickable():Boolean {
 			return _clickable;
+		}
+		
+		public function set includeInLayout(value:Boolean):void {
+			_includeInLayout = value;
+		}
+		
+		public function get includeInLayout():Boolean {
+			return _includeInLayout;
 		}
 	}
 }

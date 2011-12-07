@@ -62,7 +62,7 @@ package com.danielfreeman.madcomponents {
 			_label = new UILabel(this, 0, Y+2, "", FORMAT);
 			_backButton = new UIBackButton(this, 4, Y, "back", COLOUR);
 			_rightArrow = new UIBackButton(this, 200, Y, "next", COLOUR, true);
-			_rightButton = new UIButton(this, 200, Y-1, '<font size="16">done</font>', DONECOLOUR, new <uint>[], true);
+			_rightButton = new UIButton(this, 200, Y-1, '<font size="14">done</font>', DONECOLOUR, new <uint>[], true);
 			_rightArrow.x = attributes.width - _rightArrow.width - 6;
 			_rightButton.x = attributes.width - _rightButton.width - 6;
 			_rightButton.visible = _rightArrow.visible = false;
@@ -111,7 +111,7 @@ package com.danielfreeman.madcomponents {
  *  Right button/arrow text
  */
 		public function set rightButtonText(value:String):void {
-			_rightButton.text = '<font size="16">'+value+'</font>';
+			_rightButton.text = '<font size="14">'+value+'</font>';
 			_rightArrow.text = value;
 			_rightButton.x = _attributes.width - _rightButton.width - 6;
 			_rightArrow.x = _attributes.width - _rightArrow.width - 6;
