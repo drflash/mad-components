@@ -93,7 +93,7 @@ package
 		
 		protected static const TAB_LAYOUT:XML = 
 			
-			<tabPagesTop id="tabs" color="#111122" stageColour="#333333">
+			<tabPagesTop id="tabs" stageColour="#333333">
 				{PAGE}
 				{SCROLLXY}
 				{LIST}
