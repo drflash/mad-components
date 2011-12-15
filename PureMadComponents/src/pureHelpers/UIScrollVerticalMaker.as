@@ -26,8 +26,8 @@
 package pureHelpers
 {
 	import com.danielfreeman.madcomponents.Attributes;
-	import com.danielfreeman.madcomponents.UIScrollVertical;
 	import com.danielfreeman.madcomponents.UI;
+	import com.danielfreeman.madcomponents.UIScrollVertical;
 	
 	import flash.display.DisplayObject;
 	import flash.display.Sprite;
@@ -40,7 +40,9 @@ package pureHelpers
 		protected var _gap:Number = GAP;
 		
 		public function UIScrollVerticalMaker(screen:Sprite, width:Number, height:Number, style:String = "") {
-			super(screen,XML("<null "+style+"/>"), new Attributes(0, 0, width, height));
+			var attributes:Attributes = new Attributes(0, 0, width, height);
+			attributes.parse(XML("<null "+style+"/>"));
+			super(screen,<null/>, attributes);
 			_slider.addChild(_pureLayer = new Sprite());
 		}
 		

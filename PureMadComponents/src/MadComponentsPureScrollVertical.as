@@ -1,4 +1,4 @@
-package 
+package
 {
 	import com.danielfreeman.madcomponents.*;
 	
