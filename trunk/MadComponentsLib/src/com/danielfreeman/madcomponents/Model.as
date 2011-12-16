@@ -327,7 +327,7 @@ package com.danielfreeman.madcomponents {
  * JSON data loaded handler
  */	
 		protected function jsonIsLoaded(event:Event):void {
-			dataAMF = com.danielfreeman.madcomponents.JSON.parse(data);
+			dataAMF = com.danielfreeman.madcomponents.TinyJSON.parse(data);
 			dispatchEvent(new Event(LOADED));
 		}
 		

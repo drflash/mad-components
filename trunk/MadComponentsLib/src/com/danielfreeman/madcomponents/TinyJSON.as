@@ -28,8 +28,8 @@ package com.danielfreeman.madcomponents {
 /**
  * A very lightweight JSON parser
  */	
-	public class JSON {
-		public function JSON(){}
+	public class TinyJSON {
+		public function TinyJSON(){}
 		
 		protected static var _pos:int;
 		protected static var _json:String;
