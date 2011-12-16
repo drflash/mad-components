@@ -27,11 +27,11 @@ package com.danielfreeman.extendedMadness
 {
 	import com.danielfreeman.madcomponents.*;
 	
+	import flash.display.DisplayObject;
 	import flash.display.GradientType;
 	import flash.display.Sprite;
 	import flash.events.MouseEvent;
 	import flash.geom.Matrix;
-	import flash.display.DisplayObject;
 	
 /**
  * Segmented Control
@@ -64,21 +64,24 @@ package com.danielfreeman.extendedMadness
 		{
 			_xml = xml;
 			_attributes = attributes;
+			if (xml.font.length()>0)
+				_font = xml.font[0];
 			addChild(_pressedLayer = new Sprite());
 			var colour:uint = attributes.backgroundColours.length>0 ? attributes.backgroundColours[0] : BUTTON_COLOUR;
 			_pressedColour = attributes.backgroundColours.length>1 ? attributes.backgroundColours[1] : PRESSED_COLOUR;
-			super(screen, 0, 0, colour, xml.@alt.length()>0 && xml.@alt[0].toString() != "false");
+			super(screen, 0, 0, colour, xml.@alt == "true");
 			colourButtons();
 			if (attributes.fillH)
 				fixwidth = attributes.widthH;
 			index=0;
 		}
 		
+		
 /**
  * Set index of active segment
  */	
 		public function set index(value:int):void {
-			if (_index>=0)
+			if (_index>=0 && !_font)
 				_labels[_index].textColor = TEXT_COLOUR;
 			_index = value;
 			showPressed();
@@ -110,12 +113,9 @@ package com.danielfreeman.extendedMadness
 		
 		
 		override protected function initialise():void {
-			_curve = CONTROL_CURVE;
-			if (_xml.data.length()==1 && _xml.children().length()==1) {
+			_curve = attributes.backgroundColours.length>2 ? attributes.backgroundColours[2] : CONTROL_CURVE;
+			if (_xml.data.length()==1) {
 				drawButtons(extractData(_xml.data[0]));
-			}
-			else {
-				drawButtons(extractData(_xml));
 			}
 		}
 		
@@ -133,7 +133,7 @@ package com.danielfreeman.extendedMadness
 		
 		
 		override protected function mouseUp(event:MouseEvent):void {
-			if (_index>=0)
+			if (_index>=0 && !_font)
 				_labels[_index].textColor = TEXT_COLOUR;
 			super.mouseUp(event);
 			showPressed();
@@ -141,9 +141,10 @@ package com.danielfreeman.extendedMadness
 		
 		
 		protected function colourButtons():void {
-			for each (var label:UILabel in _labels) {
-				label.textColor = TEXT_COLOUR;
-			}
+			if (!_font)
+				for each (var label:UILabel in _labels) {
+					label.textColor = TEXT_COLOUR;
+				}
 		}
 		
 		
@@ -183,7 +184,8 @@ package com.danielfreeman.extendedMadness
 				var width0:Number = _labels[_index].width + 2*_gap - 1;
 				_pressedLayer.graphics.drawRect(left0, 1, width0, _height-1);
 			}
-			_labels[_index].textColor = PRESSED_TEXT_COLOUR;
+			if (!_font)
+				_labels[_index].textColor = PRESSED_TEXT_COLOUR;
 		}
 		
 		

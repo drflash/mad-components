@@ -27,7 +27,8 @@ package com.danielfreeman.extendedMadness
 {
 	import asfiles.MyEvent;
 	
-	import com.danielfreeman.madcomponents.*;
+	import com.danielfreeman.madcomponents.Attributes;
+	import com.danielfreeman.madcomponents.Colour;
 	
 	import flash.display.GradientType;
 	import flash.display.Sprite;
