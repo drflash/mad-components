@@ -43,33 +43,52 @@ package com.danielfreeman.extendedMadness
 		protected var _offFormat:TextFormat = new TextFormat("_sans",14);
 		protected var _labels:Array = [];
 		protected var _icons:Array = [];
+		protected var _alt:Boolean;
 		
 		
 		public function UITabPagesTop(screen:Sprite, xml:XML, attributes:Attributes) {
+			_alt = xml.@alt == "true";
+			xml.@alt = "";
 			super(screen, xml, attributes);
 			for each(var page:DisplayObject in _pages)
 				page.y = _buttonBar.height+1;
 			_attributes.y = _buttonBar.height+1;
-			_onFormat.color = UITabButtonRow(_buttonBar).offColour;
-			_offFormat.color = UITabButtonRow(_buttonBar).onColour;
+			if (!_alt) {
+				_onFormat.color = UITabButtonRow(_buttonBar).offColour;
+				_offFormat.color = UITabButtonRow(_buttonBar).onColour;
+			}
 		}
 		
 		
 		override protected function initialiseButtonBar(xml:XML, attributes:Attributes):void {
-			addChild(_buttonBar=new UITabButtonRow(this,xml,attributes));
-			attributes.height -= _buttonBar.height;
+			if (_alt) {
+				super.initialiseButtonBar(xml, attributes);
+				_buttonBar.y = 0;
+			}
+			else {
+				addChild(_buttonBar=new UITabButtonRow(this,xml,attributes));
+				attributes.height -= _buttonBar.height;
+			}
 		}
 		
 		
 		override protected function mouseDown(event:MouseEvent):void {
-			UITabButtonRow(_buttonBar).mouseDown();
+			if (_alt)
+				super.mouseDown(event);
+			else
+				UITabButtonRow(_buttonBar).mouseDown();
 		}
 		
 		
 		override protected function mouseUp(event:MouseEvent):void {
-			var oldPage:int = _page;
-			goToPage(UITabButtonRow(_buttonBar).mouseUp());
-			changeColours(oldPage, _page);
+			if (_alt) {
+				super.mouseUp(event);
+			}
+			else {
+				var oldPage:int = _page;
+				goToPage(UITabButtonRow(_buttonBar).mouseUp());
+				changeColours(oldPage, _page);
+			}
 		}
 
 
@@ -77,13 +96,20 @@ package com.danielfreeman.extendedMadness
 		 *  Rearrange the layout to new screen dimensions
 		 */	
 		override public function layout(attributes:Attributes):void {
-			attributes.height -= _buttonBar.height;
-			superLayout(attributes);
-			UITabButtonRow(_buttonBar).layout(attributes);
+			if (_alt) {
+				super.layout(attributes);
+				_buttonBar.y = 0;
+			}
+			else {
+				attributes.height -= _buttonBar.height;
+				superLayout(attributes);
+			}
 			for each(var page:DisplayObject in _pages)
 				page.y = _buttonBar.height+1;
 			_attributes.y = _buttonBar.height+1;
-			spacing();
+			if (!_alt)
+				UITabButtonRow(_buttonBar).layout(attributes);
+				spacing();
 		}
 		
 		
@@ -91,28 +117,33 @@ package com.danielfreeman.extendedMadness
 		 *  Set the label and icon of a particular tab button
 		 */
 		override public function setTab(index:int, label:String, imageClass:Class = null):void {
-			var buttonWidth:Number = _attributes.width/_pages.length;
-			if (!_labels[index])
-				_labels[index] = new UILabel(_buttonBar, 0, 0);
-			var uiLabel:UILabel = _labels[index];
-			uiLabel.defaultTextFormat = index==_page ? _onFormat : _offFormat;
-			uiLabel.text = label;
-			uiLabel.x = index*buttonWidth+(buttonWidth-uiLabel.width)/2;
-			uiLabel.y = LABEL_Y;
-				
-			if (_icons[index])
-				_buttonBar.removeChild(_icons[index]);
-			if (imageClass) {
-				var icon:Sprite = new Sprite();
-				_buttonBar.addChild(icon);
-				icon.addChild(new imageClass());
-				_icons[index] = icon;
-				icon.y = ICON_Y;
-				icon.x = index*buttonWidth+(buttonWidth-icon.width)/2;
+			if (_alt) {
+				super.setTab(index, label, imageClass);
 			}
-			
-			if (index == _page)
-				changeColours(-1, index)
+			else {
+				var buttonWidth:Number = _attributes.width/_pages.length;
+				if (!_labels[index])
+					_labels[index] = new UILabel(_buttonBar, 0, 0);
+				var uiLabel:UILabel = _labels[index];
+				uiLabel.defaultTextFormat = index==_page ? _onFormat : _offFormat;
+				uiLabel.text = label;
+				uiLabel.x = index*buttonWidth+(buttonWidth-uiLabel.width)/2;
+				uiLabel.y = LABEL_Y;
+					
+				if (_icons[index])
+					_buttonBar.removeChild(_icons[index]);
+				if (imageClass) {
+					var icon:Sprite = new Sprite();
+					_buttonBar.addChild(icon);
+					icon.addChild(new imageClass());
+					_icons[index] = icon;
+					icon.y = ICON_Y;
+					icon.x = index*buttonWidth+(buttonWidth-icon.width)/2;
+				}
+				
+				if (index == _page)
+					changeColours(-1, index);
+			}
 		}
 		
 		

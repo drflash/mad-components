@@ -52,6 +52,7 @@ package com.danielfreeman.extendedMadness
 		protected var _curve:Number = CURVE;
 		protected var _height:Number = HEIGHT;
 		protected var _alt:Boolean;
+		protected var _font:XML = null;
 		
 /**
  * Cut / Copy / Paste style buttons
@@ -65,6 +66,11 @@ package com.danielfreeman.extendedMadness
 			initialise();
 			buttonMode=useHandCursor = true;
 			addEventListener(MouseEvent.MOUSE_UP,mouseUp);
+		}
+		
+		
+		public function set font(value:XML):void {
+			_font = value;
 		}
 		
 		
@@ -101,7 +107,13 @@ package com.danielfreeman.extendedMadness
 		protected function drawButtons(labels:Vector.<String>, arrowPosition:Number = -1):void {
 			var left:Number = 0;
 			for each (var label:String in labels) {
-				var uiLabel:UILabel = new UILabel(this, left+_gap, 0, label, FORMAT);
+				var uiLabel:UILabel = new UILabel(this, left+_gap, 0, "", FORMAT);
+				if (_font) {
+					uiLabel.htmlText = _font.toXMLString().substr(0,_font.toXMLString().length-2)+ ">" + label + "</font>";
+				}
+				else {
+					uiLabel.text = label;
+				}
 				uiLabel.y = (_height - uiLabel.height) / 2;
 				left += uiLabel.width + 2*_gap;
 				_labels.push(uiLabel);

@@ -24,7 +24,7 @@
  */
 
 package com.danielfreeman.extendedMadness {
-	
+
 	import com.danielfreeman.madcomponents.*;
 	
 	import flash.display.Sprite;
