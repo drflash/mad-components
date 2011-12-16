@@ -151,7 +151,6 @@ package com.danielfreeman.madcomponents {
 			} else if (XML(value).nodeKind() != "text") {
 				var xmlString:String = XML(value).toXMLString();
 				_label.htmlText = value;
-				//	xmlString.substring(xmlString.indexOf(">")+1,xmlString.lastIndexOf("<"));
 				_shadowLabel.text = "";
 			} else {
 				_label.text = value;

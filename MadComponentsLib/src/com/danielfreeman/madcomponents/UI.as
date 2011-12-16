@@ -48,6 +48,7 @@ package com.danielfreeman.madcomponents {
  */	
 	public class UI {
 
+		public static const RESIZED:String = "resized";
 		public static const PADDING:Number = 10.0;
 		protected static const SIMULATION_RESIZE:Boolean = false;
 		protected static const DPI:uint = 160;
@@ -112,12 +113,12 @@ package com.danielfreeman.madcomponents {
 				_autoScale = false;
 			
 			if (SIMULATION_RESIZE || xml.@autoResize!="false" && !_simulated)
-				screen.stage.addEventListener(Event.RESIZE,resize);
+				screen.stage.addEventListener(Event.RESIZE, resize);
 			
 			screen.addChild(_windowLayer = new Sprite());
 			_windowLayer.scaleX = _windowLayer.scaleY = _scale;
 			
-			_activityIndicator = new UIActivity(screen,width/2,height/2);
+			_activityIndicator = new UIActivity(screen, width/2, height/2);
 	
 			_root = containers(screen,xml,_attributes);
 			if (!_root && (xml.@border.length()==0 || xml.@border[0]=="true")) {
@@ -263,6 +264,7 @@ package com.danielfreeman.madcomponents {
  */	
 		protected static function resize(event:Event):void {
 			layout(_screen.stage.stageWidth, _screen.stage.stageHeight);
+			_screen.dispatchEvent(new Event(RESIZED));
 		}
 		
 /**

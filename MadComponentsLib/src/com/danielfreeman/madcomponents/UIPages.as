@@ -100,7 +100,7 @@ package com.danielfreeman.madcomponents {
 			for each (var child0:XML in children) if (child0.nodeKind() != "text") {
 				if (child0.localName()!="data") {
 					var childstr:String = child0.toXMLString();
-					var child:XML = XML("<page>"+childstr+"</page>");
+					var child:XML = XML('<page lazyRender="'+(xml.@lazyRender)+'">'+childstr+'</page>');
 					var newAttributes:Attributes = _attributes.copy();
 					newAttributes.parse(child0);
 					if (child0.@border!="false") {

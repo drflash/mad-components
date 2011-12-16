@@ -97,6 +97,8 @@ package com.danielfreeman.madcomponents {
 			if (pressed)
 				myColor.color = 0xCCCCFF;
 			_icon.transform.colorTransform = myColor;
+			_label.x = Math.max((_fixwidth-_label.width)/2, 0);
+			_shadowLabel.x = _label.x - 1;
 		}
 		
 /**

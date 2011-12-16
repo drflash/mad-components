@@ -71,7 +71,7 @@ package com.danielfreeman.madcomponents {
 		
 		protected function initialiseButtonBar(xml:XML, attributes:Attributes):void {
 			addChild(_buttonBar=new Sprite());
-			makeTabButtons(attributes, xml.children().length(), xml.@alt.length()>0);
+			makeTabButtons(attributes, xml.children().length(), xml.@alt == "true");
 			attributes.height -= _buttonBar.height;
 			_buttonBar.y = attributes.y + attributes.height+2;
 		}
