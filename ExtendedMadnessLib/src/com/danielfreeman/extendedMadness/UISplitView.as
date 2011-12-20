@@ -110,7 +110,7 @@ package com.danielfreeman.extendedMadness
 			_top.backButton.visible = false;
 			if (xml.@topColour.length()>0)
 				_top.colour = UI.toColourValue(xml.@topColour[0]);
-			_button = new UIButton(_top, 8, 5, '<font size="16">menu</font>', BUTTON_COLOUR, new <uint>[], true);
+			_button = new UIButton(_top, 8, 5, '<font size="14">menu</font>', BUTTON_COLOUR, new <uint>[], true);
 			this.swapChildren(_menu, _list);
 			
 			_button.addEventListener(UIButton.CLICKED, showMenu);
