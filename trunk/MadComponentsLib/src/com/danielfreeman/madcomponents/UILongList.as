@@ -25,6 +25,7 @@
 
 package com.danielfreeman.madcomponents
 {
+	import flash.display.DisplayObject;
 	import flash.display.Sprite;
 	
 /**
@@ -56,6 +57,7 @@ package com.danielfreeman.madcomponents
 		protected var _lazy:Boolean = false;
 		protected var _lastStartIndex:int = -1;
 		protected var _recycleList:Vector.<UIForm> = new Vector.<UIForm>();
+		protected var _recycleLabel:Vector.<UILabel> = new Vector.<UILabel>();
 
 
 		public function UILongList(screen:Sprite, xml:XML, attributes:Attributes) {
@@ -91,6 +93,35 @@ package com.danielfreeman.madcomponents
 				}
 			}
 			_lazy = true;
+		}	
+		
+/**
+ *  Start a list with simple default label rows
+ */	
+		override protected function simpleRenderers(value:Array, position:Number = -1):void {
+			if (position < 0)
+				position = 2 * _attributes.paddingV;
+			_count = 0;
+			_textAlign = _attributes.textAlign;
+			for each (var record:* in value) {
+				var label:UILabel = labelCell(record, position);
+				position += label.height + 2 * _attributes.paddingV;
+				drawCell(position, _count);
+				position += 2 * _attributes.paddingV;
+				_cellHeight = 4 * _attributes.paddingV + label.height;
+				_count++;
+				
+				if (_recycle)
+					_recycleLabel.push(label);
+				
+				if (position > _attributes.height) {
+					for (var i:uint = _count; i<value.length; i++) {
+						drawCell((i+1) * _cellHeight + _top, i);
+					}
+					_lazy = true;
+					return;
+				}
+			}
 		}
 
 /**
@@ -106,11 +137,25 @@ package com.danielfreeman.madcomponents
 				_lastStartIndex = startIndex;
 			}
 		}
-
+		
 /**
+ *  Generate simple list labels between a specified start and end index
+ */
+		protected function lazySimpleRenderers(value:Array, startIndex:uint, endIndex:uint):void {
+			if (_lastStartIndex != startIndex) {
+				for (_count = startIndex; _count<endIndex; _count++) {
+					if (!_slider.getChildByName("label_"+_count.toString()+_suffix)) {
+						labelCell(value[_count], _count * _cellHeight + _attributes.paddingV + _top);
+					}
+				}
+				_lastStartIndex = startIndex;
+			}
+		}
+
+/**xx
  *  Is this row off screen?
  */
-		protected function offScreen(cell:UIForm):Boolean {
+		protected function offScreen(cell:DisplayObject):Boolean {
 			return cell.y + cell.height < -_slider.y || cell.y + _slider.y > _attributes.height 
 		}
 		
@@ -118,11 +163,22 @@ package com.danielfreeman.madcomponents
  *  All off-screen rows are marked recyclable
  */
 		protected function setRecycleList():void {
-			_recycleList.length = 0;
-			for (var i:int = 0; i<_slider.numChildren;i++) {
-				var row:UIForm = _slider.getChildAt(i) as UIForm;
-				if (row && offScreen(row)) {
-					_recycleList.push(row);
+			if (_simple) {
+				_recycleLabel.length = 0;
+				for (var i:int = 0; i<_slider.numChildren;i++) {
+					var label:UILabel = _slider.getChildAt(i) as UILabel;
+					if (label && offScreen(label)) {
+						_recycleLabel.push(label);
+					}
+				}
+			}
+			else {
+				_recycleList.length = 0;
+				for (var j:int = 0; j<_slider.numChildren;j++) {
+					var row:UIForm = _slider.getChildAt(j) as UIForm;
+					if (row && offScreen(row)) {
+						_recycleList.push(row);
+					}
 				}
 			}
 		}
@@ -133,7 +189,22 @@ package com.danielfreeman.madcomponents
 		override protected function newRow():UIForm {
 			if (_lazy && _recycle && _recycleList.length > 0) {
 				return _recycleList.pop();
-			} else return super.newRow();
+			}
+			else {
+				return super.newRow();
+			}
+		}
+
+/**
+ *  Re-use a recyclable label, otherwise instanciate a new one
+ */
+		override protected function newLabel():UILabel {
+			if (_lazy && _recycle && _recycleLabel.length > 0) {
+				return _recycleLabel.pop();
+			}
+			else {
+				return new UILabel(_slider, _attributes.paddingH, 0, "", FORMAT);
+			}
 		}
 
 /**
@@ -150,7 +221,11 @@ package com.danielfreeman.madcomponents
 			var endIndex:int = startIndex + Math.ceil(_attributes.height/_cellHeight + 0.5);
 			if (endIndex > _filteredData.length)
 				endIndex = _filteredData.length;
-			lazyCustomRenderers(_filteredData, startIndex, endIndex);
+			
+			if (_simple)
+				lazySimpleRenderers(_filteredData, startIndex, endIndex);
+			else
+				lazyCustomRenderers(_filteredData, startIndex, endIndex);
 		}
 
 /**
