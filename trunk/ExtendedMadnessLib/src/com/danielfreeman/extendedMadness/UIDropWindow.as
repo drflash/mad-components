@@ -27,6 +27,7 @@ package com.danielfreeman.extendedMadness
 {
 	import com.danielfreeman.madcomponents.Attributes;
 	import com.danielfreeman.madcomponents.UIWindow;
+	import com.danielfreeman.madcomponents.Colour;
 	
 	import flash.display.GradientType;
 	import flash.display.Sprite;
@@ -64,14 +65,16 @@ package com.danielfreeman.extendedMadness
 			}
 			graphics.drawRoundRect(attributes.x-CURVE + SHADOW_OFFSET, attributes.y-CURVE + SHADOW_OFFSET, attributes.width + 2 * CURVE, attributes.height + 2 * CURVE, 2 * CURVE );
 			
+			var fillColour:uint = FILL_COLOUR;
 			
 			if (colours.length==1) {
-				graphics.beginFill(colours[0]);
+				graphics.beginFill(fillColour = colours[0]);
 			}
 			else if (colours.length>1) {
 				var matr:Matrix=new Matrix();
 				matr.createGradientBox(width,height, Math.PI/2, 0, 0);
 				graphics.beginGradientFill(GradientType.LINEAR, [colours[0],colours[1]], [1.0,1.0], [0x00,0xff], matr);
+				fillColour = colours[0];
 			}
 			else {
 				graphics.beginFill(FILL_COLOUR);
@@ -81,7 +84,7 @@ package com.danielfreeman.extendedMadness
 				graphics.lineStyle(OUTLINE,colours[2], 1.0, true);
 			}
 			else {
-				graphics.lineStyle(OUTLINE,LINE_COLOUR, 1.0, true);
+				graphics.lineStyle(OUTLINE,Colour.darken(fillColour, -16), 1.0, true);
 			}
 			
 			graphics.moveTo(attributes.x - CURVE, attributes.y);
