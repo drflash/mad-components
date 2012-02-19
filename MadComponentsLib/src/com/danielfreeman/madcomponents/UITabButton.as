@@ -54,9 +54,6 @@ package com.danielfreeman.madcomponents {
 			super(_screen = screen, xx, yy, text, colour, new <uint>[0,0,0,0,0], tiny);
 			_icon.mouseEnabled = _icon.mouseChildren = false;
 			filters = null;
-			if (!tiny) {
-				_label.y = height - _label.height;
-			}
 			screen.addEventListener(CLEAR, clearState);
 		}
 		
@@ -99,6 +96,10 @@ package com.danielfreeman.madcomponents {
 			_icon.transform.colorTransform = myColor;
 			_label.x = Math.max((_fixwidth-_label.width)/2, 0);
 			_shadowLabel.x = _label.x - 1;
+			if (!_tiny) {
+				_label.y = height - _label.height;
+				_shadowLabel.y = _label.y - 1;
+			}
 		}
 		
 /**

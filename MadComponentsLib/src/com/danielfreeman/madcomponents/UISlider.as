@@ -46,6 +46,7 @@ package com.danielfreeman.madcomponents
  *   alignH = "left|right|centre|fill"
  *   alignV = "top|bottom|centre"
  *   visible = "true|false"
+ *   clickable = "true|false"
  *   width = "NUMBER"
  *   alt = "true|false"
  * /&gt;
@@ -55,6 +56,7 @@ package com.danielfreeman.madcomponents
 	{
 		protected static const WIDTH:Number = 120.0;
 		protected static const RADIUS:Number = 12.0;
+		protected static const ALT_RADIUS:Number = 8.0;
 		protected static const KNOB_COLOUR:uint = 0xDDDDDD;
 		protected static const HIGHLIGHT_COLOUR:uint = 0x3333CC;
 		protected static const SLIDER_COLOUR:uint = 0xAAAAAA;
@@ -66,10 +68,13 @@ package com.danielfreeman.madcomponents
 		protected var _knobColour:uint;
 		protected var _width:Number = WIDTH;
 		protected var _value:Number = 0.5;
+		protected var _radius:Number;
 		
-		public function UISlider(screen:Sprite, xx:Number, yy:Number, colours:Vector.<uint> = null) {
+		public function UISlider(screen:Sprite, xx:Number, yy:Number, colours:Vector.<uint> = null, alt:Boolean = false) {
 			screen.addChild(this);
 			x=xx; y=yy;
+			
+			_radius = alt ? ALT_RADIUS : RADIUS;
 
 			if (!colours)
 				colours = new <uint>[];
@@ -93,11 +98,11 @@ package com.danielfreeman.madcomponents
 		
 		protected function mouseMove(event:MouseEvent):void {
 			_knob.x = mouseX;
-			if (_knob.x < RADIUS)
-				_knob.x = RADIUS;
-			else if (_knob.x > _width - RADIUS)
-				_knob.x = _width - RADIUS;
-			_value = (_knob.x - RADIUS) / (_width - 2*RADIUS);
+			if (_knob.x < _radius)
+				_knob.x = _radius;
+			else if (_knob.x > _width - _radius)
+				_knob.x = _width - _radius;
+			_value = (_knob.x - _radius) / (_width - 2*_radius);
 			drawSlider();
 			dispatchEvent(new Event(Event.CHANGE));
 		}
@@ -113,26 +118,26 @@ package com.danielfreeman.madcomponents
 		protected function drawKnob():void {
 			addChild(_knob=new Sprite());
 			var matr:Matrix = new Matrix();
-			matr.createGradientBox(RADIUS*2, RADIUS*2, Math.PI/2, 0, -RADIUS);
+			matr.createGradientBox(_radius*2, _radius*2, Math.PI/2, 0, -_radius);
 			_knob.graphics.beginFill(Colour.darken(_knobColour));
-			_knob.graphics.drawCircle(0.3, 0.3, RADIUS+1);
+			_knob.graphics.drawCircle(0.3, 0.3, _radius+1);
 			_knob.graphics.beginGradientFill(GradientType.LINEAR, [Colour.lighten(_knobColour),Colour.darken(_knobColour)], [1.0,1.0], [0x00,0xff], matr);
-			_knob.graphics.drawCircle(0, 0, RADIUS);
+			_knob.graphics.drawCircle(0, 0, _radius);
 			_knob.graphics.beginGradientFill(GradientType.LINEAR, [Colour.darken(_knobColour),_knobColour,Colour.lighten(_knobColour,32)], [1.0,1.0,1.0], [0x00,0x66,0xFF], matr);
-			_knob.graphics.drawCircle(0, 0, RADIUS-1);
-			_knob.y = RADIUS;
+			_knob.graphics.drawCircle(0, 0, _radius-1);
+			_knob.y = _radius;
 			_knob.buttonMode = _knob.useHandCursor = true;
 		}
 		
 		
 		protected function drawSlider():void {
 			var matr:Matrix = new Matrix();
-			matr.createGradientBox(_width, SLIDER_HEIGHT, Math.PI/2, 0, RADIUS - SLIDER_HEIGHT/2);
+			matr.createGradientBox(_width, SLIDER_HEIGHT, Math.PI/2, 0, _radius - SLIDER_HEIGHT/2);
 			graphics.clear();
 			graphics.beginGradientFill(GradientType.LINEAR, [Colour.darken(_sliderColour,-64),_sliderColour,Colour.lighten(_sliderColour,64),Colour.lighten(_sliderColour,64)], [1.0,1.0,1.0,1.0], [0x00,0x00,0x80,0xff], matr);
-			graphics.drawRoundRect(0, RADIUS - SLIDER_HEIGHT/2, _width, SLIDER_HEIGHT, SLIDER_HEIGHT);
+			graphics.drawRoundRect(0, _radius - SLIDER_HEIGHT/2, _width, SLIDER_HEIGHT, SLIDER_HEIGHT);
 			graphics.beginGradientFill(GradientType.LINEAR, [Colour.darken(_highlightColour,-64),_highlightColour,Colour.lighten(_highlightColour,64),Colour.lighten(_highlightColour,64)], [1.0,1.0,1.0,1.0], [0x00,0x00,0x80,0xff], matr);
-			graphics.drawRoundRect(0, RADIUS - SLIDER_HEIGHT/2, _width * _value, SLIDER_HEIGHT, SLIDER_HEIGHT);
+			graphics.drawRoundRect(0, _radius - SLIDER_HEIGHT/2, _width * _value, SLIDER_HEIGHT, SLIDER_HEIGHT);
 		}
 		
 /**
@@ -147,7 +152,7 @@ package com.danielfreeman.madcomponents
  */
 		public function set value(valuu:Number):void {
 			_value = valuu;
-			_knob.x = RADIUS + valuu * (_width - 2*RADIUS);
+			_knob.x = _radius + valuu * (_width - 2*_radius);
 			drawSlider();
 		}
 		

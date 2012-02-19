@@ -120,7 +120,7 @@ package com.danielfreeman.madcomponents {
 			
 			_activityIndicator = new UIActivity(screen, width/2, height/2);
 	
-			_root = containers(screen,xml,_attributes);
+			_root = Sprite(containers(screen,xml,_attributes));
 			if (!_root && (xml.@border.length()==0 || xml.@border[0]=="true")) {
 				_attributes.x=PADDING;
 				_attributes.y=PADDING;
@@ -129,7 +129,8 @@ package com.danielfreeman.madcomponents {
 				_attributes.hasBorder = true;
 			}
 			if (!_root) {
-					_root = new _FormClass(screen, XML("<vertical>"+xml.toXMLString()+"</vertical>"), _attributes);
+				_root = new _FormClass(screen, XML("<vertical>"+xml.toXMLString()+"</vertical>"), _attributes);
+				_root.name = "+";
 			}
 			_root.scaleX = _root.scaleY = _scale;
 			
@@ -222,11 +223,11 @@ package com.danielfreeman.madcomponents {
 /**
  * Converts an XML tag name to a container object.
  */	
-		public static function containers(screen:Sprite, xml:XML, attributes:Attributes):Sprite {
+		public static function containers(screen:Sprite, xml:XML, attributes:Attributes):DisplayObject {
 			var idx:int = _tokens.indexOf(xml.localName());
 			if (idx>=0) {
 				attributes.parse(xml);
-				var result:Sprite = new _classes[idx](screen, xml, attributes);
+				var result:DisplayObject = new _classes[idx](screen, xml, attributes);
 				result.x=attributes.x;
 				result.y=attributes.y;
 				if (xml.@id.length()>0)
@@ -318,9 +319,9 @@ package com.danielfreeman.madcomponents {
 /**
  * Create a pop-up dialogue window
  */	
-		public static function createPopUp(xml:XML, width:Number = -1, height:Number = -1):UIWindow {
+		public static function createPopUp(xml:XML, width:Number = -1, height:Number = -1, curve:Number = -1):UIWindow {
 			_root.mouseEnabled = _root.mouseChildren = false;
-			var window:UIWindow = new UIWindow(_windowLayer, xml, new Attributes(0, 0, width, height));
+			var window:UIWindow = new UIWindow(_windowLayer, xml, new Attributes(0, 0, width, height), curve);
 			window.x = _root.x + _attributes.x + (_attributes.width - width) / 2;
 			window.y = _root.y + _attributes.y + (_attributes.height - height) / 2;
 			showPopUp(window);

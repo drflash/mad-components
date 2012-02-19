@@ -39,12 +39,16 @@ package com.danielfreeman.madcomponents {
 		protected static const SHADOW_OFFSET:Number = 4.0;
 		protected static const SHADOW_COLOUR:uint = 0x000000;
 		protected static const SHADOW_ALPHA:Number = 0.2;
+		
+		protected var _curve:Number = CURVE;
 
 /**
  *  A MadComponents pop-up window
  */
-		public function UIWindow(screen:Sprite, xml:XML, attributes:Attributes = null) {
+		public function UIWindow(screen:Sprite, xml:XML, attributes:Attributes = null, curve:Number = -1) {
 			super(screen,xml,attributes);
+			if (curve>=0)
+				_curve = curve;
 			drawBackground();
 		}
 		
@@ -62,7 +66,7 @@ package com.danielfreeman.madcomponents {
 			else {
 				graphics.beginFill(SHADOW_COLOUR, SHADOW_ALPHA);
 			}
-			graphics.drawRoundRect(attributes.x-CURVE + SHADOW_OFFSET, attributes.y-CURVE + SHADOW_OFFSET, attributes.width + 2 * CURVE, attributes.height + 2 * CURVE, CURVE);
+			graphics.drawRoundRect(attributes.x-_curve + SHADOW_OFFSET, attributes.y-_curve + SHADOW_OFFSET, attributes.width + 2 * _curve, attributes.height + 2 * _curve, _curve);
 
 			
 			if (colours.length==1) {
@@ -84,7 +88,7 @@ package com.danielfreeman.madcomponents {
 				graphics.lineStyle(OUTLINE,LINE_COLOUR, 1.0, true);
 			}
 			
-			graphics.drawRoundRect(attributes.x-CURVE, attributes.y-CURVE, attributes.width + 2 * CURVE, attributes.height + 2 * CURVE, CURVE);
+			graphics.drawRoundRect(attributes.x-_curve, attributes.y-_curve, attributes.width + 2 * _curve, attributes.height + 2 * _curve, _curve);
 		}
 
 	}
