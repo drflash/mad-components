@@ -57,6 +57,7 @@ package com.danielfreeman.madcomponents {
 		
 		protected static const DISTANCE_PER_TICK:Number = 10.0;
 		protected static const TICKS_THRESHOLD:int = 5.0;
+		protected static const MAXIMUM_TICKS:int = 3;
 	
 		protected var _pages:Array = new Array();
 		protected var _page:int = 0;
@@ -180,11 +181,10 @@ package com.danielfreeman.madcomponents {
 			sliderX = _startSlider.x + (mouseX - _startMouse.x);
 			_delta += _slider.x;
 			_distance += Math.abs(_delta);
-			_ticks++;
 			if (_distance > THRESHOLD) {
 				showScrollBar();
 			}
-			else if (_ticks == MAXIMUM_TICKS) {
+			else if (_touchTimer.currentCount == MAXIMUM_TICKS) {
 				pressButton();
 				if (_pressButton) {
 					_touchTimer.stop();
@@ -196,7 +196,7 @@ package com.danielfreeman.madcomponents {
 		
 		
 		protected function slideCondition():Boolean {
-			return !_pressButton && (Math.abs(mouseX-_startMouse.x)/_ticks) > DISTANCE_PER_TICK && _ticks < TICKS_THRESHOLD;
+			return !_pressButton && (Math.abs(mouseX-_startMouse.x)/_touchTimer.currentCount) > DISTANCE_PER_TICK && _touchTimer.currentCount < TICKS_THRESHOLD;
 		}
 		
 		

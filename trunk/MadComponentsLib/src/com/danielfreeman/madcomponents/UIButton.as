@@ -120,6 +120,13 @@ package com.danielfreeman.madcomponents {
 		}
 		
 		
+		public function set alt(value:Boolean):void {
+			_sizeY = value ? TINY_SIZE_Y : SIZE_Y;
+			_border = value ? 0.5 : 2.0;
+			drawButton();
+		}
+		
+		
 		protected function init():void {
 			if (_colours.length>3) {
 				_gap=Math.max(_colours[3]/3,SIZE_X);
@@ -234,11 +241,19 @@ package com.danielfreeman.madcomponents {
 					_label.y = (_skinHeight-_label.height)/2;
 					_shadowLabel.y = _label.y - 1;				
 				}
+				else {
+					_label.y = _sizeY-1;
+					_shadowLabel.y = _sizeY-SHADOW_OFFSET -1;
+				}
 			
 			}
 			if (_fixwidth > _label.width + 2 * _gap) {
 				_label.x = (_fixwidth-_label.width)/2;
 				_shadowLabel.x = _label.x - 1;
+			}
+			else {
+				_label.x = _gap;
+				_shadowLabel.x = _gap-SHADOW_OFFSET;
 			}
 		//	cacheAsBitmap = true;
 		}

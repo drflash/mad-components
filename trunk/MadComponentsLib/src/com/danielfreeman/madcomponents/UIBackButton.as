@@ -44,6 +44,7 @@ package com.danielfreeman.madcomponents {
 		protected var _label:UILabel;
 		protected var _colour:uint;
 		protected var _forward:Boolean;
+		protected var _height:Number = HEIGHT;
 	
 		public function UIBackButton(screen:Sprite, xx:Number, yy:Number, text:String, colour:uint, forward:Boolean = false) {
 			screen.addChild(this);
@@ -93,38 +94,37 @@ package com.danielfreeman.madcomponents {
 			matr.createGradientBox(width, HEIGHT, Math.PI/2, 0, 0);
 			graphics.beginGradientFill(GradientType.LINEAR, [Colour.darken(_colour,-100),Colour.lighten(_colour)], [1.0,1.0], [0x00,0xff], matr);
 			
-			buttonShape(0,0,width,HEIGHT);
+			buttonShape(0,0,Math.floor(width/10)*10,_height);
 
 			var gradient:Array = [Colour.lighten(_colour),Colour.darken(_colour),Colour.darken(_colour)];
 			
 			graphics.beginGradientFill(GradientType.LINEAR, gradient, [1.0,1.0,1.0], [0x00,0x80,0xff], matr);
-			buttonShape(0.0,1.0,width,HEIGHT-1.5);
+			buttonShape(0.0,1.0,Math.floor(width/10)*10-1,_height-1.5);
 		}
 		
 /**
  * Create the basic button shape
  */	
-		protected function buttonShape(x:Number,y:Number,width:Number,height:Number):void {
+		protected function buttonShape(x:Number,y:Number,buttonWidth:Number,height:Number):void {
 			var quotient:Number = (ARROW-CURVE)/ARROW;
-			var buttonWidth:Number = Math.floor(width/10)*10;
 			var s:Number = _forward ? -1.0 : 1.0;
 			if (_forward) {
 				x+= buttonWidth;
-				_label.x = 7.0 + (buttonWidth-width)/2;
+				_label.x = 7.0;// + (buttonWidth-width)/2;
 			}
 			else {
-				_label.x = 12.0 + (buttonWidth-width)/2;
+				_label.x = 12.0;// + (buttonWidth-width)/2;
 			}
-			graphics.moveTo(x,HEIGHT/2);
-			graphics.lineTo(x+s*quotient*ARROW,y+(1-quotient)*HEIGHT/2);
+			graphics.moveTo(x,_height/2);
+			graphics.lineTo(x+s*quotient*ARROW,y+(1-quotient)*_height/2);
 			graphics.curveTo(x+s*ARROW,y,x+s*(ARROW+CURVE),y);
 			graphics.lineTo(x+s*(buttonWidth-CURVE),y);
 			graphics.curveTo(x+s*buttonWidth,y,x+s*buttonWidth,y+CURVE);
 			graphics.lineTo(x+s*buttonWidth,y+height-CURVE);
 			graphics.curveTo(x+s*buttonWidth,y+height,x+s*(buttonWidth-CURVE),y+height);
 			graphics.lineTo(x+s*(ARROW+CURVE),y+height);
-			graphics.curveTo(x+s*ARROW,y+height,x+s*quotient*ARROW,y+height-(1-quotient)*HEIGHT/2);
-			graphics.lineTo(x,HEIGHT/2);
+			graphics.curveTo(x+s*ARROW,y+height,x+s*quotient*ARROW,y+height-(1-quotient)*_height/2);
+			graphics.lineTo(x,_height/2);
 		}
 	}
 }

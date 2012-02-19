@@ -85,6 +85,8 @@ package com.danielfreeman.madcomponents
 					_recycleList.push(_cell);
 				
 				if (position > _attributes.height) {
+					if (_cellHeight<0)
+						_cellHeight = (_slider.height - _top - (_refresh ? TOP : 0)) / _count;
 					for (var i:uint = _count; i<value.length; i++) {
 						drawCell((i+1) * _cellHeight + _top, i);
 					}
@@ -92,6 +94,8 @@ package com.danielfreeman.madcomponents
 					return;
 				}
 			}
+			if (_cellHeight<0)
+				_cellHeight = (_slider.height - _top - (_refresh ? TOP : 0)) / _count;
 			_lazy = true;
 		}	
 		
@@ -108,13 +112,15 @@ package com.danielfreeman.madcomponents
 				position += label.height + 2 * _attributes.paddingV;
 				drawCell(position, _count);
 				position += 2 * _attributes.paddingV;
-				_cellHeight = 4 * _attributes.paddingV + label.height;
+			//	_cellHeight = 4 * _attributes.paddingV + label.height;
 				_count++;
 				
 				if (_recycle)
 					_recycleLabel.push(label);
 				
 				if (position > _attributes.height) {
+					if (_cellHeight<0)
+						_cellHeight = (_slider.height - _top - (_refresh ? TOP : 0)) / _count;
 					for (var i:uint = _count; i<value.length; i++) {
 						drawCell((i+1) * _cellHeight + _top, i);
 					}
@@ -122,6 +128,9 @@ package com.danielfreeman.madcomponents
 					return;
 				}
 			}
+			if (_cellHeight<0)
+				_cellHeight = (_slider.height - _top - (_refresh ? TOP : 0)) / _count;
+			_lazy = true;
 		}
 
 /**
@@ -142,10 +151,11 @@ package com.danielfreeman.madcomponents
  *  Generate simple list labels between a specified start and end index
  */
 		protected function lazySimpleRenderers(value:Array, startIndex:uint, endIndex:uint):void {
+trace("_cellHeight="+_cellHeight);
 			if (_lastStartIndex != startIndex) {
 				for (_count = startIndex; _count<endIndex; _count++) {
 					if (!_slider.getChildByName("label_"+_count.toString()+_suffix)) {
-						labelCell(value[_count], _count * _cellHeight + _attributes.paddingV + _top);
+						labelCell(value[_count], _count * _cellHeight + 2 * _attributes.paddingV + _top);
 					}
 				}
 				_lastStartIndex = startIndex;

@@ -106,12 +106,8 @@ package com.danielfreeman.madcomponents {
 				_colours = UI.toColourVector(colour); 
 			if (xml.@clickable.length()>0)
 				_clickable = xml.@clickable[0].toString();
-			var align:String = xml.@alignV;
-			if (align)
-				_alignV = align;
-			align = xml.@alignH;
-			if (align)
-				_alignH = align;
+			_alignV = xml.@alignV.length()>0 ? xml.@alignV : _alignV;
+			_alignH = xml.@alignH.length()>0 ? xml.@alignH : _alignH;
 			_id = xml.@id;
 		}
 		
@@ -124,11 +120,15 @@ package com.danielfreeman.madcomponents {
 			copy._paddingH = _paddingH;
 			copy._colour = _colour;
 			copy._scrollBarColour = _scrollBarColour;
-			copy._alignH = (!container || _alignH == "fill") ? _alignH : ALIGN_H;
+			copy._alignH = (!container || _alignH == FILL) ? _alignH : ALIGN_H;
+			trace("xml="+(xml ? xml.toXMLString() : "null"));
+			trace("A _alignH="+_alignH+" container="+container+" copy._alignH="+copy._alignH);
 			copy._alignV = !container ? _alignV : ALIGN_V;
 			copy._hasBorder = _hasBorder;
 			if (xml)
 				copy.parse(xml);
+			trace("B _alignH="+_alignH+" container="+container+" copy._alignH="+copy._alignH);
+			trace();
 			return copy;
 		}
 		

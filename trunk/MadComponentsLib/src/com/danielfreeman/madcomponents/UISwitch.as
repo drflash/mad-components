@@ -52,6 +52,8 @@ package com.danielfreeman.madcomponents {
  *   visible = "true|false"
  *   width = "NUMBER"
  *   alt = "true|false"
+ *   state = "true|false"
+ *   clickable = "true|false"
  * /&gt;
  * </pre>
  */
@@ -110,7 +112,7 @@ package com.danielfreeman.madcomponents {
 				if (colours.length > 4)
 					_buttonColour = colours[4];
 				if (colours.length > 5)
-					_buttonColour = colours[5];
+					_outlineColour = colours[5];
 			}
 			
 			initialiseButton(onText, offText);
