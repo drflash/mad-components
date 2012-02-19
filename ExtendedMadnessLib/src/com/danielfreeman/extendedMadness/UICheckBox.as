@@ -54,7 +54,8 @@ package com.danielfreeman.extendedMadness
 		protected static const ON:Number = 6.0;
 		protected static const ON_COLOUR:uint=0xFFF999;
 		protected static const COLOUR:uint = 0xFCFCFC;
-		protected static const GAP:Number = 10.0;		
+		protected static const GAP:Number = 10.0;
+		protected static const SMALL_GAP:Number = 4.0;
 		
 		protected var _colour:uint = COLOUR;
 		protected var _tick:UITick;
@@ -71,11 +72,13 @@ package com.danielfreeman.extendedMadness
 			_colour = attributes.backgroundColours.length>0 ? attributes.backgroundColours[0] : COLOUR;
 			_onColour = attributes.backgroundColours.length>1 ? attributes.backgroundColours[1] : ON_COLOUR;
 			_offColour = Colour.darken(_colour,-90);
+				
 			buttonChrome();
 			makeTick();
+			state = xml.@state=="true";
 			buttonMode = mouseEnabled = true;
 			addEventListener(MouseEvent.MOUSE_UP,mouseUp);
-			_label = new UILabel(this, SIZE+GAP, 0, xml.toString());
+			_label = new UILabel(this, (_alt ? ALT_SIZE+SMALL_GAP  : SIZE+GAP), 0, xml.toString());
 			assignToLabel(xml, _label);
 		}
 		
@@ -90,7 +93,7 @@ package com.danielfreeman.extendedMadness
 					label.text=" ";
 				}
 			}
-			label.y = Math.max((SIZE - label.height)/2,0);
+			label.y = Math.max(((_alt ? ALT_SIZE : SIZE) - label.height)/2,0);
 		}
 		
 /**
