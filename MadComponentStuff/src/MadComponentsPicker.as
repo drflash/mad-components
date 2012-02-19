@@ -41,6 +41,18 @@ package
 	        								<Green/>
 	        								<Blue/>
 											<Indigo/>
+	    									<Red/>
+	        								<Orange/>
+	        								<Yellow/>
+	        								<Green/>
+	        								<Blue/>
+											<Indigo/>
+	    									<Red/>
+	        								<Orange/>
+	        								<Yellow/>
+	        								<Green/>
+	        								<Blue/>
+											<Indigo/>
 										 </data>;
 		
 		protected static const PICKER_EXAMPLE:XML = <columns gapH="0" widths="40,50%,50%" pickerHeight="180">
