@@ -30,18 +30,21 @@ package com.danielfreeman.extendedMadness {
 	
 	import com.danielfreeman.madcomponents.*;
 	
+	import flash.display.DisplayObject;
 	import flash.display.Sprite;
 	import flash.events.Event;
+
 
 	public class UIe extends UI {
 
 		protected static const DESKTOP_TOKENS:Array = ["tabPagesTop","scrollXY","scrollBarVertical","scrollBarHorizontal","scrollBarPanel","dataGrid","menu","segmentedControl","checkBox","radioButton","treeNavigation","pieChart","barChart","lineChart","scatterChart","horizontalChart","splitView","starRating","field"];
 		protected static const DESKTOP_CLASSES:Array = [UITabPagesTop,UIScrollXY,UIScrollBarVertical,UIScrollBarHorizontal,UIScrollBarPanel,UIDataGrid,UIMenu,UISegmentedControl,UICheckBox,UIRadioButton,UITreeNavigation,UIPieChart,UIBarChart,UILineChart,UIScatterChart,UIHorizontalChart,UISplitView,UIStarRating,UIField];
+		protected static const COLOUR:uint = 0x666666;
 		
 		protected static var _cursor:Cursor = null;
 		
 		public static function activate(screen:Sprite):void {
-			_FormClass = UIPanel;
+			FormClass = UIPanel;
 			extend(DESKTOP_TOKENS,DESKTOP_CLASSES);
 			HintText.SIZE = 30;
 			Cursor.HINT_Y = 64;
@@ -74,6 +77,34 @@ package com.danielfreeman.extendedMadness {
 			var result:Sprite = UI.create(screen, xml, width, height);
 			screen.setChildIndex(_cursor,screen.numChildren-1);
 			return result;
+		}	
+		
+/**
+ * Create a pop-up dialogue window
+ */	
+		public static function showCallOut(xml:XML, x:Number, y:Number):DisplayObject {
+			var result:DisplayObject;
+			var arrowPosition:Number = xml.@arrowPosition.length()>0 ? parseFloat(xml.@arrowPosition) : 0;
+			if (xml.localName() == "data") {
+				var words:Vector.<String> = new <String>[];
+				for each (var word:XML in xml.children()) {
+					words.push(word.@value.length() > 0 ? word.@value : word.localName());
+				}
+				var colour:uint = xml.backgroundColours.length>0 ? parseFloat(xml.backgroundColours[0]) : COLOUR;
+				result = new UICutCopyPaste(_windowLayer, x-Math.abs(arrowPosition), y + (arrowPosition==0 ? 0 : UICutCopyPaste.ARROW), arrowPosition, colour, xml.@alt=="true", words);
+				if (arrowPosition>0)
+					result.y -= result.height + UICutCopyPaste.ARROW;
+			}
+			else {
+				var attributes:Attributes = new Attributes();
+				attributes.parse(xml);
+				result = new UIDropWindow(_windowLayer, xml, attributes);
+				result.x = x-arrowPosition - (arrowPosition==0 ? UIDropWindow.ARROW : 0) + UIDropWindow.CURVE;
+				result.y = y + UIDropWindow.ARROW + UIDropWindow.CURVE;
+				
+			}
+			return result;
 		}
+
 	}
 }

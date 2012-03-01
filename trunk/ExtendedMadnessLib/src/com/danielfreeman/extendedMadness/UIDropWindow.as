@@ -26,8 +26,8 @@
 package com.danielfreeman.extendedMadness
 {
 	import com.danielfreeman.madcomponents.Attributes;
-	import com.danielfreeman.madcomponents.UIWindow;
 	import com.danielfreeman.madcomponents.Colour;
+	import com.danielfreeman.madcomponents.UIWindow;
 	
 	import flash.display.GradientType;
 	import flash.display.Sprite;
@@ -40,11 +40,13 @@ package com.danielfreeman.extendedMadness
 	{
 		public static const ARROW:Number = 20.0;
 		public static const CURVE:Number = 8.0;
+		
+		protected var _arrowPosition:Number;
 
 		public function UIDropWindow(screen:Sprite, xml:XML, attributes:Attributes=null) {
+			_arrowPosition = xml.@arrowPosition.length()>0 ? parseFloat(xml.@arrowPosition) : 0;
 			super(screen, xml, attributes);
 		}
-		
 		
 		override public function layout(attributes:Attributes):void {
 			super.layout(attributes);
@@ -88,8 +90,18 @@ package com.danielfreeman.extendedMadness
 			}
 			
 			graphics.moveTo(attributes.x - CURVE, attributes.y);
-			graphics.lineTo(attributes.x - CURVE + ARROW, attributes.y - CURVE - ARROW);
-			graphics.lineTo(attributes.x - CURVE + 2 * ARROW, attributes.y - CURVE);
+			
+			if (_arrowPosition==0) {
+				graphics.lineTo(attributes.x - CURVE + ARROW, attributes.y - CURVE - ARROW);
+				graphics.lineTo(attributes.x - CURVE + 2 * ARROW, attributes.y - CURVE);
+			}
+			else {
+				graphics.curveTo(attributes.x - CURVE, attributes.y - CURVE, attributes.x, attributes.y - CURVE);
+				graphics.lineTo(_arrowPosition + attributes.x - CURVE - ARROW, attributes.y - CURVE);
+				graphics.lineTo(_arrowPosition + attributes.x - CURVE, attributes.y - CURVE - ARROW);
+				graphics.lineTo(_arrowPosition + attributes.x - CURVE + ARROW, attributes.y - CURVE);
+			}
+			
 			graphics.lineTo(attributes.x + attributes.width, attributes.y - CURVE);
 			graphics.curveTo(attributes.x + attributes.width + CURVE, attributes.y - CURVE, attributes.x + attributes.width + CURVE, attributes.y);
 			graphics.lineTo(attributes.x + attributes.width + CURVE, attributes.y + attributes.height);
