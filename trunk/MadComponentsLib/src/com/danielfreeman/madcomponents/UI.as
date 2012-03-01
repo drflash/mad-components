@@ -47,9 +47,13 @@ package com.danielfreeman.madcomponents {
  * </pre>
  */	
 	public class UI {
-
+		
 		public static const RESIZED:String = "resized";
 		public static const PADDING:Number = 10.0;
+
+		public static var ModelClass:Class = Model;
+		public static var FormClass:Class = UIForm;
+		
 		protected static const SIMULATION_RESIZE:Boolean = false;
 		protected static const DPI:uint = 160;
 		protected static const DIM_ALPHA:Number = 0.4;
@@ -74,7 +78,6 @@ package com.danielfreeman.madcomponents {
 		protected static var _simulated:Boolean = true;
 		protected static var _activityIndicator:UIActivity;
 		protected static var _maskIt:Boolean = true;
-		protected static var _FormClass:Class = UIForm;
 		protected static var _stageColours:Vector.<uint> = null;
 		protected static var _dpi:uint = DPI;
 		
@@ -129,7 +132,7 @@ package com.danielfreeman.madcomponents {
 				_attributes.hasBorder = true;
 			}
 			if (!_root) {
-				_root = new _FormClass(screen, XML("<vertical>"+xml.toXMLString()+"</vertical>"), _attributes);
+				_root = new FormClass(screen, XML("<vertical>"+xml.toXMLString()+"</vertical>"), _attributes);
 				_root.name = "+";
 			}
 			_root.scaleX = _root.scaleY = _scale;
@@ -212,13 +215,7 @@ package com.danielfreeman.madcomponents {
 			}
 			screen.graphics.drawRect(-padding, -padding, width+2*padding, height+2*padding);
 		}
-		
-/**
- * If you extend MadComponents, you may wish to redefine FormClass.  It is initially set to UIForm.
- */
-		public static function get FormClass():Class {
-			return _FormClass;
-		}
+
 	
 /**
  * Converts an XML tag name to a container object.
@@ -257,7 +254,7 @@ package com.danielfreeman.madcomponents {
  * Redraw the user interface
  */	
 		public static function redraw():Sprite {
-			return create(_screen, _FormClass(_root).xml);
+			return create(_screen, FormClass(_root).xml);
 		}
 
 /**
@@ -286,7 +283,7 @@ package com.danielfreeman.madcomponents {
 					_attributes.hasBorder = true;
 			}
 			if (!container) {
-				_FormClass(_root).layout(_attributes);
+				FormClass(_root).layout(_attributes);
 			}
 			if (_popUps > 0) {
 				dimUI();
@@ -320,7 +317,6 @@ package com.danielfreeman.madcomponents {
  * Create a pop-up dialogue window
  */	
 		public static function createPopUp(xml:XML, width:Number = -1, height:Number = -1, curve:Number = -1):UIWindow {
-			_root.mouseEnabled = _root.mouseChildren = false;
 			var window:UIWindow = new UIWindow(_windowLayer, xml, new Attributes(0, 0, width, height), curve);
 			window.x = _root.x + _attributes.x + (_attributes.width - width) / 2;
 			window.y = _root.y + _attributes.y + (_attributes.height - height) / 2;
@@ -355,8 +351,7 @@ package com.danielfreeman.madcomponents {
 			window.visible = false;
 			_popUps--;
 			if (_popUps <= 0) {
-				_root.mouseEnabled = _root.mouseChildren = true;
-				_windowLayer.graphics.clear();
+				unDimUI();
 			}
 		}
 		
@@ -397,10 +392,19 @@ package com.danielfreeman.madcomponents {
 /**
  * Dim the user interface beneath the pop-ups, ensuring that all dialogues are modal
  */	
-		protected static function dimUI():void {
+		public static function dimUI():void {
+			_root.mouseEnabled = _root.mouseChildren = false;
 			_windowLayer.graphics.clear();
 			_windowLayer.graphics.beginFill(0x000000,DIM_ALPHA);
 			_windowLayer.graphics.drawRect(0, 0, _screen.stage.stageWidth, _screen.stage.stageHeight);
+		}
+		
+/**
+ * Un-dim the user interface beneath the pop-ups
+ */	
+		public static function unDimUI():void {
+			_root.mouseEnabled = _root.mouseChildren = true;
+			_windowLayer.graphics.clear();
 		}
 		
 /**

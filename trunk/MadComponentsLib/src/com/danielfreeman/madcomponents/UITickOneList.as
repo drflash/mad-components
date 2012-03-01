@@ -47,6 +47,7 @@ package com.danielfreeman.madcomponents {
  *    sortBy = "IDENTIFIER"
  *    index = "INTEGER"
  *    mask = "true|false"
+ *    showPressed = "true|false"
  *    alignV = "scroll|no scroll"
  *    tickColour = "#rrggbb"
  * /&gt;

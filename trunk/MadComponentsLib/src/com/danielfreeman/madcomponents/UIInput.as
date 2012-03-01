@@ -33,6 +33,7 @@ package com.danielfreeman.madcomponents {
 	import flash.events.TextEvent;
 	import flash.filters.DropShadowFilter;
 	import flash.geom.Matrix;
+	import flash.geom.Point;
 	import flash.geom.Rectangle;
 	import flash.text.TextFormat;
 
@@ -194,6 +195,16 @@ package com.danielfreeman.madcomponents {
 			graphics.drawRoundRect(1, 1, _fixwidth-2, height-2, CURVE-1);
 			graphics.beginFill(_colours.length > 1 ? _colours[1] : BACKGROUND);
 			graphics.drawRoundRect(2.5, 3, _fixwidth-3.5, height-4, CURVE-2);
+		}
+		
+		
+/**
+ *  Stage rectangle
+ */		
+		public function stageRect():Rectangle {
+			var leftTop:Point = _label.localToGlobal(new Point(0,0));
+			var rightBottom:Point = _label.localToGlobal(new Point(_label.width,_label.height));
+			return new Rectangle(leftTop.x, leftTop.y, rightBottom.x - leftTop.x, rightBottom.y - leftTop.y);
 		}
 		
 		

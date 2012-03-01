@@ -163,7 +163,6 @@ package com.danielfreeman.madcomponents {
 		override protected function redrawCells():void {
 			_cellLeft = _attributes.x + _attributes.paddingH - PADDING;
 			_cellWidth = _attributes.width - 2 * _attributes.paddingH + 2 * PADDING;
-			_group = 0;
 			for each(var groupDetails:Object in _groupPositions) {
 				_length = groupDetails.length;
 				_cellTop = groupDetails.top;

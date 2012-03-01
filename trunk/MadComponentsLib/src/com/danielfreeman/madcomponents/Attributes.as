@@ -121,14 +121,10 @@ package com.danielfreeman.madcomponents {
 			copy._colour = _colour;
 			copy._scrollBarColour = _scrollBarColour;
 			copy._alignH = (!container || _alignH == FILL) ? _alignH : ALIGN_H;
-			trace("xml="+(xml ? xml.toXMLString() : "null"));
-			trace("A _alignH="+_alignH+" container="+container+" copy._alignH="+copy._alignH);
 			copy._alignV = !container ? _alignV : ALIGN_V;
 			copy._hasBorder = _hasBorder;
 			if (xml)
 				copy.parse(xml);
-			trace("B _alignH="+_alignH+" container="+container+" copy._alignH="+copy._alignH);
-			trace();
 			return copy;
 		}
 		

@@ -45,6 +45,7 @@ package com.danielfreeman.madcomponents
  *    pullDownColour = "#rrggbb"
  *    sortBy = "IDENTIFIER"
  *    index = "INTEGER"
+ *    showPressed = "true|false"
  *    mask = "true|false"
  *    alignV = "scroll|no scroll"
  *    recycle = "true|false"
@@ -151,7 +152,6 @@ package com.danielfreeman.madcomponents
  *  Generate simple list labels between a specified start and end index
  */
 		protected function lazySimpleRenderers(value:Array, startIndex:uint, endIndex:uint):void {
-trace("_cellHeight="+_cellHeight);
 			if (_lastStartIndex != startIndex) {
 				for (_count = startIndex; _count<endIndex; _count++) {
 					if (!_slider.getChildByName("label_"+_count.toString()+_suffix)) {
