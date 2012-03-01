@@ -31,21 +31,28 @@ package com.danielfreeman.extendedMadness
 	import flash.display.Sprite;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
+	import flash.events.TimerEvent;
 	import flash.geom.Matrix;
 	import flash.text.TextFormat;
+	import flash.utils.Timer;
 	
 
 	public class UICutCopyPaste extends MadSprite
 	{
+		public static const CLICKED:String = "clicked";
+		
+		public static const ARROW:Number = 14.0;
 		protected static const HEIGHT:Number = 38.0;
 		protected static const ALT_HEIGHT:Number = 22.0;
 		protected static const GAP:Number = 10.0;
 		protected static const CURVE:Number = 16.0;
-		protected static const ARROW:Number = 14.0;
 		protected static const COLOUR:uint = 0x555555;
 		protected static const FORMAT:TextFormat = new TextFormat("_sans",16,0xFFFFFF);
+		protected static const PRESSED_COLOUR:uint = 0x6666CC;
+		protected static const PRESSED_TEXT_COLOUR:uint = 0xFFFFFF;
 		
 		protected var _labels:Vector.<UILabel> = new Vector.<UILabel>();
+		protected var _arrowPosition:Number;
 		protected var _index:int = -1;
 		protected var _colour:uint = COLOUR;
 		protected var _gap:Number = GAP;
@@ -53,17 +60,21 @@ package com.danielfreeman.extendedMadness
 		protected var _height:Number = HEIGHT;
 		protected var _alt:Boolean;
 		protected var _font:XML = null;
+		protected var _pressedLayer:Sprite;
+		protected var _pressedColour:uint = UIList.HIGHLIGHT;
+		protected var _timer:Timer;
 		
 /**
  * Cut / Copy / Paste style buttons
  */
-		public function UICutCopyPaste(screen:Sprite, xx:Number, yy:Number, colour:uint = 0x666666, alt:Boolean = false)
-		{
+		public function UICutCopyPaste(screen:Sprite, xx:Number, yy:Number, arrowPosition:Number = 0, colour:uint = 0x666666, alt:Boolean = false, words:Vector.<String> = null) {
 			screen.addChild(this);
 			x=xx;y=yy;
 			_colour = colour;
 			_height = alt ? ALT_HEIGHT : HEIGHT;
-			initialise();
+			_arrowPosition = arrowPosition;
+			addChild(_pressedLayer = new Sprite());
+			initialise(words);
 			buttonMode=useHandCursor = true;
 			addEventListener(MouseEvent.MOUSE_UP,mouseUp);
 		}
@@ -74,14 +85,19 @@ package com.danielfreeman.extendedMadness
 		}
 		
 		
-		protected function initialise():void {
-			drawButtons(new <String>["Cut","Copy","Paste"],50);
+		protected function initialise(words:Vector.<String>):void {
+			drawButtons(words ? words : new <String>["Cut","Copy","Paste"], _arrowPosition);
+			_timer = new Timer(50, 1);
+			_timer.addEventListener(TimerEvent.TIMER_COMPLETE, resetHighlight);
 		}
 		
 		
 		protected function mouseUp(event:MouseEvent):void {
 			updateIndex();
 			dispatchEvent(new Event(Event.CHANGE));
+			showPressed();
+			_timer.reset();
+			_timer.start();
 		}
 		
 		
@@ -104,7 +120,7 @@ package com.danielfreeman.extendedMadness
 		}
 		
 		
-		protected function drawButtons(labels:Vector.<String>, arrowPosition:Number = -1):void {
+		protected function drawButtons(labels:Vector.<String>, arrowPosition:Number = 0):void {
 			var left:Number = 0;
 			for each (var label:String in labels) {
 				var uiLabel:UILabel = new UILabel(this, left+_gap, 0, "", FORMAT);
@@ -122,7 +138,7 @@ package com.danielfreeman.extendedMadness
 		}
 
 			
-		protected function buttonChrome(left:Number, arrowPosition:Number = -1):void {
+		protected function buttonChrome(left:Number, arrowPosition:Number = 0):void {
 			var matr:Matrix = new Matrix();
 			var gradient:Array = [Colour.lighten(_colour,128),_colour,_colour];
 			matr.createGradientBox(left, _height, Math.PI/2, 0, 0);
@@ -131,11 +147,16 @@ package com.danielfreeman.extendedMadness
 			graphics.lineStyle(1, Colour.darken(_colour,-32), 1.0, true);
 			graphics.moveTo(0,_curve);
 			graphics.curveTo(0, 0, _curve, 0);
+			if (arrowPosition<0) {
+				graphics.lineTo(-arrowPosition - ARROW, 0);
+				graphics.lineTo(-arrowPosition, - ARROW);
+				graphics.lineTo(-arrowPosition + ARROW, 0);
+			}
 			graphics.lineTo(left - _curve, 0);
 			graphics.curveTo(left, 0, left, _curve);
 			graphics.lineTo(left, _height - _curve);
 			graphics.curveTo(left, _height, left - _curve, _height);
-			if (arrowPosition>=0) {
+			if (arrowPosition>0) {
 				graphics.lineTo(arrowPosition + ARROW, _height);
 				graphics.lineTo(arrowPosition, _height + ARROW);
 				graphics.lineTo(arrowPosition - ARROW, _height);
@@ -152,6 +173,53 @@ package com.danielfreeman.extendedMadness
 				graphics.beginGradientFill(GradientType.LINEAR, [Colour.darken(_colour), _colour], [1.0,1.0], [0x00,0xff], matr);
 				graphics.drawRect(position - _gap + 1, 1, 1, _height-1);
 			}
+		}
+		
+		
+		protected function showPressed():void {
+			var matr:Matrix = new Matrix();
+			_pressedLayer.graphics.clear();
+			matr.createGradientBox(width, _height, Math.PI/2, 0, 0);
+			_pressedLayer.graphics.beginGradientFill(GradientType.LINEAR, [Colour.darken(_pressedColour,-32),_pressedColour,Colour.lighten(_pressedColour,48),Colour.lighten(_pressedColour,48)], [1.0,1.0,1.0,1.0], [0x00,0x20,0x80,0xff], matr);
+			if (_index<0) {
+				return;
+			}
+			else if (_labels.length==1) {
+				_pressedLayer.graphics.drawRoundRect(1, 1, width-2, _height-1,_curve);
+			}
+			else if (_index==0) {
+				var right:Number = _labels[1].x - _gap +1;
+				_pressedLayer.graphics.moveTo(1, _curve);
+				_pressedLayer.graphics.curveTo(1, 1, _curve, 1);
+				_pressedLayer.graphics.lineTo(right, 1);
+				_pressedLayer.graphics.lineTo(right, _height);
+				_pressedLayer.graphics.lineTo(_curve, _height);
+				_pressedLayer.graphics.curveTo(1, _height, 1, _height - _curve);
+				_pressedLayer.graphics.lineTo(1, _curve-1);
+			}
+			else if (_index==_labels.length-1) {
+				var left:Number = _labels[_index].x - _gap +2;
+				_pressedLayer.graphics.moveTo(left, 1);
+				_pressedLayer.graphics.lineTo(width-_curve, 1);
+				_pressedLayer.graphics.curveTo(width-1, 1, width-1, _curve);
+				_pressedLayer.graphics.lineTo(width-1, _height-_curve);
+				_pressedLayer.graphics.curveTo(width-1, _height, width-_curve-1, _height);
+				_pressedLayer.graphics.lineTo(left, _height);
+				_pressedLayer.graphics.lineTo(left, 1);
+			}
+			else {
+				var left0:Number = _labels[_index].x - _gap + 2;
+				var width0:Number = _labels[_index].width + 2*_gap - 1;
+				_pressedLayer.graphics.drawRect(left0, 1, width0, _height-1);
+			}
+			if (!_font)
+				_labels[_index].textColor = PRESSED_TEXT_COLOUR;
+		}
+		
+		
+		protected function resetHighlight(event:TimerEvent):void {
+			_pressedLayer.graphics.clear();
+			dispatchEvent(new Event(CLICKED));
 		}
 		
 		

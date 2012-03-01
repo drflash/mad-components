@@ -31,6 +31,7 @@ package com.danielfreeman.extendedMadness
 	import flash.display.GradientType;
 	import flash.display.Sprite;
 	import flash.events.MouseEvent;
+	import flash.events.Event;
 	import flash.geom.Matrix;
 	
 /**
@@ -48,16 +49,13 @@ package com.danielfreeman.extendedMadness
  * */
 	public class UISegmentedControl extends UICutCopyPaste implements IContainerUI
 	{
-		protected static const BUTTON_COLOUR:uint = 0xE6E6E6; //0xAFAFAF;
-		protected static const PRESSED_COLOUR:uint = 0x6666CC;
+		protected static const BUTTON_COLOUR:uint = 0xE6E6E6;
 		protected static const TEXT_COLOUR:uint = 0x666666;
-		protected static const PRESSED_TEXT_COLOUR:uint = 0xFFFFFF;
 		protected static const CONTROL_CURVE:Number = 12.0;
 		
 		protected var _attributes:Attributes;
 		protected var _xml:XML;
-		protected var _pressedLayer:Sprite;
-		protected var _pressedColour:uint = PRESSED_COLOUR;
+
 		
 		
 		public function UISegmentedControl(screen:Sprite, xml:XML, attributes:Attributes)
@@ -66,10 +64,8 @@ package com.danielfreeman.extendedMadness
 			_attributes = attributes;
 			if (xml.font.length()>0)
 				_font = xml.font[0];
-			addChild(_pressedLayer = new Sprite());
 			var colour:uint = attributes.backgroundColours.length>0 ? attributes.backgroundColours[0] : BUTTON_COLOUR;
-			_pressedColour = attributes.backgroundColours.length>1 ? attributes.backgroundColours[1] : PRESSED_COLOUR;
-			super(screen, 0, 0, colour, xml.@alt == "true");
+			super(screen, 0, 0, 0, colour, xml.@alt == "true");
 			colourButtons();
 			if (attributes.fillH)
 				fixwidth = attributes.widthH;
@@ -81,10 +77,7 @@ package com.danielfreeman.extendedMadness
  * Set index of active segment
  */	
 		public function set index(value:int):void {
-			if (_index>=0 && !_font)
-				_labels[_index].textColor = TEXT_COLOUR;
 			_index = value;
-			showPressed();
 		}
 		
 /**
@@ -112,8 +105,9 @@ package com.danielfreeman.extendedMadness
 		}
 		
 		
-		override protected function initialise():void {
-			_curve = attributes.backgroundColours.length>2 ? attributes.backgroundColours[2] : CONTROL_CURVE;
+		override protected function initialise(words:Vector.<String>):void {
+			_curve = _attributes.backgroundColours.length>2 ? _attributes.backgroundColours[2] : CONTROL_CURVE;
+			_pressedColour = _attributes.backgroundColours.length>1 ? _attributes.backgroundColours[1] : PRESSED_COLOUR;
 			if (_xml.data.length()==1) {
 				drawButtons(extractData(_xml.data[0]));
 			}
@@ -135,7 +129,8 @@ package com.danielfreeman.extendedMadness
 		override protected function mouseUp(event:MouseEvent):void {
 			if (_index>=0 && !_font)
 				_labels[_index].textColor = TEXT_COLOUR;
-			super.mouseUp(event);
+			updateIndex();
+			dispatchEvent(new Event(Event.CHANGE));
 			showPressed();
 		}
 		
@@ -147,46 +142,6 @@ package com.danielfreeman.extendedMadness
 				}
 		}
 		
-		
-		protected function showPressed():void {
-			var matr:Matrix = new Matrix();
-			_pressedLayer.graphics.clear();
-			matr.createGradientBox(width, _height, Math.PI/2, 0, 0);
-			_pressedLayer.graphics.beginGradientFill(GradientType.LINEAR, [Colour.darken(_pressedColour,-32),_pressedColour,Colour.lighten(_pressedColour,48),Colour.lighten(_pressedColour,48)], [1.0,1.0,1.0,1.0], [0x00,0x20,0x80,0xff], matr);
-			if (_index<0) {
-				return;
-			}
-			else if (_labels.length==1) {
-				_pressedLayer.graphics.drawRoundRect(1, 1, width-2, _height-1,_curve);
-			}
-			else if (_index==0) {
-				var right:Number = _labels[1].x - _gap +1;
-				_pressedLayer.graphics.moveTo(1, _curve);
-				_pressedLayer.graphics.curveTo(1, 1, _curve, 1);
-				_pressedLayer.graphics.lineTo(right, 1);
-				_pressedLayer.graphics.lineTo(right, _height);
-				_pressedLayer.graphics.lineTo(_curve, _height);
-				_pressedLayer.graphics.curveTo(1, _height, 1, _height - _curve);
-				_pressedLayer.graphics.lineTo(1, _curve-1);
-			}
-			else if (_index==_labels.length-1) {
-				var left:Number = _labels[_index].x - _gap +2;
-				_pressedLayer.graphics.moveTo(left, 1);
-				_pressedLayer.graphics.lineTo(width-_curve, 1);
-				_pressedLayer.graphics.curveTo(width-1, 1, width-1, _curve);
-				_pressedLayer.graphics.lineTo(width-1, _height-_curve);
-				_pressedLayer.graphics.curveTo(width-1, _height, width-_curve-1, _height);
-				_pressedLayer.graphics.lineTo(left, _height);
-				_pressedLayer.graphics.lineTo(left, 1);
-			}
-			else {
-				var left0:Number = _labels[_index].x - _gap + 2;
-				var width0:Number = _labels[_index].width + 2*_gap - 1;
-				_pressedLayer.graphics.drawRect(left0, 1, width0, _height-1);
-			}
-			if (!_font)
-				_labels[_index].textColor = PRESSED_TEXT_COLOUR;
-		}
 		
 		
 		public function get attributes():Attributes {
@@ -213,6 +168,11 @@ package com.danielfreeman.extendedMadness
 		
 		public function get xml():XML {
 			return _xml;
+		}
+		
+		
+		public function clearPressed():void {
+			_pressedLayer.graphics.clear();
 		}
 	}
 }
