@@ -107,7 +107,7 @@ package
 
 			UIe.createInWindow(this, LAYOUT);
 			
-			new UICutCopyPaste(this, 300, 10);
+			new UICutCopyPaste(this, 300, 10, 50);
 
 			new AlertMessage(this, "Extended Madness Demo", "ok");
 
