@@ -71,14 +71,7 @@ package com.danielfreeman.extendedMadness
 				fixwidth = attributes.widthH;
 			index=0;
 		}
-		
-		
-/**
- * Set index of active segment
- */	
-		public function set index(value:int):void {
-			_index = value;
-		}
+
 		
 /**
  * Set width of component
