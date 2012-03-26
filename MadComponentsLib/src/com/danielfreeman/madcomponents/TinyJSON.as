@@ -96,6 +96,10 @@ package com.danielfreeman.madcomponents {
 				result = parseNumber();
 			}
 			else switch (nextToken) {
+				case 'n': // handles JSON null, the form  ...,"description":null,...
+					_pos += 4;
+					result = '';
+					break;
 				case '"': 
 					var posV0:int = _pos;
 					endQuotePosition();

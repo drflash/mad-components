@@ -66,11 +66,11 @@ package com.danielfreeman.madcomponents {
 		public static const DRAWER_UP:String = "drawerUp";
 		public static const DRAWER_DOWN:String = "drawerDown";
 		
-		protected static const DELTA:int = 40;
 		protected static const STEPS:int = 8;
 		protected static const PADDING:Number = 10.0;
 		protected static const DIM_ALPHA:Number = 0.4;
 		public static var DRAWER_HEIGHT:Number = 250;
+		public static var SLIDE_SPEED:int = 40;
 
 		protected var _pages:Array = [];
 		protected var _page:int = 0;
@@ -78,7 +78,7 @@ package com.danielfreeman.madcomponents {
 		protected var _lastPage:DisplayObject;
 		protected var _slideX:Number = 0;
 		protected var _slideY:Number = 0;
-		protected var _slideTimer:Timer = new Timer(DELTA, STEPS);
+		protected var _slideTimer:Timer = new Timer(SLIDE_SPEED, STEPS);
 		
 		protected var _xml:XML;
 		protected var _attributes:Attributes;
@@ -86,6 +86,7 @@ package com.danielfreeman.madcomponents {
 		protected var _transition:String;
 		protected var _lastPageIndex:int;
 		protected var _border:Boolean = true;
+		protected var _layoutAfterSlide:Attributes = null;
 		
 		
 		public function UIPages(screen:Sprite, xml:XML, attributes:Attributes) {
@@ -146,6 +147,10 @@ package com.danielfreeman.madcomponents {
  *  Rearrange the layout to new screen dimensions
  */	
 		public function layout(attributes:Attributes):void {
+			if (_slideTimer.running) {
+				_layoutAfterSlide = attributes;
+				return;
+			}
 			var children:XMLList = _xml.children();
 			var idx:int = 0;
 			_attributes = attributes.copy();
@@ -311,6 +316,11 @@ package com.danielfreeman.madcomponents {
 				
 				if (!isSimpleTransition(_transition)) {
 					_page = _lastPageIndex;
+				}
+				
+				if (_layoutAfterSlide) {
+					layout(_layoutAfterSlide);
+					_layoutAfterSlide = null;
 				}
 			}
 		}

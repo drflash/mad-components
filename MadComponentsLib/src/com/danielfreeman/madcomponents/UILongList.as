@@ -39,8 +39,7 @@ package com.danielfreeman.madcomponents
  *    gapV = "NUMBER"
  *    gapH = "NUMBER"
  *    border = "true|false"
- *    autoLayout = "true|false"
- *    lines = "i,j,k..."
+ *    lines = "true|false"
  *    pullDownRefresh = "true|false"
  *    pullDownColour = "#rrggbb"
  *    sortBy = "IDENTIFIER"
@@ -51,6 +50,8 @@ package com.danielfreeman.madcomponents
  *    recycle = "true|false"
  * /&gt;
  * </pre>
+ * 
+ * Note that autoLayout="true" is not supported by UILongList
  */
 	public class UILongList extends UIList {
 

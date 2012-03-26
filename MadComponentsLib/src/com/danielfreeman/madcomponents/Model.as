@@ -461,7 +461,7 @@ package com.danielfreeman.madcomponents {
 		public function sendData(sendBy:String = ""):Object {
 			if (sendBy!="")
 				_sendBy = sendBy;
-			var result:XML = _schema.copy();
+			var result:XML = _sendSchema.copy();
 			_dataString=new URLVariables();
 			substitute(result);
 			return (_sendBy=="xml") ? result : _dataString;
@@ -476,7 +476,7 @@ package com.danielfreeman.madcomponents {
 						if (_sendBy=="xml")
 							item.replace(0,obj.text);
 						else
-							_dataString[item.toString()]=obj.text;
+							_dataString[item.localName()]=obj.text;
 					}
 				}
 				else {
