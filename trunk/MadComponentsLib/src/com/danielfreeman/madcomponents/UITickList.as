@@ -47,7 +47,7 @@ package com.danielfreeman.madcomponents {
  *    gapH = "NUMBER"
  *    border = "true|false"
  *    autoLayout = "true|false"
- *    lines = "i,j,k..."
+ *    lines = "true|false"
  *    pullDownRefresh = "true|false"
  *    pullDownColour = "#rrggbb"
  *    sortBy = "IDENTIFIER"

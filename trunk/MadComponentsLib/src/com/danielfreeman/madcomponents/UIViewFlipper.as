@@ -160,7 +160,7 @@ package com.danielfreeman.madcomponents {
 			if (!_scrollBarLayer) return;
 			_scrollBarLayer.graphics.clear();
 			_page = Math.round( - _slider.x / _width);
-			if (_colour!=Attributes.TRANSPARENT) {
+			if (_scrollBarColour!=Attributes.TRANSPARENT) {
 				var barPosition:Number = (_width - SPACING * _pages.length) / 2;
 				_scrollBarLayer.graphics.lineStyle(1.0, _scrollBarColour);
 				for (var i:int = 0; i<_pages.length; i++) {
