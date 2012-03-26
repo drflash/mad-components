@@ -23,70 +23,85 @@
  * <p>Redistributions of files must retain the above copyright notice.</p>
  */
 
-package com.danielfreeman.extendedMadness {
+package com.danielfreeman.extendedMadness
+{
+	import asfiles.GraphPalette;
+	import asfiles.GraphSettings;
+	import asfiles.MyEvent;
+	import asfiles.Packet;
+	import asfiles.PieGraph;
 	
 	import com.danielfreeman.madcomponents.*;
 	
+	import flash.display.Bitmap;
+	import flash.display.BitmapData;
 	import flash.display.DisplayObject;
 	import flash.display.Sprite;
+	import flash.events.Event;
+	import flash.geom.Matrix;
 	import flash.geom.Rectangle;
-	
+	import flash.utils.getDefinitionByName;
+
+
 /**
- * UIPanel (overrides extended madness UIForm)
+ * Image Skin
  * <pre>
- * &lt;horizontal|vertical|columns|rows|group|clickableGroup|frame
+ * &lt;skin
  *    id = "IDENTIFIER"
- *    colour = "#rrggbb"
- *    background = "#rrggbb, #rrggbb, ..."
- *    gapV = "NUMBER"
- *    gapH = "NUMBER"
  *    alignH = "left|right|centre|fill"
  *    alignV = "top|bottom|centre|fill"
  *    visible = "true|false"
- *    lines = "i,j,k..."
- *    widths = "i(%),j(%),k(%)…"
- *    heights = "i(%),j(%),k(%)…"
- *    pickerHeight = "NUMBER"
- *    border = "true|false"
- *    autoLayout = "true|false"
+ *    width = "NUMBER"
+ *    height = "NUMBER"
+ *    clickable = "true|false"
  * /&gt;
  * </pre>
- * */	
-	public class UIPanel extends UIForm {
+ * */
 
-		protected static const PADDING:Number = 16.0;
-	
-		protected var _totalWidth:Number;
-		protected var _totalHeight:Number;
+	public class UISkin extends UIImage9 implements IContainerUI
+	{
 
+		public function UISkin(screen:Sprite, xml:XML, attributes:Attributes) {
+			super(screen, xml, attributes);
+			includeInLayout = false;
+			mouseEnabled = false;
+			var isRow:Boolean = parent.parent.parent is UIList;
+			if (isRow) {
+				drawSkin();
+			}
+		}
 
-		public function UIPanel(screen:Sprite, xml:XML, attributes:Attributes = null, row:Boolean = false, inGroup:Boolean = false) {
-			super(screen, xml, attributes, row, inGroup);
-			_totalWidth = width;
-			_totalHeight = height + PADDING;
+		
+		override public function layout(attributes:Attributes):void {
+			_attributes = attributes;
+			drawSkin();
 		}
 		
 		
-		public function setSize(width:Number, height:Number):void {
-			_totalWidth = width;
-			_totalHeight = height;
+		override public function set skinClass(value:Class):void {
+			if (_skin)
+				_skinContainer.removeChild(_skin);
+			_skinContainer.addChild(_skin = new value());
 		}
 		
 		
-		public function get totalheight():Number {
-			return _totalHeight;
+		override protected function drawImage():void {
 		}
 		
 		
-		public function get totalwidth():Number {
-			return _totalWidth;
-		}
-		
-		
-		override protected function parseBlock(xml:XML, attributes:Attributes, mode:String, row:Boolean):DisplayObject {
-			var result:DisplayObject = super.parseBlock(xml, attributes, mode, row);
-			UIe.listListener(result, xml);
-			return result;
+		protected function drawSkin():void {
+			if (!_skin)
+				return;
+			if (_skinBitmap) {
+				removeChild(_skinBitmap);
+			}
+			_skin.width = _attributes.widthH+2*_attributes.paddingH;
+			_skin.height = _attributes.heightV+2*_attributes.paddingV;
+			var myBitmapData:BitmapData = new BitmapData(_skin.width, _skin.height, true, 0x00FFFFFF);
+			myBitmapData.draw(_skinContainer);
+			addChild(_skinBitmap = new Bitmap(myBitmapData));
+			_skinBitmap.x = -_attributes.paddingH;
+			_skinBitmap.y = -_attributes.paddingV;			
 		}
 
 	}

@@ -33,15 +33,19 @@ package com.danielfreeman.extendedMadness {
 	import flash.display.DisplayObject;
 	import flash.display.Sprite;
 	import flash.events.Event;
+	import flash.utils.Timer;
+	import flash.events.TimerEvent;
 
 
 	public class UIe extends UI {
 
-		protected static const DESKTOP_TOKENS:Array = ["tabPagesTop","scrollXY","scrollBarVertical","scrollBarHorizontal","scrollBarPanel","dataGrid","menu","segmentedControl","checkBox","radioButton","treeNavigation","pieChart","barChart","lineChart","scatterChart","horizontalChart","splitView","starRating","field"];
-		protected static const DESKTOP_CLASSES:Array = [UITabPagesTop,UIScrollXY,UIScrollBarVertical,UIScrollBarHorizontal,UIScrollBarPanel,UIDataGrid,UIMenu,UISegmentedControl,UICheckBox,UIRadioButton,UITreeNavigation,UIPieChart,UIBarChart,UILineChart,UIScatterChart,UIHorizontalChart,UISplitView,UIStarRating,UIField];
+		protected static const DESKTOP_TOKENS:Array = ["tabPagesTop","scrollXY","scrollBarVertical","scrollBarHorizontal","scrollBarPanel","dataGrid","menu","segmentedControl","checkBox","radioButton","treeNavigation","pieChart","barChart","lineChart","scatterChart","horizontalChart","splitView","starRating","field","scrollHorizontal","listHorizontal","detailList","image9","skin"];
+		protected static const DESKTOP_CLASSES:Array = [UITabPagesTop,UIScrollXY,UIScrollBarVertical,UIScrollBarHorizontal,UIScrollBarPanel,UIDataGrid,UIMenu,UISegmentedControl,UICheckBox,UIRadioButton,UITreeNavigation,UIPieChart,UIBarChart,UILineChart,UIScatterChart,UIHorizontalChart,UISplitView,UIStarRating,UIField,UIScrollHorizontal,UIListHorizontal,UIDetailList,UIImage9,UISkin];
 		protected static const COLOUR:uint = 0x666666;
 		
 		protected static var _cursor:Cursor = null;
+		protected static var _skin:UISkin = null;
+		protected static var _clickTimer:Timer = new Timer(90,1);
 		
 		public static function activate(screen:Sprite):void {
 			FormClass = UIPanel;
@@ -49,8 +53,9 @@ package com.danielfreeman.extendedMadness {
 			HintText.SIZE = 30;
 			Cursor.HINT_Y = 64;
 			_cursor = new Cursor(screen);
+			_clickTimer.addEventListener(TimerEvent.TIMER, makeVisible);
 		}
-		
+
 /**
  * Create a UI layout in a resizable window
  */
@@ -67,7 +72,7 @@ package com.danielfreeman.extendedMadness {
 			screen.setChildIndex(_cursor,screen.numChildren-1);
 			return result;
 		}
-		
+
 /**
  * Create a UI layout with extended components
  */
@@ -75,10 +80,11 @@ package com.danielfreeman.extendedMadness {
 			if (!_cursor)
 				activate(screen);
 			var result:Sprite = UI.create(screen, xml, width, height);
+			listListener(result, xml);
 			screen.setChildIndex(_cursor,screen.numChildren-1);
 			return result;
 		}	
-		
+
 /**
  * Create a pop-up dialogue window
  */	
@@ -104,6 +110,44 @@ package com.danielfreeman.extendedMadness {
 				
 			}
 			return result;
+		}
+		
+		
+		public static function listListener(screen:DisplayObject, xml:XML):void {
+			if (screen is UIList && UIList(screen).rendererXML && UIList(screen).rendererXML.skin.length()>0) {
+				screen.addEventListener(UIList.CLICKED, listChanged, false, 0, true);
+			}
+		}
+		
+		
+		protected static function listChanged(event:Event):void {
+			if (_skin) {
+				_skin.visible = true;
+				_clickTimer.stop();
+				_skin = null;
+			}
+			var panel:UIPanel = UIPanel(UIList(event.target).rowContainer);
+			var skin:DisplayObject = panel.getChildAt(1);
+			if (skin is UISkin) {
+				_skin = UISkin(skin);
+			}
+			else {
+				skin = panel.getChildAt(0);
+				if (skin is UISkin) {
+					_skin = UISkin(skin);
+				}
+			}
+			if (_skin) {
+				_skin.visible = false;
+				_clickTimer.reset();
+				_clickTimer.start();
+			}
+		}
+		
+		
+		protected static function makeVisible(event:TimerEvent):void {
+			_skin.visible = true;
+			_skin = null;
 		}
 
 	}

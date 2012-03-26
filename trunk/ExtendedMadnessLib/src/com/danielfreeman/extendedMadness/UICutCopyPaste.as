@@ -118,6 +118,15 @@ package com.danielfreeman.extendedMadness
 		public function get index():int {
 			return _index;
 		}
+
+
+/**
+ * Set index of active segment
+ */	
+		public function set index(value:int):void {
+			_index = value;
+			showPressed();
+		}
 		
 		
 		protected function drawButtons(labels:Vector.<String>, arrowPosition:Number = 0):void {
