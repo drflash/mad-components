@@ -37,7 +37,7 @@ package
 			
 			<detailList background="#FFFFFF,#F6F6F6">
 				{FRUIT_DATA}
-				<detail border="true" darkenColour="#F6F6F6" shadowColour="#D6D6D6" background="#D6D6D6">				
+				<detail border="true" darkenColour="#F9F9F9" shadowColour="#D6D6D6" background="#D6D6D6">				
 					<columns>
 						<vertical>
 							<checkBox id="option1">option 1</checkBox>
