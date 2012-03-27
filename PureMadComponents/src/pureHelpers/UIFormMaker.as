@@ -55,8 +55,13 @@ package pureHelpers
 		}
 		
 		
+		public function lastChild():DisplayObject {
+			return _pureLayer.numChildren>0 ? _pureLayer.getChildAt(_pureLayer.numChildren - 1) : null;
+		}
+		
+		
 		public function attachHorizontal(child:DisplayObject):void {
-			var lastChild:DisplayObject = _pureLayer.numChildren>0 ? _pureLayer.getChildAt(_pureLayer.numChildren - 1) : null;
+			var lastChild:DisplayObject = lastChild();
 			_pureLayer.addChild(child);
 			child.x = lastChild ? lastChild.x + lastChild.width + _gap : UI.PADDING;
 			child.y = lastChild ? lastChild.y : UI.PADDING;
@@ -64,7 +69,7 @@ package pureHelpers
 		
 		
 		public function attachVertical(child:DisplayObject):void {
-			var lastChild:DisplayObject = _pureLayer.numChildren>0 ? _pureLayer.getChildAt(_pureLayer.numChildren - 1) : null;
+			var lastChild:DisplayObject = lastChild();
 			_pureLayer.addChild(child);
 			child.x = lastChild ? lastChild.x : UI.PADDING;
 			child.y = lastChild ? lastChild.y + lastChild.height + _gap : UI.PADDING;
