@@ -36,7 +36,7 @@ package
 			callout2.x = 20.0;
 			callout2.y = 150.0;
 			
-			var form:UIFormMaker = new UIFormMaker(callout2, 180, 140);
+			var form:UIFormMaker = new UIFormMaker(callout2, 180, 135);
 			form.attachVertical(new UIButton(form,0,0,"Option 1"));UIButton(form.lastChild()).fixwidth = 180;
 			form.attachVertical(new UIButton(form,0,0,"Option 2"));UIButton(form.lastChild()).fixwidth = 180;
 			form.attachVertical(new UIButton(form,0,0,"Option 3"));UIButton(form.lastChild()).fixwidth = 180;
