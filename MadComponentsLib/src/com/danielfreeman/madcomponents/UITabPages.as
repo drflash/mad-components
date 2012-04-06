@@ -130,6 +130,16 @@ package com.danielfreeman.madcomponents {
 			makeTabButtons(_attributes, pages.length, alt);
 			_buttonBar.y = attributes.y + attributes.height+2;
 		}
+		
+		
+		override public function set pageNumber(value:int):void {
+			for (var i:int=0; i<_buttonBar.numChildren; i++) {
+				var button:UITabButton = UITabButton(_buttonBar.getChildAt(i));
+				button.state = (i == value);
+			}
+			super.goToPage(value);
+		}
+
 
 /**
  *  Draw the tab buttons

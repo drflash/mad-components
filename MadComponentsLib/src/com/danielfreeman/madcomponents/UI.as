@@ -34,6 +34,7 @@ package com.danielfreeman.madcomponents {
 	import flash.system.Capabilities;
 	import flash.text.TextField;
 
+
 /**
  * MadComponents UI root class
  * <pre>
@@ -61,8 +62,8 @@ package com.danielfreeman.madcomponents {
 		protected static const HEIGHT:Number = 454;
 		protected static const COLOUR:uint = 0x9999AA;
 		
-		protected static const TOKENS:Array = ["scrollVertical","viewFlipper","list","tickList","tickOneList","groupedList","dividedList","pages","tabPages","navigation","navigationPages","frame","longList"];
-		protected static const CLASSES:Array = [UIScrollVertical,UIViewFlipper,UIList,UITickList,UITickOneList,UIGroupedList,UIDividedList,UIPages,UITabPages,UINavigation,UINavigationPages,UIForm,UILongList];
+		protected static const TOKENS:Array = ["scrollVertical","viewFlipper","list","groupedList","dividedList","pages","tabPages","navigation","navigationPages","longList"];
+		protected static const CLASSES:Array = [UIScrollVertical,UIViewFlipper,UIList,UIGroupedList,UIDividedList,UIPages,UITabPages,UINavigation,UINavigationPages,UILongList];
 
 		protected static var _tokens:Array = TOKENS;
 		protected static var _classes:Array = CLASSES;
@@ -107,6 +108,7 @@ package com.danielfreeman.madcomponents {
 			else {
 				_attributes = newAttributes(width=Capabilities.screenResolutionX, height=Capabilities.screenResolutionY);
 			}
+
 			
 			XML.prettyPrinting = false;
 			_xml = xml;
@@ -201,6 +203,8 @@ package com.danielfreeman.madcomponents {
 		public static function drawBackgroundColour(colours:Vector.<uint>, width:Number, height:Number, screen:Sprite = null, padding:Number = 0):void {
 			if (!screen)
 				screen = _root;
+			if (screen==_root && _stageColours && _stageColours.length>0)
+				colours = _stageColours;
 			screen.graphics.clear();
 			if (colours.length == 1) {
 				screen.graphics.beginFill(colours[0]);
@@ -214,6 +218,12 @@ package com.danielfreeman.madcomponents {
 				screen.graphics.beginFill(0,0);
 			}
 			screen.graphics.drawRect(-padding, -padding, width+2*padding, height+2*padding);
+		}
+		
+		
+		
+		public static function get scale():Number {
+			return _scale;
 		}
 
 	
@@ -247,7 +257,7 @@ package com.danielfreeman.madcomponents {
  * Is this the XML tag name of a UIForm container?
  */	
 		public static function isForm(name:String):Boolean {
-			return name=="horizontal" || name=="vertical" || name=="columns" || name=="rows" || name=="group" || name=="clickableGroup";
+			return name=="frame" || name=="horizontal" || name=="vertical" || name=="columns" || name=="rows" || name=="group" || name=="clickableGroup";
 		}
 		
 /**
@@ -270,9 +280,9 @@ package com.danielfreeman.madcomponents {
  */	
 		public static function layout(width:Number = -1, height:Number = -1):void {
 			_attributes = newAttributes(width, height);
+			_attributes.parse(_xml);
 			var container:Boolean = isContainer(_xml.localName());
 			if (container) {
-				_attributes.parse(_xml);
 				IContainerUI(_root).layout(_attributes);
 			}
 			if (!container && (_xml.@border.length()==0 || _xml.@border[0]=="true")) {

@@ -61,6 +61,8 @@ package com.danielfreeman.madcomponents {
  *    sortBy = "IDENTIFIER"
  *    mask = "true|false"
  *    alignV = "scroll|no scroll"
+ *    highlightPressed = "true|false"
+ *    autoLayout = "true|false"
  * /&gt;
  * </pre>
  */
@@ -84,10 +86,13 @@ package com.danielfreeman.madcomponents {
 		protected var _hasHeadings:Boolean = false;
 		protected var _groupDetails:Object;
 		protected var _headingFormat:TextFormat = BLACK;
+		protected var _autoLayoutGroup:Boolean = true;
 		
 		
 		public function UIGroupedList(screen:Sprite, xml:XML, attributes:Attributes) {
+			_autoLayoutGroup = xml.@autoLayout == "true";
 			super(screen, xml, attributes);
+			_autoLayout = false;
 			_field = "";
 		}
 		
@@ -136,6 +141,8 @@ package com.danielfreeman.madcomponents {
 					g++;
 				}
 			}
+			if (_autoLayoutGroup)
+				doLayout();
 		}
 		
 /**
@@ -377,13 +384,14 @@ package com.danielfreeman.madcomponents {
 			var children:XMLList = value.group;
 			for each (var group:XML in children) {
 				var row:Array = [];
+				
 				if (group.@icon.length()>0)
 					result.push(getDefinitionByName(group.@icon.toString()) as Class);
 				else if (group.@label.length()>0)
 					result.push(group.@label.toString());
+				
 				for each (var child:XML in group.children()) {
-					var item:Object = {label:((child.@label.length()>0) ? child.@label : child.localName())};
-					row.push(item);
+					row.push(attributesToObject(child));
 				}
 				result.push(row);
 			}
@@ -394,22 +402,24 @@ package com.danielfreeman.madcomponents {
  *  Draw highlight when a row is clicked
  */
 		protected function drawHighlight():void {
-			var groupDetails:Object = _groupPositions[_group];
-			var length:int = groupDetails.length;
-			var top:Number = groupDetails.top + _pressedCell * groupDetails.cellHeight;
-			var bottom:Number = top + groupDetails.cellHeight;
-			_highlight.graphics.beginFill(HIGHLIGHT);
-			if (length==1) {
-				_highlight.graphics.drawRoundRect(_cellLeft, top, _cellWidth, bottom - top, 1.5 * CURVE);
-			}
-			else if (_pressedCell==0) {
-				curvedTop(_highlight.graphics, _cellLeft, top, _cellLeft + _cellWidth, bottom);
-			}
-			else if (_pressedCell==length-1) {
-				curvedBottom(_highlight.graphics, _cellLeft, top, _cellLeft + _cellWidth, bottom);
-			}
-			else {
-				_highlight.graphics.drawRect(_cellLeft, top, _cellWidth + 1, bottom - top);
+			if (_highlightPressed) {
+				var groupDetails:Object = _groupPositions[_group];
+				var length:int = groupDetails.length;
+				var top:Number = groupDetails.top + _pressedCell * groupDetails.cellHeight;
+				var bottom:Number = top + groupDetails.cellHeight;
+				_highlight.graphics.beginFill(HIGHLIGHT);
+				if (length==1) {
+					_highlight.graphics.drawRoundRect(_cellLeft, top, _cellWidth, bottom - top, 1.5 * CURVE);
+				}
+				else if (_pressedCell==0) {
+					curvedTop(_highlight.graphics, _cellLeft, top, _cellLeft + _cellWidth, bottom);
+				}
+				else if (_pressedCell==length-1) {
+					curvedBottom(_highlight.graphics, _cellLeft, top, _cellLeft + _cellWidth, bottom);
+				}
+				else {
+					_highlight.graphics.drawRect(_cellLeft, top, _cellWidth + 1, bottom - top);
+				}
 			}
 		}
 		

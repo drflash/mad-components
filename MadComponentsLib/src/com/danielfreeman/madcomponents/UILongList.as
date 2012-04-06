@@ -45,6 +45,7 @@ package com.danielfreeman.madcomponents
  *    sortBy = "IDENTIFIER"
  *    index = "INTEGER"
  *    showPressed = "true|false"
+ *    highlightPressed = "true|false"
  *    mask = "true|false"
  *    alignV = "scroll|no scroll"
  *    recycle = "true|false"

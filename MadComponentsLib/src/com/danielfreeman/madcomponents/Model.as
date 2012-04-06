@@ -294,7 +294,8 @@ package com.danielfreeman.madcomponents {
 				addEventListener(Event.COMPLETE, jsonIsLoaded);
 			if (!request)
 				request = new URLRequest(url);
-			request.data = sendData();
+			if (!request.data)
+				request.data = sendData();
 			request.method = (_sendBy=="get") ? URLRequestMethod.GET : URLRequestMethod.POST;
 			if (_sendBy=="xml")
 				request.contentType = "text/xml";
