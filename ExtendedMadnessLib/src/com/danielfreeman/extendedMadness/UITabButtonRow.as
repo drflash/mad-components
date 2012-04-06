@@ -85,6 +85,13 @@ package com.danielfreeman.extendedMadness
 		}
 		
 		
+		public function set index(value:int):void {
+			_index = value;
+			_highlight.graphics.clear();
+			drawAButton(_highlight, _index, _onColour);
+		}
+		
+		
 		public function layout(attributes:Attributes):void {
 			_width = attributes.width;
 			_buttonWidth = _width / _numButtons;

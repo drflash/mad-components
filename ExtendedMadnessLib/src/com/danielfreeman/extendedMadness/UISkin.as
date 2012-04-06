@@ -24,13 +24,7 @@
  */
 
 package com.danielfreeman.extendedMadness
-{
-	import asfiles.GraphPalette;
-	import asfiles.GraphSettings;
-	import asfiles.MyEvent;
-	import asfiles.Packet;
-	import asfiles.PieGraph;
-	
+{	
 	import com.danielfreeman.madcomponents.*;
 	
 	import flash.display.Bitmap;
@@ -58,7 +52,7 @@ package com.danielfreeman.extendedMadness
  * </pre>
  * */
 
-	public class UISkin extends UIImage9 implements IContainerUI
+	public class UISkin extends UIImage9
 	{
 
 		public function UISkin(screen:Sprite, xml:XML, attributes:Attributes) {
@@ -85,7 +79,7 @@ package com.danielfreeman.extendedMadness
 		}
 		
 		
-		override protected function drawImage():void {
+		override protected function drawComponent():void {
 		}
 		
 		
@@ -100,6 +94,7 @@ package com.danielfreeman.extendedMadness
 			var myBitmapData:BitmapData = new BitmapData(_skin.width, _skin.height, true, 0x00FFFFFF);
 			myBitmapData.draw(_skinContainer);
 			addChild(_skinBitmap = new Bitmap(myBitmapData));
+			_skinBitmap.smoothing = true;
 			_skinBitmap.x = -_attributes.paddingH;
 			_skinBitmap.y = -_attributes.paddingV;			
 		}

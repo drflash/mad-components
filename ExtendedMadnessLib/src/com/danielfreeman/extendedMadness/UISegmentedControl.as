@@ -128,6 +128,17 @@ package com.danielfreeman.extendedMadness
 		}
 		
 		
+/**
+ * Set index of active segment
+ */	
+		override public function set index(value:int):void {
+			if (_index>=0 && !_font)
+				_labels[_index].textColor = TEXT_COLOUR;
+			_index = value;
+			showPressed();
+		}
+		
+		
 		protected function colourButtons():void {
 			if (!_font)
 				for each (var label:UILabel in _labels) {

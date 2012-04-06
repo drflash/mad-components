@@ -39,8 +39,8 @@ package com.danielfreeman.extendedMadness {
 
 	public class UIe extends UI {
 
-		protected static const DESKTOP_TOKENS:Array = ["tabPagesTop","scrollXY","scrollBarVertical","scrollBarHorizontal","scrollBarPanel","dataGrid","menu","segmentedControl","checkBox","radioButton","treeNavigation","pieChart","barChart","lineChart","scatterChart","horizontalChart","splitView","starRating","field","scrollHorizontal","listHorizontal","detailList","image9","skin"];
-		protected static const DESKTOP_CLASSES:Array = [UITabPagesTop,UIScrollXY,UIScrollBarVertical,UIScrollBarHorizontal,UIScrollBarPanel,UIDataGrid,UIMenu,UISegmentedControl,UICheckBox,UIRadioButton,UITreeNavigation,UIPieChart,UIBarChart,UILineChart,UIScatterChart,UIHorizontalChart,UISplitView,UIStarRating,UIField,UIScrollHorizontal,UIListHorizontal,UIDetailList,UIImage9,UISkin];
+		protected static const DESKTOP_TOKENS:Array = ["tickList","tickOneList","tabPagesTop","scrollXY","scrollBarVertical","scrollBarHorizontal","scrollBarPanel","dataGrid","menu","segmentedControl","checkBox","radioButton","treeNavigation","pieChart","barChart","lineChart","scatterChart","horizontalChart","splitView","starRating","field","scrollHorizontal","listHorizontal","detailList","image9","imageX","skin","progressBar","line","icons","touch"];
+		protected static const DESKTOP_CLASSES:Array = [UITickList,UITickOneList,UITabPagesTop,UIScrollXY,UIScrollBarVertical,UIScrollBarHorizontal,UIScrollBarPanel,UIDataGrid,UIMenu,UISegmentedControl,UICheckBox,UIRadioButton,UITreeNavigation,UIPieChart,UIBarChart,UILineChart,UIScatterChart,UIHorizontalChart,UISplitView,UIStarRating,UIField,UIScrollHorizontal,UIListHorizontal,UIDetailList,UIImage9,UIImageX,UISkin,UIProgressBar,UILine,UIIcons,UITouch];
 		protected static const COLOUR:uint = 0x666666;
 		
 		protected static var _cursor:Cursor = null;

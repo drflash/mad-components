@@ -113,6 +113,12 @@ package com.danielfreeman.extendedMadness
 		}
 		
 		
+		override public function set pageNumber(value:int):void {
+			UITabButtonRow(_buttonBar).index = value;
+			super.goToPage(value);
+		}
+		
+		
 		/**
 		 *  Set the label and icon of a particular tab button
 		 */
