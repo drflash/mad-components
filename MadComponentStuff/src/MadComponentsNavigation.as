@@ -93,10 +93,6 @@ package
 												<font color="#FFFFFF"/>											
 											</list>;
 		
-		protected static const TICK_LIST:XML = <tickOneList gapV="6" id="tickList" colour="#BBBBCC" tickColour="#333344" background="#FFFFFF,#FFFFFF,#F3F3FF">
-													{FRUIT_DATA}
-												</tickOneList>;
-		
 		protected static const LIST_GROUPS_RENDERER:XML = <groupedList id="list3" background="#C6CCD6,#FFFFFF" colour="#CCCCCC" gapH="32" gapV="4" alignV="centre">
 															{GROUPED_DATA}															
 															<horizontal>
@@ -115,7 +111,6 @@ package
 													{LIST2}
 													{DIVIDED_LIST}
 													{LIST_GROUPS_RENDERER}
-													{TICK_LIST}
 												</navigation>;
 		
 		protected var _navigator:UINavigation;

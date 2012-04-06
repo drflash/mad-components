@@ -42,7 +42,7 @@ package
 		
 		protected static const LAYOUT:XML = <vertical stageColour="#FFCC33">
 												<button id="button1" skin={getQualifiedClassName(RED)} height="200" alignH="fill"><font size="30"><b>button 1</b></font></button>
-												<button id="button2" alignH="fill"><font size="30"><b>button 2</b></font></button>
+												<button id="button2" skin={getQualifiedClassName(RED)} alignH="fill"><font size="30"><b>button 2</b></font></button>
 											</vertical>;
 		
 		public function MadComponents9Patch(screen:Sprite = null) {
