@@ -25,12 +25,6 @@
 
 package com.danielfreeman.extendedMadness
 {
-	import asfiles.GraphPalette;
-	import asfiles.GraphSettings;
-	import asfiles.MyEvent;
-	import asfiles.Packet;
-	import asfiles.PieGraph;
-	
 	import com.danielfreeman.madcomponents.*;
 	
 	import flash.display.Bitmap;
@@ -55,25 +49,20 @@ package com.danielfreeman.extendedMadness
  * </pre>
  * */
 
-	public class UIImage9 extends MadSprite implements IContainerUI
+	public class UIImage9 extends UIContainerBaseClass
 	{
-		
-		protected var _attributes:Attributes;
-		protected var _xml:XML;
 		protected var _skin:DisplayObject = null;
 		protected var _skinContainer:Sprite = new Sprite();
 		protected var _skinBitmap:Bitmap = null;
 
 
 		public function UIImage9(screen:Sprite, xml:XML, attributes:Attributes) {
-			_attributes = attributes;
-			_xml = xml;
-			screen.addChild(this);
+			super(screen, xml, attributes);
 			text = xml.toString();
 		}
 		
 		
-		protected function drawImage():void {
+		override protected function drawComponent():void {
 			if (!_skin)
 				return;
 			if (_skinBitmap) {
@@ -84,39 +73,8 @@ package com.danielfreeman.extendedMadness
 			var myBitmapData:BitmapData = new BitmapData(_attributes.widthH, _attributes.heightV, true, 0x00FFFFFF);
 			myBitmapData.draw(_skinContainer);
 			addChild(_skinBitmap = new Bitmap(myBitmapData));
-		}
-		
-		
-		public function layout(attributes:Attributes):void {
-			_attributes = attributes;
-			drawImage();
-		}
-		
-		
-		public function get attributes():Attributes {
-			return _attributes;
-		}
-		
-		
-		public function get xml():XML {
-			return _xml;
-		}
-		
-		
-		public function findViewById(id:String, row:int = -1, group:int = -1):DisplayObject {
-			return null;
-		}
-		
-		
-		public function clear():void {
-			graphics.clear();
-		}
-		
-		
-		public function get pages():Array {
-			return [];
-		}
-		
+			_skinBitmap.smoothing = true;
+		}		
 		
 /**
  * Set image
@@ -131,11 +89,7 @@ package com.danielfreeman.extendedMadness
 			if (_skin)
 				_skinContainer.removeChild(_skin);
 			_skinContainer.addChild(_skin = new value());
-			drawImage();
-		}
-		
-		
-		public function destructor():void {
+			drawComponent();
 		}
 	}
 }
