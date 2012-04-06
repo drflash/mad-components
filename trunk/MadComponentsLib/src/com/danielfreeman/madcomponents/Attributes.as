@@ -68,6 +68,10 @@ package com.danielfreeman.madcomponents {
 
 
 		public function Attributes(x:Number = 0, y:Number = 0, width:Number = 0, height:Number = 0) {
+			if (width<0)
+				width = 0;
+			if (height<0)
+				height = 0;	
 			super(x, y, width, height);
 		}
 		

@@ -39,6 +39,12 @@ package com.danielfreeman.madcomponents {
 
 	
 /**
+ * A page transition has completed
+ */
+	[Event( name="changeComplete", type="flash.events.Event" )]
+
+	
+/**
  *  MadComponents pages container
  * <pre>
  * &lt;pages
@@ -59,6 +65,8 @@ package com.danielfreeman.madcomponents {
  */
 	public class UIPages extends Sprite implements IContainerUI {
 	
+		public static const COMPLETE:String = "changeComplete";
+		
 		public static const SLIDE_LEFT:String = "left";
 		public static const SLIDE_RIGHT:String = "right";
 		public static const SLIDE_UP:String = "up";
@@ -92,7 +100,8 @@ package com.danielfreeman.madcomponents {
 		public function UIPages(screen:Sprite, xml:XML, attributes:Attributes) {
 			
 			_xml = xml;
-			_attributes = attributes.copy();
+			_attributes = attributes.copy(xml);
+			UI.drawBackgroundColour(_attributes.backgroundColours, _attributes.width, _attributes.y + _attributes.height, this);
 			_attributes.x=0;_attributes.y=0;
 		//	_border = xml.@border.length()==0 || xml.@border[0]!="false";
 			
@@ -121,9 +130,9 @@ package com.danielfreeman.madcomponents {
 			_slideTimer.addEventListener(TimerEvent.TIMER,slide);
 			
 			if (xml.@mask.length()>0 && xml.@mask[0]!="false")
-				scrollRect = new Rectangle(0,0,attributes.width,attributes.height);
+				scrollRect = new Rectangle(0,0,_attributes.width, _attributes.height);
 			
-			UI.drawBackgroundColour(attributes.backgroundColours, attributes.width, attributes.height, this);
+			
 		}
 		
 /**
@@ -153,9 +162,9 @@ package com.danielfreeman.madcomponents {
 			}
 			var children:XMLList = _xml.children();
 			var idx:int = 0;
-			_attributes = attributes.copy();
+			_attributes = attributes.copy(_xml);
+			UI.drawBackgroundColour(_attributes.backgroundColours, _attributes.width, _attributes.y + _attributes.height, this);
 			_attributes.x=0;_attributes.y=0;
-			UI.drawBackgroundColour(_attributes.backgroundColours, _attributes.width, _attributes.height, this);
 			for (var i:int = 0; i<children.length(); i++) {
 				var childXML:XML = children[i];
 				if (childXML.localName()!="data" && childXML.nodeKind() != "text") {
@@ -262,6 +271,7 @@ package com.danielfreeman.madcomponents {
 				default:			_lastPage.visible = false;
 									_lastPage = null;
 									dispatchEvent(new Event(Event.CHANGE));
+									dispatchEvent(new Event(COMPLETE));
 			}
 		}
 		
@@ -322,6 +332,7 @@ package com.danielfreeman.madcomponents {
 					layout(_layoutAfterSlide);
 					_layoutAfterSlide = null;
 				}
+				dispatchEvent(new Event(COMPLETE));
 			}
 		}
 		
@@ -352,6 +363,11 @@ package com.danielfreeman.madcomponents {
  */	
 		public function get pageNumber():int {
 			return _page;
+		}
+		
+		
+		public function set pageNumber(value:int):void {
+			goToPage(value);
 		}
 		
 /**

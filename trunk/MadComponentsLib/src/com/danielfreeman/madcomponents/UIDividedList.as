@@ -49,6 +49,8 @@ package com.danielfreeman.madcomponents {
  *    sortBy = "IDENTIFIER"
  *    mask = "true|false"
  *    alignV = "scroll|no scroll"
+ *    highlightPressed = "true|false"
+ *    autoLayout = "true|false"
  * /&gt;
  * </pre>
  */	
@@ -67,11 +69,13 @@ package com.danielfreeman.madcomponents {
  *  When a list row is clicked, display a highlight
  */	
 		override protected function drawHighlight():void {
-			var groupDetails:Object = _groupPositions[_group];
-			var top:Number = groupDetails.top + _pressedCell * groupDetails.cellHeight;
-			var bottom:Number = top + groupDetails.cellHeight;
-			_highlight.graphics.beginFill(HIGHLIGHT);
-			_highlight.graphics.drawRect(_cellLeft, top, _cellWidth + 1, bottom - top);
+			if (_highlightPressed) {
+				var groupDetails:Object = _groupPositions[_group];
+				var top:Number = groupDetails.top + _pressedCell * groupDetails.cellHeight;
+				var bottom:Number = top + groupDetails.cellHeight;
+				_highlight.graphics.beginFill(HIGHLIGHT);
+				_highlight.graphics.drawRect(_cellLeft, top, _cellWidth + 1, bottom - top);
+			}
 		}
 		
 /**

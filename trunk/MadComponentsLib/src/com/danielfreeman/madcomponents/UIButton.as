@@ -94,12 +94,14 @@ package com.danielfreeman.madcomponents {
 		protected var _buttonSkin:DisplayObject = null;
 		protected var _skinHeight:Number = -1;
 		protected var _defaultWidth:Number;
-		
-	
+		protected var _alt:Boolean = false;
+
+
 		public function UIButton(screen:Sprite, xx:Number, yy:Number, text:String, colour:uint = 0x9999AA, colours:Vector.<uint> = null, tiny:Boolean = false) {
 			if (tiny) {
 				_sizeY = TINY_SIZE_Y;
 				_border = 0.5;
+				_alt = true;
 			}
 			screen.addChild(this);
 			x=xx;y=yy;
@@ -190,7 +192,7 @@ package com.danielfreeman.madcomponents {
 		
 		protected function drawButton(pressed:Boolean = false):void {
 			var width:Number = Math.max(_fixwidth,_label.width + 2 * _gap);
-			if (_buttonSkin && (_label.text=="" || _label.text==" ")) {
+			if (_buttonSkin && _alt) {
 				_buttonSkin.scaleX = 1.0;
 				width = _buttonSkin.width;
 			}
@@ -206,6 +208,7 @@ package com.danielfreeman.madcomponents {
 				var myBitmapData:BitmapData = new BitmapData(width, _buttonSkin.height, true, 0x00FFFFFF);
 				myBitmapData.draw(_skinContainer);
 				addChildAt(_skin = new Bitmap(myBitmapData),0);
+				_skin.smoothing = true;
 				_label.y = (_skin.height - _label.height)/2;
 				_shadowLabel.y = _label.y-SHADOW_OFFSET;
 				if (pressed) {

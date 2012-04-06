@@ -27,9 +27,9 @@ package com.danielfreeman.madcomponents
 {
 	import flash.display.GradientType;
 	import flash.display.Sprite;
+	import flash.events.Event;
 	import flash.events.MouseEvent;
 	import flash.geom.Matrix;
-	import flash.events.Event;
 
 /**
  * The slider value has changed
@@ -69,6 +69,8 @@ package com.danielfreeman.madcomponents
 		protected var _width:Number = WIDTH;
 		protected var _value:Number = 0.5;
 		protected var _radius:Number;
+		protected var _sliderHeight:Number = SLIDER_HEIGHT;
+		
 		
 		public function UISlider(screen:Sprite, xx:Number, yy:Number, colours:Vector.<uint> = null, alt:Boolean = false) {
 			screen.addChild(this);
@@ -132,12 +134,12 @@ package com.danielfreeman.madcomponents
 		
 		protected function drawSlider():void {
 			var matr:Matrix = new Matrix();
-			matr.createGradientBox(_width, SLIDER_HEIGHT, Math.PI/2, 0, _radius - SLIDER_HEIGHT/2);
+			matr.createGradientBox(_width, _sliderHeight, Math.PI/2, 0, _radius - _sliderHeight/2);
 			graphics.clear();
 			graphics.beginGradientFill(GradientType.LINEAR, [Colour.darken(_sliderColour,-64),_sliderColour,Colour.lighten(_sliderColour,64),Colour.lighten(_sliderColour,64)], [1.0,1.0,1.0,1.0], [0x00,0x00,0x80,0xff], matr);
-			graphics.drawRoundRect(0, _radius - SLIDER_HEIGHT/2, _width, SLIDER_HEIGHT, SLIDER_HEIGHT);
+			graphics.drawRoundRect(0, _radius - _sliderHeight/2, _width, _sliderHeight, _sliderHeight);
 			graphics.beginGradientFill(GradientType.LINEAR, [Colour.darken(_highlightColour,-64),_highlightColour,Colour.lighten(_highlightColour,64),Colour.lighten(_highlightColour,64)], [1.0,1.0,1.0,1.0], [0x00,0x00,0x80,0xff], matr);
-			graphics.drawRoundRect(0, _radius - SLIDER_HEIGHT/2, _width * _value, SLIDER_HEIGHT, SLIDER_HEIGHT);
+			graphics.drawRoundRect(0, _radius - _sliderHeight/2, _width * _value, _sliderHeight, _sliderHeight);
 		}
 		
 /**
