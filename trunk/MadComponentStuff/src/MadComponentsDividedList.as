@@ -36,14 +36,14 @@ package
 	public class MadComponentsDividedList extends Sprite {
 		
 		
-		protected static const DIVIDED_LIST:XML = <dividedList id="list">
+		protected static const DIVIDED_LIST:XML = <dividedList id="list" autoLayout="true">
 													<horizontal>
 														<image id="image">48</image>
 														<vertical>
-															<label id="label" width="250"/>
+															<label id="label"/>
 															<label id="label2"/>
 														</vertical>
-														<label alignH="right" alignV="bottom" width="60" id="price"/>
+														<label alignH="right" alignV="bottom" id="price"/>
 													</horizontal>
 												</dividedList>;
 		

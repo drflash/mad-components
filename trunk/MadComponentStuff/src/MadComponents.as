@@ -149,10 +149,6 @@ package
 												<font color="#FFFFFF"/>											
 											</list>;
 		
-		protected static const TICK_LIST:XML = <tickOneList gapV="6" id="tickList" colour="#BBBBCC" tickColour="#333344" background="#FFFFFF,#FFFFFF,#F3F3FF">
-													{FRUIT_DATA}
-												</tickOneList>;
-		
 		protected static const PICKER:XML = <columns gapH="0" background="#9999AA" pickerHeight="180">
 														<picker id="picker1" colour="#FFFFFF" background="#EECC66" index="1">
 															<font color="#996633"/>
@@ -204,7 +200,6 @@ package
 													{LIST2}
 													{DIVIDED_LIST}
 													{LIST_GROUPS_RENDERER}
-													{TICK_LIST}
 												</navigation>;			
 													
 		protected static const DRAWER:XML = <vertical background="#333333" colour="#99AA99">
