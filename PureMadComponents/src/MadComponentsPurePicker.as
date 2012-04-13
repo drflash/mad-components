@@ -30,8 +30,13 @@ package
 	import flash.display.StageAlign;
 	import flash.display.StageScaleMode;
 	import com.danielfreeman.madcomponents.*;
+	import flash.events.Event;
+	
 	
 	public class MadComponentsPurePicker extends Sprite {
+		
+		protected var _picker0:UIPicker;
+		protected var _picker1:UIPicker;
 		
 		protected static const DATA:XML = <data>
 											<Apple/>
@@ -58,9 +63,25 @@ package
 			stage.align = StageAlign.TOP_LEFT;  
 			stage.scaleMode = StageScaleMode.NO_SCALE;
 			
-			var columns:UIForm = new UIForm(this, <columns gapH="0"><picker>{DATA}</picker><picker>{DATA}</picker></columns>,new Attributes(0,0,280,200));
+			var columns:UIForm = new UIForm(this, <columns gapH="0"><picker id="picker0">{DATA}</picker><picker id="picker1">{DATA}</picker></columns>,new Attributes(0,0,280,200));
 			columns.x = 20;
 			columns.y = 40;
+			
+			_picker0 = UIPicker(columns.findViewById("picker0"));
+			_picker0.addEventListener(Event.CHANGE, picker0Changed);
+			
+			_picker1 = UIPicker(columns.findViewById("picker1"));
+			_picker1.addEventListener(Event.CHANGE, picker1Changed);
+		}
+		
+		
+		protected function picker0Changed(event:Event):void {
+			trace("Picker0:"+_picker0.index+","+_picker0.row.label);
+		}
+		
+		
+		protected function picker1Changed(event:Event):void {
+			trace("Picker1:"+_picker1.index+","+_picker1.row.label);
 		}
 	}
 }
