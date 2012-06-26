@@ -9,13 +9,15 @@ package
 	
 	public class ExtendedMadnessPureSegmented extends Sprite
 	{
-		protected static const DATA:XML = <data>
-											<Apple/>
-											<Orange/>
-											<Banana/>
-											<Pineapple/>
-											<Lemon/>
-										</data>;
+		protected static const DATA:XML = <segmentedControl>
+											<data>
+												<Apple/>
+												<Orange/>
+												<Banana/>
+												<Pineapple/>
+												<Lemon/>
+											</data>
+										</segmentedControl>;
 
 		public function ExtendedMadnessPureSegmented(screen:Sprite = null) {
 			if (screen)
