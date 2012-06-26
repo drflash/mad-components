@@ -58,7 +58,7 @@ package
 			stage.align = StageAlign.TOP_LEFT;  
 			stage.scaleMode = StageScaleMode.NO_SCALE;
 			
-			UI.create(this, TICKLIST);
+			UIe.create(this, TICKLIST);
 			
 			_tickList = UITickList(UI.findViewById("ticks"));
 			_tickList.addEventListener(Event.CHANGE, tickListChanged);
