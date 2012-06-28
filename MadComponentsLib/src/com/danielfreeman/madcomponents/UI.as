@@ -50,12 +50,12 @@ package com.danielfreeman.madcomponents {
 	public class UI {
 		
 		public static const RESIZED:String = "resized";
-		public static const PADDING:Number = 10.0;
-
+		
+		public static var PADDING:Number = 10.0;
 		public static var ModelClass:Class = Model;
 		public static var FormClass:Class = UIForm;
+		public static var SIMULATION_RESIZE:Boolean = false;
 		
-		protected static const SIMULATION_RESIZE:Boolean = false;
 		protected static const DPI:uint = 160;
 		protected static const DIM_ALPHA:Number = 0.4;
 		protected static const WIDTH:Number = 300;
@@ -98,6 +98,9 @@ package com.danielfreeman.madcomponents {
 			if (xml.@dpi.length()>0)
 				_dpi = parseInt(xml.@dpi[0]);
 			
+			if (xml.@autoScale=="false")
+				_autoScale = false;
+			
 			if (width > 0) {
 				_attributes = newAttributes(width, height);
 				_maskIt = false;
@@ -108,14 +111,10 @@ package com.danielfreeman.madcomponents {
 			else {
 				_attributes = newAttributes(width=Capabilities.screenResolutionX, height=Capabilities.screenResolutionY);
 			}
-
 			
 			XML.prettyPrinting = false;
 			_xml = xml;
 			_screen = screen;
-			
-			if (xml.@autoScale=="false")
-				_autoScale = false;
 			
 			if (SIMULATION_RESIZE || xml.@autoResize!="false" && !_simulated)
 				screen.stage.addEventListener(Event.RESIZE, resize);

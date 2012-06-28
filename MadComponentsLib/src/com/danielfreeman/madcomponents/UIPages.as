@@ -74,11 +74,12 @@ package com.danielfreeman.madcomponents {
 		public static const DRAWER_UP:String = "drawerUp";
 		public static const DRAWER_DOWN:String = "drawerDown";
 		
-		protected static const STEPS:int = 8;
+		public static var DRAWER_HEIGHT:Number = 250;
+		public static var SLIDE_INTERVAL:int = 40;
+		public static var STEPS:int = 8;
+		
 		protected static const PADDING:Number = 10.0;
 		protected static const DIM_ALPHA:Number = 0.4;
-		public static var DRAWER_HEIGHT:Number = 250;
-		public static var SLIDE_SPEED:int = 40;
 
 		protected var _pages:Array = [];
 		protected var _page:int = 0;
@@ -86,7 +87,7 @@ package com.danielfreeman.madcomponents {
 		protected var _lastPage:DisplayObject;
 		protected var _slideX:Number = 0;
 		protected var _slideY:Number = 0;
-		protected var _slideTimer:Timer = new Timer(SLIDE_SPEED, STEPS);
+		protected var _slideTimer:Timer = new Timer(SLIDE_INTERVAL, STEPS);
 		
 		protected var _xml:XML;
 		protected var _attributes:Attributes;
@@ -95,6 +96,9 @@ package com.danielfreeman.madcomponents {
 		protected var _lastPageIndex:int;
 		protected var _border:Boolean = true;
 		protected var _layoutAfterSlide:Attributes = null;
+		protected var _easing:Boolean = false;
+		protected var _easeIn:Number = 0.5;
+		protected var _easeOut:Number = 0.5;
 		
 		
 		public function UIPages(screen:Sprite, xml:XML, attributes:Attributes) {
@@ -103,7 +107,12 @@ package com.danielfreeman.madcomponents {
 			_attributes = attributes.copy(xml);
 			UI.drawBackgroundColour(_attributes.backgroundColours, _attributes.width, _attributes.y + _attributes.height, this);
 			_attributes.x=0;_attributes.y=0;
-		//	_border = xml.@border.length()==0 || xml.@border[0]!="false";
+
+			_easing = xml.@easing == "true";
+			if (xml.@easeIn.length()>0)
+				_easeIn = parseFloat(xml.@easeIn);
+			if (xml.@easeOut.length()>0)
+				_easeOut = parseFloat(xml.@easeOut);
 			
 			screen.addChildAt(this,0);
 			var children:XMLList = xml.children();
@@ -127,12 +136,10 @@ package com.danielfreeman.madcomponents {
 				_page = 0;
 				_thisPage.visible = true;
 			}
-			_slideTimer.addEventListener(TimerEvent.TIMER,slide);
+			_slideTimer.addEventListener(TimerEvent.TIMER, slide);
 			
 			if (xml.@mask.length()>0 && xml.@mask[0]!="false")
-				scrollRect = new Rectangle(0,0,_attributes.width, _attributes.height);
-			
-			
+				scrollRect = new Rectangle(0,0,_attributes.width, _attributes.height);	
 		}
 		
 /**
@@ -307,13 +314,37 @@ package com.danielfreeman.madcomponents {
 			return transition=="" || transition==SLIDE_LEFT || transition==SLIDE_RIGHT;
 		}
 		
+		
+		protected function bezier(p0:Number,p1:Number,p2:Number,t:Number):Number {
+			return t*t*p0+2*t*(1-t)*p1+(1-t)*(1-t)*p2
+		}
+		
+		
+		protected function easing(t:Number):Number {
+			if (t<0.5)
+				return bezier(0.0, -_easeIn/2+0.25, 0.5, (1-t*2));
+			else
+				return bezier(0.5, _easeOut/2+0.75, 1.0, (1-t)*2);
+		}
+		
+		
+		protected function delta(t:Number, increment:Number):Number {
+			if (_easing) {
+				return t==0 ? 0 : increment*STEPS*(easing(t) - easing(t-1/STEPS));
+			}
+			else {
+				return increment;
+			}
+		}
+		
 /**
  *  Animate slide transition
  */	
 		protected function slide(event:TimerEvent):void {
-			_lastPage.x+=_slideX;
-			_thisPage.x+=_slideX;
-			_thisPage.y+=_slideY;
+			var t:Number = Timer(event.currentTarget).currentCount/STEPS;
+			_lastPage.x += delta(t, _slideX);
+			_thisPage.x += delta(t, _slideX);
+			_thisPage.y += delta(t, _slideY);
 			if (Timer(event.currentTarget).currentCount == STEPS) {
 				_slideTimer.stop();
 				_thisPage.cacheAsBitmap=false;
@@ -322,6 +353,7 @@ package com.danielfreeman.madcomponents {
 				}
 				else if (_transition != SLIDE_UP && _transition != DRAWER_UP) {
 					removeLastPage();
+					_thisPage.x = 0;
 				}
 				
 				if (!isSimpleTransition(_transition)) {

@@ -34,14 +34,16 @@ package com.danielfreeman.madcomponents {
  */	
 	public class UIActivity extends Sprite {
 		
-		public static const SPOKES:int = 12;
+		public static var SPOKES:int = 12;
+		public static var INTERVAL:int = 100;
+		
 		protected static const INNER:Number = 16.0;
 		protected static const OUTER:Number = 40.0;
 		protected static const THICKNESS:Number = 4.0;
 		protected static const INCREMENT:int = 8;
 		protected static const DEGTORAD:Number = 2*Math.PI;
 		
-		protected var timer:Timer = new Timer(100);
+		protected var timer:Timer = new Timer(INTERVAL);
 
 		public function UIActivity(screen:Sprite, xx:Number, yy:Number, visible:Boolean = false) {
 			screen.addChild(this);

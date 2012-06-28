@@ -122,6 +122,16 @@ package com.danielfreeman.madcomponents {
 		}
 		
 		
+		public function get label():UILabel {
+			return _label;
+		}
+		
+		
+		public function get shadowLabel():UILabel {
+			return _shadowLabel;
+		}
+		
+		
 		public function set alt(value:Boolean):void {
 			_sizeY = value ? TINY_SIZE_Y : SIZE_Y;
 			_border = value ? 0.5 : 2.0;

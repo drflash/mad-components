@@ -50,7 +50,7 @@ package com.danielfreeman.madcomponents {
  * </pre>
  */	
 	public class UIViewFlipper extends UIScrollVertical {
-	
+		
 		protected static const RADIUS:Number = 4.0;
 		protected static const SPACING:Number = 16.0;
 		protected static const SCROLLBAR_GAP:Number = 20.0;
@@ -263,10 +263,22 @@ package com.danielfreeman.madcomponents {
 				sliderX = _slider.x + _delta;
 				showScrollBar();
 				if (Math.abs(_delta) < 1.0) {
-					stopMovement();
 					sliderX = -_endSlider;
+					stopMovement();
 				}
 			}
+		}
+		
+		
+		public function set pageNumber(value:int):void {
+			_page = value;
+			_slider.x = - _page * _width;
+			showScrollBar();
+		}
+		
+		
+		public function get pageNumber():int {
+			return _page;
 		}
 		
 	}
