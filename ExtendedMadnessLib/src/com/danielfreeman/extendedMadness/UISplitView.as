@@ -131,6 +131,11 @@ package com.danielfreeman.extendedMadness
 		}
 		
 		
+		public function get right():UIPages {
+			return _right;
+		}
+		
+		
 		protected function showMenu(event:Event):void {
 			if (!_landscape) {
 				_menu.visible = _list.visible = !_menu.visible;

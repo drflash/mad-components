@@ -58,8 +58,10 @@ package com.danielfreeman.extendedMadness
 		
 		public function UIProgressBar(screen:Sprite, xml:XML, attributes:Attributes) {
 			super(screen, 0, 0, attributes.backgroundColours, xml.@alt == "true");
+			fixwidth = attributes.widthH;
 			if (xml.@value.length()>0)
 				value = parseFloat(xml.@value);
+			
 		}
 		
 		
