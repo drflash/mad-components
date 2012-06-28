@@ -185,12 +185,12 @@ package com.danielfreeman.extendedMadness
 		}
 		
 		
-		protected function showPressed():void {
+		protected function showPressed():void {trace("showPressed _labels.length="+_labels.length);
 			var matr:Matrix = new Matrix();
 			_pressedLayer.graphics.clear();
 			matr.createGradientBox(width, _height, Math.PI/2, 0, 0);
 			_pressedLayer.graphics.beginGradientFill(GradientType.LINEAR, [Colour.darken(_pressedColour,-32),_pressedColour,Colour.lighten(_pressedColour,48),Colour.lighten(_pressedColour,48)], [1.0,1.0,1.0,1.0], [0x00,0x20,0x80,0xff], matr);
-			if (_index<0) {
+			if (_index<0 || _labels.length<=0) {
 				return;
 			}
 			else if (_labels.length==1) {

@@ -98,7 +98,7 @@ package com.danielfreeman.extendedMadness
 		}
 		
 		
-		override protected function initialise(words:Vector.<String>):void {
+		override protected function initialise(words:Vector.<String>):void {trace("initialise _xml="+_xml);
 			_curve = _attributes.backgroundColours.length>2 ? _attributes.backgroundColours[2] : CONTROL_CURVE;
 			_pressedColour = _attributes.backgroundColours.length>1 ? _attributes.backgroundColours[1] : PRESSED_COLOUR;
 			if (_xml.data.length()==1) {

@@ -33,7 +33,9 @@ package com.danielfreeman.extendedMadness
 	import flash.display.GradientType;
 	import flash.display.Sprite;
 	import flash.events.Event;
+	import flash.events.EventDispatcher;
 	import flash.geom.Matrix;
+	import flash.utils.Dictionary;
 
 /**
  * Android-style radio button
@@ -52,10 +54,21 @@ package com.danielfreeman.extendedMadness
 	{
 		public static const TOGGLE:String = "toggle";
 		
+		protected static var GROUPS:Dictionary = new Dictionary();
+		
+		protected var _group:EventDispatcher;
+		
 		public function UIRadioButton(screen:Sprite, xml:XML, attributes:Attributes)
 		{
+			_group = screen;
+			if (xml.@group.length()>0) {
+				var key:String
+				_group = GROUPS[key];
+				if (!_group)
+					_group = GROUPS[key] = new EventDispatcher();
+			}
 			super(screen, xml, attributes);
-			screen.addEventListener(TOGGLE, toggle);
+			_group.addEventListener(TOGGLE, toggle);
 		}
 		
 		
@@ -90,8 +103,14 @@ package com.danielfreeman.extendedMadness
 		
 		
 		override protected function redraw():void {
-			parent.dispatchEvent(new MyEvent(TOGGLE, this));
+			_group.dispatchEvent(new MyEvent(TOGGLE, this));
 			buttonChrome();
+		}
+		
+		
+		override public function destructor():void {
+			super.destructor();
+			_group.removeEventListener(TOGGLE, toggle);
 		}
 	}
 }
