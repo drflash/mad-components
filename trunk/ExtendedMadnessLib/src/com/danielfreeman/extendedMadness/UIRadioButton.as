@@ -62,7 +62,7 @@ package com.danielfreeman.extendedMadness
 		{
 			_group = screen;
 			if (xml.@group.length()>0) {
-				var key:String
+				var key:String = xml.@group;
 				_group = GROUPS[key];
 				if (!_group)
 					_group = GROUPS[key] = new EventDispatcher();

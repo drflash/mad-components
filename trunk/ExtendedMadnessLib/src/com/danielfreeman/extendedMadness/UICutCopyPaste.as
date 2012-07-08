@@ -118,6 +118,14 @@ package com.danielfreeman.extendedMadness
 		public function get index():int {
 			return _index;
 		}
+		
+		
+/**
+ * Get the string value of the button clicked
+ */
+		public function get value():String {
+			return _index>=0 ? _labels[_index].text : "";
+		}
 
 
 /**
@@ -185,7 +193,7 @@ package com.danielfreeman.extendedMadness
 		}
 		
 		
-		protected function showPressed():void {trace("showPressed _labels.length="+_labels.length);
+		protected function showPressed():void {
 			var matr:Matrix = new Matrix();
 			_pressedLayer.graphics.clear();
 			matr.createGradientBox(width, _height, Math.PI/2, 0, 0);
