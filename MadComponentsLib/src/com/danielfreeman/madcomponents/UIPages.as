@@ -271,7 +271,7 @@ package com.danielfreeman.madcomponents {
 									_thisPage.y = _attributes.height  + _attributes.y;
 									startSlide(-DRAWER_HEIGHT/STEPS);
 									break;
-				case DRAWER_DOWN:	_thisPage.y = _attributes.height  + _attributes.x - DRAWER_HEIGHT;
+				case DRAWER_DOWN:	_thisPage.y = _attributes.height  + _attributes.y - DRAWER_HEIGHT;
 									startSlide((_attributes.height + _attributes.y)/STEPS);
 									_drawer = null;
 									break;
