@@ -27,6 +27,7 @@ package
 			stage.scaleMode = StageScaleMode.NO_SCALE;
 			var attributes:Attributes = new Attributes(0,0,250,50);
 			attributes.parse(<style background="#EEDDCC,#AA9933"/>);
+			
 			var segmentedControl:UISegmentedControl = new UISegmentedControl(this, DATA, attributes);
 		}
 	}
