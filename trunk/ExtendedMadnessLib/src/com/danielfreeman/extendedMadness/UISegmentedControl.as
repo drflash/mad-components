@@ -70,8 +70,13 @@ package com.danielfreeman.extendedMadness
 			if (attributes.fillH)
 				fixwidth = attributes.widthH;
 			index=0;
+			addEventListener(MouseEvent.MOUSE_DOWN, mouseDown); // JSS fix
 		}
 
+
+		protected function mouseDown(event:MouseEvent):void {
+			event.stopPropagation();											
+		}
 		
 /**
  * Set width of component
@@ -177,6 +182,12 @@ package com.danielfreeman.extendedMadness
 		
 		public function clearPressed():void {
 			_pressedLayer.graphics.clear();
+		}
+		
+		
+		override public function destructor():void {
+			super.destructor();
+			removeEventListener(MouseEvent.MOUSE_DOWN, mouseDown);
 		}
 	}
 }

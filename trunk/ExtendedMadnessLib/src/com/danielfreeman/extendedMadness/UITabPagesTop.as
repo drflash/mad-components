@@ -43,7 +43,6 @@ package com.danielfreeman.extendedMadness
 		protected var _offFormat:TextFormat = new TextFormat("_sans",14);
 		protected var _labels:Array = [];
 		protected var _icons:Array = [];
-		protected var _alt:Boolean;
 		
 		
 		public function UITabPagesTop(screen:Sprite, xml:XML, attributes:Attributes) {

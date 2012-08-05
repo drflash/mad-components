@@ -81,6 +81,17 @@ package com.danielfreeman.extendedMadness
 					_graph.colours[i++] = UI.toColourValue(value);
 				}
 			}
+			
+			if (xml.@increment.length()>0) {
+				_graph.increment = parseFloat(xml.@increment);
+			}
+			if (xml.@maximum.length()>0) {
+				_graph.maximum = parseFloat(xml.@maximum);
+			}
+			if (xml.@minimum.length()>0) {
+				_graph.minimum = parseFloat(xml.@minimum);
+			}
+			
 			_graph.resize2(attributes.width,attributes.height);
 			_graph.contained();
 			_graph.controls.visible = false;
@@ -188,6 +199,39 @@ package com.danielfreeman.extendedMadness
 		
 		public function get pages():Array {
 			return [];
+		}
+		
+		
+		public function set increment(value:Number):void {
+			_graph.increment = value;
+			_graph.refresh();
+		}
+		
+		
+		public function set minimum(value:Number):void {
+			_graph.minimum = value;
+			_graph.refresh();
+		}
+		
+		
+		public function set maximum(value:Number):void {
+			_graph.maximum = value;
+			_graph.refresh();
+		}
+		
+		
+		public function get increment():Number {
+			return _graph.increment;
+		}
+		
+		
+		public function get minimum():Number {
+			return _graph.minimum;
+		}
+		
+		
+		public function get maximum():Number {
+			return _graph.maximum;
 		}
 		
 		
