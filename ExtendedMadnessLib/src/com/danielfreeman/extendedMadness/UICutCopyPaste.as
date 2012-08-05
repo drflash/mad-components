@@ -76,7 +76,7 @@ package com.danielfreeman.extendedMadness
 			addChild(_pressedLayer = new Sprite());
 			initialise(words);
 			buttonMode=useHandCursor = true;
-			addEventListener(MouseEvent.MOUSE_UP,mouseUp);
+			addEventListener(MouseEvent.MOUSE_UP, mouseUp);
 		}
 		
 		

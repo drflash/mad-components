@@ -60,7 +60,7 @@ package com.danielfreeman.extendedMadness
 	public class UITreeNavigation extends UINavigation {
 		
 		protected var _data:XML;
-		protected var _treePointer:XML = null;;
+		protected var _treePointer:XML = null;
 		protected var _treeLists:Vector.<UIList> = new Vector.<UIList>;
 		protected var _erase:UIList = null;
 		protected var _label:String;

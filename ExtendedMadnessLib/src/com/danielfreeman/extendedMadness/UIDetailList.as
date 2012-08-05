@@ -300,7 +300,7 @@ package com.danielfreeman.extendedMadness
  */
 		public function hideDetail():void {
 			if (!_detailLayer || !_detailLayer.visible)
-				return
+				return;
 			_startY = mouseY;
 			_doOpen = false;
 			_detailTimer.reset();
@@ -320,7 +320,7 @@ package com.danielfreeman.extendedMadness
 				_detailLayer.removeChild(_detailTop);
 				_detailTop = null;
 				_detailLayer.removeChild(_detailBottom);
-				_detailBottom = null
+				_detailBottom = null;
 			}
 		}
 		
