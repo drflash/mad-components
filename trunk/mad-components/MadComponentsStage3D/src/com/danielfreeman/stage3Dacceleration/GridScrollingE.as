@@ -87,7 +87,7 @@ package com.danielfreeman.stage3Dacceleration {
  * 
  * The fragment shader allows or a UV-animated panel to slide up in front of the current panel.
  */
-		override public function initialise():void {trace("initialise");
+		override public function initialise():void {
 			
 			_tiledVertexShader.assemble( Context3DProgramType.VERTEX,
 				"add vt0, va0, vc8.zwww \n" +	// scroll
@@ -116,7 +116,6 @@ package com.danielfreeman.stage3Dacceleration {
 
 			_projectionMatrix.perspectiveFieldOfViewLH(60.0*Math.PI/180, _aspectRatio, 0.1, 1000.0);
 			translationMatrix();
-			trace("end initialise");
 		}
 		
 /**

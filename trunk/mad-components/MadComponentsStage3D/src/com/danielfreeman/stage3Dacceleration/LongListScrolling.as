@@ -25,13 +25,7 @@
 
 package com.danielfreeman.stage3Dacceleration {
 
-	import com.danielfreeman.madcomponents.IContainerUI;
-	import com.danielfreeman.madcomponents.UI;
-	import com.danielfreeman.madcomponents.UIGroupedList;
-	import com.danielfreeman.madcomponents.UIList;
-	import com.danielfreeman.madcomponents.UILongList;
-	import com.danielfreeman.madcomponents.UIPicker;
-	import com.danielfreeman.madcomponents.UIScrollVertical;
+	import com.danielfreeman.madcomponents.*;
 	
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
@@ -76,6 +70,7 @@ package com.danielfreeman.stage3Dacceleration {
 		
 		protected static const VERY_FAST_SCHEME:Boolean = true;
 		protected static const SLOW:Number = 32.0;
+		protected static const QUALITY:Number = 1.0;
 		
 		protected static const DEBUG:Boolean = false;
 		
@@ -99,6 +94,7 @@ package com.danielfreeman.stage3Dacceleration {
 		protected var _fastScrollingThreshold:int = FAST_INDEX_DIFFERENCE;
 		protected var _wasGoingVeryFast:Boolean = false;
 		protected var _reloadIncremental:int = -1;
+		protected var _quality:Number = QUALITY;
 
 		
 /**
@@ -168,7 +164,18 @@ package com.danielfreeman.stage3Dacceleration {
 		
 			_indexBuffer = _context3D.createIndexBuffer(6);
 			_indexBuffer.uploadFromVector(Vector.<uint>([0, 1, 2,  0, 2, 3]), 0, 6);
+		}
 		
+/**
+ * Set quality.  0 > value >= 1.  1 = full quality, 0.1 is terrible.
+ */
+		public function set quality(value:Number):void {
+			_quality = value;
+		}
+		
+		
+		public function get quality():Number {
+			return _quality;
 		}
 		
 /**
@@ -185,12 +192,16 @@ package com.danielfreeman.stage3Dacceleration {
 			_fastScrolling = value;
 		}
 		
-		
 /**
- * Fast scrolling threshold (default is 1 - may be higher for devices with faster processors)
+ * Fast scrolling threshold.  If you have amore powerful device - set it higher.
  */
 		public function set fastScrollingThreshold(value:int):void {
 			_fastScrollingThreshold = value;
+		}
+		
+		
+		public function get fastScrollingThreshold():int {
+			return _fastScrollingThreshold;
 		}
 		
 /**
@@ -201,8 +212,8 @@ package com.danielfreeman.stage3Dacceleration {
 			var left:Number = 2 * pointList.x / _screen.stage.stageWidth - 1.0;
 			var top:Number = - 2 * pointList.y / _screen.stage.stageHeight + 1.0;
 			var right:Number = left + 2 * listWidth / _screen.stage.stageWidth;
-			var bottom:Number = top - 2 * STRIP_HEIGHT / _screen.stage.stageHeight;
-			
+			var bottom:Number = top - 2 * STRIP_HEIGHT / (_screen.stage.stageHeight * _quality);
+
 			var xyzVertexBuffer:VertexBuffer3D = _context3D.createVertexBuffer(4, 3);
 			xyzVertexBuffer.uploadFromVector(Vector.<Number>([
 				left, 		bottom, 	0.02,
@@ -210,7 +221,7 @@ package com.danielfreeman.stage3Dacceleration {
 				right,		top,		0.02,
 				left,		top,		0.02	]), 0, 4);
 			_xyzVertexBuffersAll.push(xyzVertexBuffer);
-			
+
 			var uvVertexBuffer:VertexBuffer3D = _context3D.createVertexBuffer(4, 2);
 			uvVertexBuffer.uploadFromVector(Vector.<Number>([
 				0, 						1,
@@ -296,13 +307,13 @@ package com.danielfreeman.stage3Dacceleration {
 		protected function loadNewRow(listRecord:ListRecord, newRowIndex:int, from:Number = 0, overwrite:Boolean = false):void {
 			var list:IContainerUI = listRecord.container;
 			var isScrolling:Boolean = list is UIScrollVertical;
-			var listWidth:Number = UI.scale*theWidth(list);
+			var listWidth:Number = _quality * UI.scale * theWidth(list);
 			var updated:Boolean = false;
 			
 			var listRowBitmapData:Vector.<BitmapData> = _listRowBitmapData[listRecord.textureIndex];
 			var listRowTextures:Vector.<Texture> = _listRowTextures[listRecord.textureIndex];
 			var recycleRow:Vector.<uint> = _recycleRow[listRecord.textureIndex];
-			var y:Number = newRowIndex * STRIP_HEIGHT / UI.scale;
+			var y:Number = newRowIndex * STRIP_HEIGHT;
 			
 			if (newRowIndex >= listRowBitmapData.length) {
 				listRowBitmapData.push(null);
@@ -318,7 +329,7 @@ package com.danielfreeman.stage3Dacceleration {
 				var backgroundColour:uint = list.attributes.backgroundColours.length > 0 ? list.attributes.backgroundColours[0] : 0xFFFFFF;
 				
 				var bitmapData:BitmapData = newRowBitmapData(listRowBitmapData, recycleRow, newRowIndex, listWidth, backgroundColour, listRecord.background);
-				saveTexture(bitmapData, slider, new Rectangle(0, 0, listWidth, STRIP_HEIGHT), 0, -y * UI.scale);
+				saveTexture(bitmapData, slider, new Rectangle(0, 0, listWidth, STRIP_HEIGHT), 0, -y, _quality);
 				newRowTexture(listRowTextures, recycleRow, newRowIndex, bitmapData);
 
 				if (newRowIndex == 0) {
@@ -343,7 +354,7 @@ package com.danielfreeman.stage3Dacceleration {
 			scroller.visible = false;
 			list.drawComponent();
 			listRecord.background = new BitmapData(power2(listWidth), STRIP_HEIGHT, false, DEBUG ? 0xffff00 : backgroundColour);
-			saveTexture(listRecord.background, list, new Rectangle(0, 0, listWidth, STRIP_HEIGHT));
+			saveTexture(listRecord.background, list, new Rectangle(0, 0, listWidth, STRIP_HEIGHT), 0, 0, _quality);
 			scroller.visible = true;
 		}
 
@@ -358,7 +369,7 @@ package com.danielfreeman.stage3Dacceleration {
 			for each (var list:IContainerUI in lists) {
 				var listWidth:Number = UI.scale*theWidth(list);
 				var textureWidth:Number = power2(listWidth);
-				var listRecord:ListRecord = new ListRecord(list, _listRecords.length, list is UIList && UIList(list).showPressed, listWidth/textureWidth);
+				var listRecord:ListRecord = new ListRecord(list, _listRecords.length, list is UIList && UIList(list).showPressed, _quality * listWidth/textureWidth);
 				if (list is UIGroupedList) {
 					saveBackgroundBitmap(listRecord, listWidth);
 				}
@@ -412,12 +423,10 @@ package com.danielfreeman.stage3Dacceleration {
 			_uvVertexBuffersAll = new Vector.<VertexBuffer3D>;
 
 			for each (var listRecord:ListRecord in _listRecords) {
-
-				
 				var listRowBitmapData:Vector.<BitmapData> = _listRowBitmapData[listRecord.textureIndex];
 				var listRowTextures:Vector.<Texture> = _listRowTextures[listRecord.textureIndex];
 				for (var i:int = 0; i<= listRowBitmapData.length; i++) {
-					pushVerticesAndUV(listRecord, UI.scale*theWidth(listRecord.container));
+					pushVerticesAndUV(listRecord, UI.scale * theWidth(listRecord.container));
 					var bitmapData:BitmapData = listRowBitmapData[i];
 					if (bitmapData) {
 						var texture:Texture = _context3D.createTexture(bitmapData.width, bitmapData.height, Context3DTextureFormat.BGRA, false);
@@ -489,7 +498,7 @@ package com.danielfreeman.stage3Dacceleration {
 							removeListRow(recycleRow, l);
 						}
 					}
-			
+
 					for (var j:int = Math.max( topStrip, 0); j < Math.min(listRecord.firstRowIndex, length + 1); j++) { // list scrolled down (new rows higher than old)
 						loadNewRow(listRecord, j);
 					}
@@ -567,10 +576,10 @@ package com.danielfreeman.stage3Dacceleration {
 				if (listRecord.onScreen || listRecord == _listRecordCurrent || listRecord == _listRecordNext) {
 					var list:IContainerUI = listRecord.container;
 					var isScrolling:Boolean = list is UIScrollVertical;
-					var length:int = Math.ceil(UI.scale * (isScrolling ? Sprite(list.pages[0]).height : theHeight(list))/STRIP_HEIGHT);
+					var length:int = Math.ceil(_quality * UI.scale * (isScrolling ? Sprite(list.pages[0]).height : theHeight(list))/STRIP_HEIGHT);
 					var scrollPositionY:Number =  (isScrolling ? UI.scale * UIScrollVertical(list).scrollPositionY : -_centre.y);
-					var topStrip:int =  Math.max(Math.floor(scrollPositionY/STRIP_HEIGHT), 0);
-					var bottomStrip:int = Math.min(topStrip + Math.ceil(UI.scale * theHeight(list)/STRIP_HEIGHT), length);
+					var topStrip:int =  Math.max(Math.floor(_quality * scrollPositionY/STRIP_HEIGHT), 0);
+					var bottomStrip:int = Math.min(topStrip + Math.ceil(_quality * UI.scale * theHeight(list)/STRIP_HEIGHT), length);
 					var renderCursorCondition:Boolean = _frameCount <= CLICK_FRAMES && _notTooFastForClick && isScrolling && _showCursor && _activeList == listRecord;
 					var goingVeryFast:Boolean = _fastScrolling && listRecord.lazyRender && Math.abs(listRecord.delta) > _fastScrollingThreshold * STRIP_HEIGHT;
 					var aboveOrBelow:Boolean = isScrolling && (scrollPositionY < 0 || scrollPositionY > UI.scale * UIScrollVertical(list).maximumSlide);
@@ -603,31 +612,32 @@ package com.danielfreeman.stage3Dacceleration {
 					else {
 						setMotionBlur(listRecord);
 					}
-					
+										
 					_wasGoingVeryFast = goingVeryFast;
 
 					var xPosition:Number = (listRecord == _listRecordCurrent) ? _positionCurrent : ((listRecord == _listRecordNext) ? _positionNext : 0);
-					var yPosition:Number = 2 * scrollPositionY/_screen.stage.stageHeight ;
+					var yPosition:Number = 2 * scrollPositionY/_screen.stage.stageHeight;
 					
 					if (goingVeryFast || _reloadIncremental >= 0) {
+						trace("going very fast");
 						var textureIndex:int = Math.max(listRecord.firstRowIndex, 0);
 						var numberOfTextures:int = listRecord.lastRowIndex - listRecord.firstRowIndex;
 						var count:int = Math.floor(Math.random() * numberOfTextures);
 						for (var i:int = topStrip; i <= bottomStrip; i++) {
 							_context3D.setTextureAt(0, _listRowTextures[listRecord.textureIndex][textureIndex + count]);
 							count = Math.max((count + 1) % numberOfTextures, 1);
-							_context3D.setProgramConstantsFromVector(Context3DProgramType.VERTEX, 0, Vector.<Number>([ xPosition, yPosition - i * 2 * STRIP_HEIGHT /_screen.stage.stageHeight , 0.0, 0.0 ]) );	// vc0
+							_context3D.setProgramConstantsFromVector(Context3DProgramType.VERTEX, 0, Vector.<Number>([ xPosition, yPosition - i * 2 * STRIP_HEIGHT / (_screen.stage.stageHeight * _quality) , 0.0, 0.0 ]) );	// vc0
 							_context3D.drawTriangles(_indexBuffer, 0, 2);
 						}
 					}
 					else {
 						for (var j:int = topStrip; j <= bottomStrip; j++) {
 							_context3D.setTextureAt(0, _listRowTextures[listRecord.textureIndex][j]);
-							_context3D.setProgramConstantsFromVector(Context3DProgramType.VERTEX, 0, Vector.<Number>([ xPosition, yPosition - j * 2 * STRIP_HEIGHT /_screen.stage.stageHeight , 0.0, 0.0 ]) );	// vc0
+							_context3D.setProgramConstantsFromVector(Context3DProgramType.VERTEX, 0, Vector.<Number>([ xPosition, yPosition - j * 2 * STRIP_HEIGHT / (_screen.stage.stageHeight * _quality) , 0.0, 0.0 ]) );	// vc0
 							_context3D.drawTriangles(_indexBuffer, 0, 2);
 						}
 					}
-					_context3D.setProgramConstantsFromVector(Context3DProgramType.VERTEX, 0, Vector.<Number>([ xPosition, yPosition , 0.0, 0.0 ]) );
+					_context3D.setProgramConstantsFromVector(Context3DProgramType.VERTEX, 0, Vector.<Number>([ xPosition, yPosition, 0.0, 0.0 ]) );
 					
 					if (renderCursorCondition) {
 						renderCursor(listRecord);
