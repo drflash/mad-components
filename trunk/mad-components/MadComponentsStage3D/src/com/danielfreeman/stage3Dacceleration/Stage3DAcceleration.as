@@ -57,8 +57,14 @@ package com.danielfreeman.stage3Dacceleration {
 		protected static var _currentlyDoing:Stage3DAcceleration = null;
 		protected static var _theDefault:Stage3DAcceleration = null;
 		protected static var _onEnterFrameHandler:Function = null;
+		
+		protected static var _easeIn:Number = EASE_IN;
+		protected static var _easeOut:Number = EASE_OUT;
 
 		protected var _aspectRatio:Number;
+		
+
+		
 
 /**
  * This is the base class for MadComponents3D classes.
@@ -119,14 +125,22 @@ package com.danielfreeman.stage3Dacceleration {
 		}
 		
 /**
+ * Set easing values
+ */
+		public static function setEasing(easeIn:Number, easeOut:Number):void {
+			_easeIn = easeIn;
+			_easeOut = easeOut;
+		}
+		
+/**
  * Bezier easing equation
  */
 		protected static function easing(t:Number):Number {
 			if (t<0.5) {
-				return bezier(0,EASE_IN,0.5,(1-t*2));
+				return bezier(0, _easeIn, 0.5, (1-t*2));
 			}
 			else {
-				return bezier(0.5,EASE_OUT,1,(1-t)*2);
+				return bezier(0.5, _easeOut, 1, (1-t)*2);
 			}
 		}
 		
