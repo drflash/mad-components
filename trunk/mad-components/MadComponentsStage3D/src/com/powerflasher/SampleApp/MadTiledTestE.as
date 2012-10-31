@@ -201,6 +201,7 @@ package com.powerflasher.SampleApp {
 		protected function contextComplete(event:Event):void {
 			_tiledUI = new GridScrollingE();
 			_tiledUI.defineGrid(GRID);
+		//	_tiledUI.replaceTileTexture(2, 0, formatForIcon(PAGE4));
 			_tiledUI.start();
 			_tiledUI.pageTexture(_popUp);
 			_tiledUI.addSwapFlipTexture(0, 0, formatForIcon(PAGE3));
