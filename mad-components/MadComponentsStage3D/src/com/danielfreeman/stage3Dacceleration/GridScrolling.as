@@ -264,7 +264,7 @@ package com.danielfreeman.stage3Dacceleration {
 /**
  * Define the grid interface with a 2D vector of MadComponents Layout XML.
  */
-		public function defineGrid(grid:Vector.<Vector.<XML>>, gridPageWidth:int = 0):void {trace("defineGrid");
+		public function defineGrid(grid:Vector.<Vector.<XML>>, gridPageWidth:int = 0):void {
 			_gridPageWidth = gridPageWidth;
 			translationMatrix();
 			_screenEdge = screenRangeAtDepth(0.0);
@@ -380,13 +380,12 @@ package com.danielfreeman.stage3Dacceleration {
 			}
 				
 			contextResumed(false);
-			trace("end DefineGrid");
 		}
 		
 /**
  * Restore shaders, streams and textures after context loss.
  */
-		override public function contextResumed(running:Boolean):void {trace("context resumed");
+		override public function contextResumed(running:Boolean):void {
 
 			_tiledShaderProgram = _context3D.createProgram();
 			_tiledShaderProgram.upload( _tiledVertexShader.agalcode, _tiledFragmentShader.agalcode);
@@ -399,19 +398,30 @@ package com.danielfreeman.stage3Dacceleration {
 			
 			_indexBuffer = _context3D.createIndexBuffer( _indices.length );
 			_indexBuffer.uploadFromVector(_indices, 0, _indices.length );
-			trace("cr 0");
 			_tiledTexture = new Vector.<Texture>();
-			for each (var bitmapData:BitmapData in _textureBitMapData) {trace(bitmapData.width, bitmapData.height);
+			for each (var bitmapData:BitmapData in _textureBitMapData) {
 				var texture:Texture = _context3D.createTexture(bitmapData.width, bitmapData.height, Context3DTextureFormat.BGRA, false);
 				texture.uploadFromBitmapData(bitmapData);
 				_tiledTexture.push(texture);
 			}
-			trace("cr 1");
 			if (running) {
 				enable();
 				onEnterFrame(this, drawTiles);
 			}
-			trace("end context resumed");
+		}
+		
+		
+/**
+ * Replace a tile texture.
+ */
+		public function replaceTileTexture(row:int, column:int, layout:XML):void {
+			var index:uint = _gridPositionToArrayIndex[column][row];
+			var cellSize:Point = _cellSize[index];
+			var bitmapData:BitmapData = _textureBitMapData[index];
+			
+			var madRendered:UIForm = new UIForm(new Sprite(), layout, new Attributes(0, 0, cellSize.x/UI.scale, cellSize.y/UI.scale));
+			saveTexture(bitmapData, madRendered, new Rectangle(0, 0, cellSize.x, cellSize.y), 0, 0, QUALITY_SCALE);
+			_tiledTexture[index].uploadFromBitmapData(bitmapData);
 		}
 		
 /**
