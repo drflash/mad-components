@@ -25,90 +25,94 @@
 
 package com.powerflasher.SampleApp {
 	
-	[SWF(frameRate="60", backgroundColor="#FFFFFF")]	
-	
+	[SWF(frameRate="60", backgroundColor="#FFFFFF")]
 
-	import com.danielfreeman.madcomponents.UI;
-	import com.danielfreeman.madcomponents.UIGroupedList;
-	import com.danielfreeman.madcomponents.UIList;
-	import com.danielfreeman.stage3Dacceleration.ListScrolling;
-	import com.danielfreeman.stage3Dacceleration.LongListScrolling;
-	import com.danielfreeman.stage3Dacceleration.PageFlipping;
-	import com.danielfreeman.stage3Dacceleration.Stage3DAcceleration;
-	
 	import flash.display.Sprite;
 	import flash.display.StageAlign;
 	import flash.display.StageScaleMode;
-	import flash.events.Event;
-	import flash.utils.getQualifiedClassName;
+	import flash.events.Event;	
+	import com.danielfreeman.madcomponents.*;
+	import com.danielfreeman.extendedMadness.*;
+	import com.danielfreeman.stage3Dacceleration.*;
 
-	public class LongListScrollingTest extends Sprite {
-		
+	public class ListScrollingTest extends Sprite {
 
-		[Embed(source="images/mp3_48.png")]
-		protected static const MP3:Class;
-		
-		[Embed(source="images/mp4_48.png")]
-		protected static const MP4:Class;
-
-		[Embed(source="images/palm_48.png")]
-		protected static const PALM:Class;
-		
-		[Embed(source="images/psp_48.png")]
-		protected static const PSP:Class;
-		
-		[Embed(source="images/usb_48.png")]
-		protected static const USB:Class;
-		
-		protected static const PICTURES:Vector.<Class> = new <Class>[MP3, MP4, PALM, PSP, USB];
-		protected static const WORDS:Vector.<String> = new <String>["Open Source","Popular","Lightweight","Versatile","Styleable","Skinnable","Powerful","Easily Extensible","Stage3D Accelerated"];
-
-
+			
+		protected static const DATA:XML =
+				
+					<data>
+						<Red/>
+						<Orange/>
+						<Yellow/>														
+						<Green/>
+						<Blue/>
+						<Indigo/>
+						<Pink/>
+						<Tangerine/>
+						<Purple/>
+						<Orange/>
+						<Yellow/>														
+						<Green/>
+						<Blue/>
+						<Indigo/>
+						<Pink/>
+						<Tangerine/>
+						<Purple/>
+						<Orange/>
+						<Yellow/>														
+						<Green/>
+						<Blue/>
+						<Indigo/>
+						<Pink/>
+						<Tangerine/>
+						<Purple/>
+						<Red/>
+						<Orange/>
+						<Yellow/>														
+						<Green/>
+						<Blue/>
+						<Indigo/>
+						<Pink/>
+						<Tangerine/>
+						<Purple/>
+					</data>;
+	
+			
 		protected static const LAYOUT:XML = 
 		
-			<groupedList id="list" gapH="32" gapV="4" background="#DDDDFF">
-				<horizontal background="#FFFFFF">
-					<image id="image">48</image>
-					<vertical>
-						<label id="label"><font size="18"/></label>
-						<label id="label2"><font color="#666666" size="11"/></label>
-					</vertical>
-				</horizontal>														
-			</groupedList>;
-
-
-		protected var _list:UIGroupedList;
+			<list id="list" background="#CCCCFF,#CCCCFF">
+				{DATA}
+				<horizontal>
+					<label id="label"/>;
+					<switch id="switch" alignH="right"/>
+				</horizontal>
+			</list>;
+	
+	
+	
+		protected var _list:UIList;
 		protected var _listScrolling:LongListScrolling;
-		protected var _pageFlipping:PageFlipping;
 
 
-		public function LongListScrollingTest(screen:Sprite = null) {
+		public function ListScrollingTest(screen:Sprite = null) {
 			if (screen)
 				screen.addChild(this);
 
 			stage.align = StageAlign.TOP_LEFT;  
 			stage.scaleMode = StageScaleMode.NO_SCALE;
 
-			UI.create(this, LAYOUT);
+			UIe.create(this, LAYOUT);
 
-			_list = UIGroupedList(UI.findViewById("list"));
+			_list = UIList(UI.findViewById("list"));
             _list.addEventListener(UIList.CLICKED, clickHandler);
 			_list.addEventListener(UIList.LONG_CLICK, longClickHandler);
 			_list.addEventListener(UIList.CLICKED_END, clickedEndHandler);
 			
-			var data:Array = [];
-			for (var i:int=0; i<WORDS.length; i++) {
-				data.push({label:WORDS[i], image:getQualifiedClassName(PICTURES[i%PICTURES.length]), label2:'here is some small text'});
+			
+			for (var i:int = 0; i < _list.length; i++) {
+				UISwitch(_list.findViewById("switch", i)).addEventListener(Event.CHANGE, switchChanged);
 			}
-			_list = UIGroupedList(UI.findViewById("list"));
-			var groupedData:Array = [];
-			for (var j:int = 0; j<10; j++) {
-				groupedData.push("\n\nMadComponents is ...", data);
-			}
-			_list.data = groupedData;
-
-			trace("list length="+Sprite(_list.pages[0]).height);
-
+			
 			addEventListener(Stage3DAcceleration.CONTEXT_COMPLETE, contextComplete);
 			Stage3DAcceleration.startStage3D(this);
 		}
@@ -121,7 +125,7 @@ package com.powerflasher.SampleApp {
 		
 		
 		protected function clickHandler(event:Event):void {
-        	trace("clicked");
+        	trace("clicked:"+_list.index);
 		}
 		
 		
@@ -133,6 +137,12 @@ package com.powerflasher.SampleApp {
 		protected function clickedEndHandler(event:Event):void {
         	trace("clicked end");
 		}
+		
+		
+		protected function switchChanged(event:Event):void {
+			trace("switch changed:"+_listScrolling.componentChanged.name);
+			_listScrolling.updateClickedComponent();
+        }
 
 	}
 }
