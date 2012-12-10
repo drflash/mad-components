@@ -47,6 +47,9 @@ package com.danielfreeman.stage3Dacceleration {
 
 	public class GridPage extends Stage3DAcceleration{
 		
+		public static const TOP:String = "top";
+		public static const BOTTOM:String = "bottom";
+	
 		protected static const GRID_SIZE:uint = 128;
 		
 		protected var _page:IContainerUI;
@@ -78,6 +81,8 @@ package com.danielfreeman.stage3Dacceleration {
 		protected var _originalVertices:Vector.<Number> = null;
 		
 		protected var _workaround:Bitmap = null;
+		protected var _offsetX:Number = 0;
+		protected var _offsetY:Number = 0;
 
 /**
  * This class captures a MadComponents page or panel, and represents it in Stage3D by a grid of square textures
@@ -133,7 +138,7 @@ package com.danielfreeman.stage3Dacceleration {
 			_lastWidthNormalised = 2 * _lastWidth/_screen.stage.stageWidth;
 			_lastHeightNormalised = 2 * _lastHeight/_screen.stage.stageHeight;
 			
-			loadPage();
+			loadPage(backgroundColour);
 		}
 		
 		
@@ -152,7 +157,7 @@ package com.danielfreeman.stage3Dacceleration {
 				for (var j:int = 0; j<_rows; j++) {
 					var bitmapData:BitmapData = new BitmapData(GRID_SIZE, GRID_SIZE, false, backgroundColour);
 					var texture:Texture = _context3D.createTexture(GRID_SIZE, GRID_SIZE, Context3DTextureFormat.BGRA, false);
-					saveTexture(bitmapData, Sprite(_page), new Rectangle(0, 0, GRID_SIZE * UI.scale, GRID_SIZE * UI.scale), -i * GRID_SIZE, -j * GRID_SIZE);
+					saveTexture(bitmapData, Sprite(_page), new Rectangle(0, 0, GRID_SIZE * UI.scale, GRID_SIZE * UI.scale), -i * GRID_SIZE - _offsetX, -j * GRID_SIZE - _offsetY);
 					texture.uploadFromBitmapData(bitmapData);
 					gridBitmapdata.push(bitmapData);
 					gridTexture.push(texture);
@@ -213,6 +218,13 @@ package com.danielfreeman.stage3Dacceleration {
 		}
 		
 /**
+ * store vertices
+ */
+		public function set vertices0(value:Vector.<Number>):void {
+			_originalVertices = value.concat();
+		}
+		
+/**
  * Retrieve the last quad set.
  */
 		public function get vertices():Vector.<Number> {
@@ -253,11 +265,6 @@ package com.danielfreeman.stage3Dacceleration {
 		}
 		
 		
-		override public function enable():void {
-
-		}
-		
-		
 		override public function disable():void {
 			_context3D.setVertexBufferAt( 0, null ); //va0
 			_context3D.setVertexBufferAt( 1, null ); //va1
@@ -280,31 +287,12 @@ package com.danielfreeman.stage3Dacceleration {
 			for (var i:int = fromX; i <= toX; i++) {
 				for (var j:int = fromY; j <= toY; j++) {trace(i,j);
 					var bitmapData:BitmapData = _gridBitmapdata[i][j];
-					saveTexture(bitmapData, Sprite(_page), new Rectangle(0, 0, GRID_SIZE * UI.scale, GRID_SIZE * UI.scale), -i * GRID_SIZE, -j * GRID_SIZE);	
+					saveTexture(bitmapData, Sprite(_page), new Rectangle(0, 0, GRID_SIZE * UI.scale, GRID_SIZE * UI.scale), -i * GRID_SIZE - _offsetX, -j * GRID_SIZE - _offsetY);	
 					_gridTexture[i][j].uploadFromBitmapData(bitmapData);
 				}
 			}
 		}
-		
-		
-	/*	public function updatePage(component:DisplayObject):void {
-			var globalPoint:Point = component.localToGlobal(new Point(0,0));
-			var localPoint:Point = Sprite(_page).globalToLocal(globalPoint);
-			var fromX:int = Math.max( Math.floor(UI.scale * localPoint.x / GRID_SIZE), 0);
-			var toX:int = Math.min( Math.floor(UI.scale * (localPoint.x + component.width) / GRID_SIZE), _columns - 1);
-			var fromY:int = Math.max( Math.floor(UI.scale * localPoint.y / GRID_SIZE), 0);
-			var toY:int = Math.min( Math.floor(UI.scale * (localPoint.y + component.height) / GRID_SIZE), _rows - 1);
-			for (var i:int = fromX; i <= toX; i++) {
-				for (var j:int = fromY; j <= toY; j++) {
-					var bitmapData:BitmapData = new BitmapData(GRID_SIZE, GRID_SIZE);
-					var texture:Texture = _context3D.createTexture(GRID_SIZE, GRID_SIZE, Context3DTextureFormat.BGRA, false);
-					saveTexture(bitmapData, Sprite(_page), new Rectangle(0, 0, GRID_SIZE * UI.scale, GRID_SIZE * UI.scale), -i * GRID_SIZE, -j * GRID_SIZE);	
-					texture.uploadFromBitmapData(bitmapData);
-					_gridBitmapdata[i][j] = bitmapData;
-					_gridTexture[i][j] = texture;
-				}
-			}
-		} */
+
 		
 /**
  * Render the page.

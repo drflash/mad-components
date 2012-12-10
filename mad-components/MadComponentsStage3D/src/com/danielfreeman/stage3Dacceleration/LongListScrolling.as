@@ -537,8 +537,13 @@ package com.danielfreeman.stage3Dacceleration {
  * Apply motion blur.
  */
 		protected function setMotionBlur(listRecord:ListRecord):void {
-			var motionBlur:int = Math.floor(Math.abs(listRecord.delta/MOTION_BLUR_DIVISOR));
-			_context3D.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 0, Vector.<Number>([ MOTION_K0, MOTION_K1, MOTION_K2, motionBlur / STRIP_HEIGHT]) );	// fc0
+			if (_lastPositionY == _screen.stage.mouseY) {
+				_context3D.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 0, Vector.<Number>([ 1.0, 0.0, 0.0, 0.0]) );
+			}
+			else {
+				var motionBlur:int = Math.floor(Math.abs(listRecord.delta/MOTION_BLUR_DIVISOR));
+				_context3D.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 0, Vector.<Number>([ MOTION_K0, MOTION_K1, MOTION_K2, motionBlur / STRIP_HEIGHT]) );	// fc0
+			}
 		}
 		
 /**

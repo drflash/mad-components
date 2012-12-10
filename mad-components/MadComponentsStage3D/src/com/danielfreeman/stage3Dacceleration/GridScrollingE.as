@@ -160,6 +160,14 @@ package com.danielfreeman.stage3Dacceleration {
 		}
 		
 		
+		override public function contextResumed(running:Boolean):void {
+			super.contextResumed(running);
+			for each (var page:GridPage in _pages) {
+				page.contextResumed(running);
+			}
+		}
+		
+		
 		protected function flipTransformation(frame:Number, angle:Number, axis:Vector3D, scaleX:Number = 1.0, scaleY:Number = 1.0):void {
 			if (_reverse) {
 				frame = 1 - frame;
@@ -219,9 +227,6 @@ package com.danielfreeman.stage3Dacceleration {
 			_reverse = true;
 			_frame = -INCREMENT;
 			activate(this);
-			if (UI.uiLayer) {
-				UI.uiLayer.visible = false;
-			}
 			if (UI.windowLayer) {
 				UI.windowLayer.visible = false;
 			}
@@ -297,6 +302,7 @@ package com.danielfreeman.stage3Dacceleration {
 					onEnterFrame(this, drawTiles);
 				}
 				else {
+					_finish = false;
 					stop();
 				}
 				_frame = 1.0;
