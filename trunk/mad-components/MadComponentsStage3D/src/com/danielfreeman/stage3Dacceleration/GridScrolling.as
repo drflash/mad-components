@@ -136,7 +136,7 @@ package com.danielfreeman.stage3Dacceleration {
 		protected var _moving:int;
 
 
-		public function GridScrolling(hasPageIndicator:Boolean = false) {
+		public function GridScrolling() {
 			initialise();
 		}
 		
@@ -451,9 +451,6 @@ package com.danielfreeman.stage3Dacceleration {
 			_enabled = false;
 			_screen.stage.removeEventListener(MouseEvent.MOUSE_UP, mouseUp);
 			_screen.stage.removeEventListener(MouseEvent.MOUSE_DOWN, mouseDown);
-			if (UI.uiLayer) {
-				UI.uiLayer.visible = true;
-			}
 			if (UI.windowLayer) {
 				UI.windowLayer.visible = true;
 			}
@@ -483,6 +480,11 @@ package com.danielfreeman.stage3Dacceleration {
 			secondTranslationMatrix();
 			_context3D.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 4, _secondMatrix, true); //vc4 - vc7
 			_screen.stage.addEventListener(MouseEvent.MOUSE_DOWN, mouseDown);
+		}
+		
+		
+		public function finish():void {
+			_finish = true;
 		}
 
 		
@@ -519,7 +521,7 @@ package com.danielfreeman.stage3Dacceleration {
 			if (present) {
 				_context3D.present();
 			}
-			
+
 			if (!_enabled) {
 				deactivate(this);
 			}

@@ -65,6 +65,8 @@ package com.danielfreeman.stage3Dacceleration {
 		protected var _reflectionFragmentShader:AGALMiniAssembler = new AGALMiniAssembler();
 		protected var _reflectionShaderProgram:Program3D;
 		protected var _lastPosition:Number = -1.0;
+		
+		protected static const ALTERNATIVE_SCHEME:Boolean = true;
 
 		
 		public function PageFlippingE() {
@@ -139,7 +141,8 @@ package com.danielfreeman.stage3Dacceleration {
 			translationMatrix();
 
 			_pageFlippingVertexShader.assemble( Context3DProgramType.VERTEX,
-				"add vt0, vc4, va0 \n" + // for fast scrolling
+				"mul vt0.xyzw, va0.xyxw, vc6.xyzw \n" + // interpolate
+				"add vt0, vc4, vt0 \n" + // for fast scrolling
 				"m44 op, vt0, vc0 \n" +	// vertex
 				"mov v0, va1 \n"	// interpolate UVT
 			);
@@ -155,7 +158,8 @@ package com.danielfreeman.stage3Dacceleration {
 			// vc4.x - reflect va0.y (y coordinate)
 			// vc4.y - reflect va1.y (V)
 			// vc4.z - always 0
-				"add vt0, vc4, va0 \n" + // for fast scrolling
+				"mul vt0.xyzw, va0.xyxw, vc6.xyzw \n" + // interpolate
+				"add vt0, vc4, vt0 \n" + // for fast scrolling
 				"sub vt0.y, vc5.y, vt0.y \n" +  // reflect around baseline
 				"m44 op, vt0, vc0 \n" +	// vertex
 				"sub vt0.y, vt0.y, vc5.x \n" +
@@ -193,7 +197,15 @@ package com.danielfreeman.stage3Dacceleration {
 			
 			_count = pages.length;
 			for each (var page:Sprite in pages) {
-				_gridPages.push(new GridPage(IContainerUI(page), backgroundColour));
+				var gridPage:GridPage = new GridPage(IContainerUI(page), backgroundColour);
+				gridPage.vertices = Vector.<Number> ([
+			//	X,				Y,				Z,
+					-1.0,			-1.0,			0.0,
+					1.0,			-1.0,			0.0,
+					1.0,			1.0,			0.0,
+					-1.0,			1.0,			0.0
+				]);
+				_gridPages.push(gridPage);
 			}
 		}
 		
@@ -204,6 +216,8 @@ package com.danielfreeman.stage3Dacceleration {
 
 			_pageFlippingShaderProgram = _context3D.createProgram();
 			_pageFlippingShaderProgram.upload( _pageFlippingVertexShader.agalcode, _pageFlippingFragmentShader.agalcode);
+			_reflectionShaderProgram = _context3D.createProgram();
+			_reflectionShaderProgram.upload( _reflectionVertexShader.agalcode, _reflectionFragmentShader.agalcode);
 
 			for each (var page:GridPage in _gridPages) {
 				page.contextResumed(running);
@@ -231,14 +245,18 @@ package com.danielfreeman.stage3Dacceleration {
 		override protected function setRegisters():void {
 			_context3D.setProgram(_pageFlippingShaderProgram);
 			_context3D.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 0, _finalMatrix, true); //vc0 - vc3
-			_context3D.setProgramConstantsFromVector(Context3DProgramType.VERTEX, 5, Vector.<Number>([ 0.0, 0.0, 0.0, 0.0 ])); //vc4
+			_context3D.setProgramConstantsFromVector(Context3DProgramType.VERTEX, 5, Vector.<Number>([ 0.0, 0.0, 0.0, 0.0 ])); //vc5
+			_context3D.setProgramConstantsFromVector(Context3DProgramType.VERTEX, 6, Vector.<Number>([ 1.0, 1.0, 0.0, 1.0 ])); //vc6
 		}
 		
 		
 		override protected function setPageVertices(i:int, pageVertices:Vector.<Number>):void {
-			if (_position != _lastPosition || i == pageNumber && _zoomIn > 0.0) {
-				var page:GridPage = _gridPages[i];
-				page.vertices = pageVertices;			
+			if (ALTERNATIVE_SCHEME) {
+				_gridPages[i].vertices0 = pageVertices;
+			}
+			else
+				if (_position != _lastPosition || i == pageNumber && _zoomIn > 0.0) {
+					_gridPages[i].vertices = pageVertices;
 			}
 		}
 		
@@ -253,6 +271,16 @@ package com.danielfreeman.stage3Dacceleration {
 			_flavour(position, zoomIn);
 			drawPages();
 		}
+		
+		
+		override protected function makePages(position:Number, zoomIn:Number = 0):void {
+			if (ALTERNATIVE_SCHEME) { //faster scrolling
+				doMakePages(position, zoomIn);
+			}
+			else {
+				super.makePages(position, zoomIn);
+			}
+		}
 
 /**
  * Render pages.
@@ -261,9 +289,22 @@ package com.danielfreeman.stage3Dacceleration {
 			_context3D.clear(_zoomIn*(_zoomedColour>>32 & 0xff)/0xff, _zoomIn*(_zoomedColour>>16 & 0xff)/0xff, _zoomIn*(_zoomedColour & 0xff)/0xff);
 			for each (var page:GridPage in _gridPages) {
 				_context3D.setProgram(_pageFlippingShaderProgram);
+				if (ALTERNATIVE_SCHEME) {
+					var deltaX:Number = (page.vertices[3] - page.vertices[0]) / 2;
+					var deltaY:Number = (page.vertices[7] - page.vertices[4]) / 2;
+					var deltaZ:Number = (page.vertices[5] - page.vertices[2]) / 2;
+					_context3D.setProgramConstantsFromVector(Context3DProgramType.VERTEX, 4, Vector.<Number>([ page.vertices[0] + deltaX, page.vertices[1] + deltaY, page.vertices[2] + deltaZ, 0.0 ]) );	// vc4
+					_context3D.setProgramConstantsFromVector(Context3DProgramType.VERTEX, 6, Vector.<Number>([
+						deltaX,
+						deltaY,
+						deltaZ,
+						1.0
+					]) );	// vc6
+				}
 				page.display();
 				var baseline:Number = page.vertices[1];
 				_context3D.setProgramConstantsFromVector(Context3DProgramType.VERTEX, 5, Vector.<Number>([ baseline, 2.0*baseline, -1/(2*UNIT), 0.5 ]) );	// vc5
+
 				_context3D.setProgram(_reflectionShaderProgram);
 				page.display(true);
 			}

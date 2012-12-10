@@ -456,6 +456,9 @@ package com.danielfreeman.madcomponents {
 				}
 				item.removeChildAt(i);
 			}
+			if (item==_root && _root) {
+				_screen.removeChild(_root);
+			}
 		}
 	}
 }

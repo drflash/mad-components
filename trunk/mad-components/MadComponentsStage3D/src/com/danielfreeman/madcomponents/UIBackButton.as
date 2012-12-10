@@ -41,7 +41,7 @@ package com.danielfreeman.madcomponents {
 		protected static const ARROW:Number = 10.0;
 		protected static const CURVE:Number = 5.0;
 		protected static const X:Number = 12.0;
-		protected static const Y:Number = 5.0;
+		protected static const Y:Number = 6;
 		
 		public static const ADJUSTMENT:Number = 0.0;
 		
@@ -97,12 +97,12 @@ package com.danielfreeman.madcomponents {
 			var matr:Matrix=new Matrix();
 			var buttonWidth:Number = Math.round(width/8)*8+2;
 			matr.createGradientBox(width, HEIGHT, Math.PI/2, 0, 0);
-			graphics.beginGradientFill(GradientType.LINEAR, [Colour.darken(_colour,-100),Colour.lighten(_colour)], [1.0,1.0], [0x00,0xff], matr);
+		//	graphics.beginGradientFill(GradientType.LINEAR, [Colour.darken(_colour,-32),Colour.lighten(_colour, 0)], [1.0,1.0], [0x00,0xff], matr);
+			graphics.beginFill(Colour.darken(_colour));
 			var x:Number = _forward ? 0.0 : 2.0;
 			buttonShape(x, 0.0, buttonWidth, _height);
 
 			var gradient:Array = [Colour.lighten(_colour),Colour.darken(_colour),Colour.darken(_colour)];
-			
 			graphics.beginGradientFill(GradientType.LINEAR, gradient, [1.0,1.0,1.0], [0x00,0x80,0xff], matr);
 			buttonShape(x, 1.0, buttonWidth-1, _height-1.5);
 			_label.x = ( buttonWidth - _label.width ) / 2 + ( _forward ? -3 : 4 );

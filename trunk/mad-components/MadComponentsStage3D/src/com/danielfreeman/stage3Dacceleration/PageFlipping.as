@@ -268,7 +268,8 @@ package com.danielfreeman.stage3Dacceleration {
 			var sideShape:Vector.<Number> = (offset>0) ? rightMadFlow(_boundary-(1-offset)*TWEEK) : leftMadFlow(position);
 			var i:int = 0;
 			var factor:Number = (Math.abs(offset)<PAUSE || flat) ? 1.0 : Math.pow(1.0-(Math.abs(offset)-PAUSE)/(1.0-PAUSE), POWER);
-			for each (var value:Number in centrePanel(offset*SIDEWAYS)) {
+			var centre:Vector.<Number> = centrePanel(offset*SIDEWAYS);
+			for each (var value:Number in centre) {
 				result.push(zoomIn*_fillScreen[i]+(1-zoomIn)*(factor*value + (1-factor) * sideShape[i]));
 				i++;
 			}
