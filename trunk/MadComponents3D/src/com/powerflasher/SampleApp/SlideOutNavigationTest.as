@@ -95,18 +95,8 @@ public class SlideOutNavigationTest extends Sprite {
 			stage.align = StageAlign.TOP_LEFT;
 			stage.scaleMode = StageScaleMode.NO_SCALE;
 
-			UIe.create(this, SLIDE_OUT_NAVIGATION);
-			addEventListener(Stage3DAcceleration.CONTEXT_COMPLETE, contextComplete);
-			Stage3DAcceleration.startStage3D(this);
+			SlideOutNavigation.create(this, SLIDE_OUT_NAVIGATION);
 		}
-		
-		
-		protected function contextComplete(event:Event):void {
-			_slideOutNavigation = new SlideOutNavigation();
-			_slideOutNavigation.allListTextures();
-        }
-		
-		
 
 	}
 }

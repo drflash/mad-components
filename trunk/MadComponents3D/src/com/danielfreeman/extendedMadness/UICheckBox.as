@@ -77,7 +77,7 @@ package com.danielfreeman.extendedMadness
 			makeTick();
 			state = xml.@state=="true";
 			buttonMode = mouseEnabled = true;
-			addEventListener(MouseEvent.MOUSE_UP,mouseUp);
+			addEventListener(MouseEvent.MOUSE_UP, mouseUp);
 			_label = new UILabel(this, (_alt ? ALT_SIZE+SMALL_GAP  : SIZE+GAP), 0, xml.toString());
 			assignToLabel(xml, _label);
 		}

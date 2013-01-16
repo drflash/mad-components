@@ -244,7 +244,7 @@ package com.danielfreeman.madcomponents {
  * Positions a component according to its positioning attributes
  */	
 		public function position(item:DisplayObject, inhibitV:Boolean = false):void {
-			if (_id!="")
+			if (_id!="" && item.name!="+" && item.name!="-")
 				item.name = _id;
 			switch (_alignH) {
 				case FILL:
@@ -273,7 +273,7 @@ package com.danielfreeman.madcomponents {
 		
 		
 		public function initPosition(item:DisplayObject):void {
-			if (_id!="")
+			if (_id!="" && item.name!="+" && item.name!="-")
 				item.name = _id;
 			item.y = y;
 		}

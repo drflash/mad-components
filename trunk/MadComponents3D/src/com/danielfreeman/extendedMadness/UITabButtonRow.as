@@ -36,6 +36,7 @@ package com.danielfreeman.extendedMadness
 	{
 		public static const OFF_COLOUR:uint = 0x999999;
 		public static const ON_COLOUR:uint = 0xF9F9F9;
+		public static const BACKGROUND_COLOUR:uint = 0x000000;
 		
 		protected static const HEIGHT:Number = 64.0;
 		protected static const GAP:Number = 2.0;
@@ -53,14 +54,27 @@ package com.danielfreeman.extendedMadness
 		protected var _highlight:Sprite;
 		protected var _offColour:uint = OFF_COLOUR;
 		protected var _onColour:uint = ON_COLOUR;
+		protected var _backgroundColour:uint = BACKGROUND_COLOUR;
 		
 		public function UITabButtonRow(screen:Sprite, xml:XML, attributes:Attributes)
 		{
-			var colours:Vector.<uint> = attributes.backgroundColours;
-			if (colours.length>0)
-				_onColour = colours[0];
-			if (colours.length>1)
-				_offColour = colours[1];
+			var tabButtonColours:String = xml.@tabButtonColours;
+			if (tabButtonColours) {
+				var colourVector:Vector.<uint> = UI.toColourVector(tabButtonColours);
+				if (colourVector.length > 0)
+					_backgroundColour = colourVector[0];
+				if (colourVector.length > 1)
+					_onColour = colourVector[1];
+				if (colourVector.length > 2)
+					_offColour = colourVector[2];				
+			}
+			else { 
+				var colours:Vector.<uint> = attributes.backgroundColours;
+				if (colours.length > 0)
+					_onColour = colours[0];
+				if (colours.length > 1)
+					_offColour = colours[1];
+			}
 			screen.addChild(this);
 			_numButtons = xml.children().length();
 			addChild(_pressed  = new Sprite());
@@ -80,6 +94,29 @@ package com.danielfreeman.extendedMadness
 		}
 		
 		
+		public function get backgroundColour():uint {
+			return _backgroundColour;
+		}
+
+
+		public function set onColour(value:uint):void {
+			_onColour = value;
+			refresh();
+		}
+		
+		
+		public function set offColour(value:uint):void {
+			_offColour = value;
+			refresh();
+		}
+		
+		
+		public function set backgroundColour(value:uint):void {
+			_backgroundColour = value;
+			refresh();
+		}
+
+		
 		public function get index():int {
 			return _index;
 		}
@@ -92,18 +129,25 @@ package com.danielfreeman.extendedMadness
 		}
 		
 		
-		public function layout(attributes:Attributes):void {
-			_width = attributes.width;
-			_buttonWidth = _width / _numButtons;
+		protected function refresh():void {
 			_pressed.graphics.clear();
 			_highlight.graphics.clear();
 			drawTabButtons(_numButtons);
-			drawAButton(_highlight, _index, _onColour);
+			drawAButton(_highlight, _index, _onColour);	
+		}
+		
+		
+		public function layout(attributes:Attributes):void {
+			_width = attributes.width;
+			_buttonWidth = _width / _numButtons;
+			refresh();
 		}
 		
 		
 		protected function drawTabButtons(n:int):void {
 			graphics.clear();
+			graphics.beginFill(_backgroundColour);
+			graphics.drawRect(0, 0, _width, _height);
 			for (var i:int = 0; i<n; i++) {
 				drawAButton(this, i, _offColour);
 			}

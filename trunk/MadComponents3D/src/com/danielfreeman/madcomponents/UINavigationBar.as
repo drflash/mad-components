@@ -43,7 +43,7 @@ package com.danielfreeman.madcomponents {
 		protected static const LEFTCOLOUR:uint = 0x7777AA;
 		protected static const DONECOLOUR:uint = 0xAA7777;
 		protected static const SIDES:Number = 100.0;
-		protected static const Y:Number = 6.0;
+		protected static const Y:Number = 6;
 		
 		protected var _label:UILabel;
 		protected var _shadowLabel:UILabel;
@@ -62,14 +62,19 @@ package com.danielfreeman.madcomponents {
 			drawBar();
 			_shadowLabel = new UILabel(this, 0, Y+1, "", DARK_FORMAT);
 			_label = new UILabel(this, 0, Y+2, "", FORMAT);
-			_leftButton = new UIButton(this, 4, Y-1, '<font size="14">left</font>', LEFTCOLOUR, new <uint>[], true);		// JSS
+			_leftButton = new UIButton(this, 8, Y, '<font size="14">left</font>', LEFTCOLOUR, new <uint>[], true);		// JSS
 			_leftButton.visible = false;
 			_backButton = new UIBackButton(this, 4, Y, "back", COLOUR);
 			_rightArrow = new UIBackButton(this, 200, Y, "next", COLOUR, true);
-			_rightButton = new UIButton(this, 200, Y-1, '<font size="14">done</font>', DONECOLOUR, new <uint>[], true);
-			_rightArrow.x = attributes.width - _rightArrow.width - 5;
-			_rightButton.x = attributes.width - _rightButton.width - 5;
+			_rightButton = new UIButton(this, 200, Y, '<font size="14">done</font>', DONECOLOUR, new <uint>[], true);
+			adjustButtons();
 			_rightButton.visible = _rightArrow.visible = false;
+		}
+		
+		
+		protected function adjustButtons():void {
+			_rightArrow.x = _attributes.width - _rightArrow.width - 6;
+			_rightButton.x = _attributes.width - _rightButton.width - 8;
 		}
 		
 /**
@@ -139,8 +144,7 @@ package com.danielfreeman.madcomponents {
 		public function set rightButtonText(value:String):void {
 			_rightButton.text = '<font size="14">'+value+'</font>';
 			_rightArrow.text = value;
-			_rightButton.x = _attributes.width - _rightButton.width - 6;
-			_rightArrow.x = _attributes.width - _rightArrow.width - 6;
+			adjustButtons();
 		}
 		
 /**
@@ -150,8 +154,7 @@ package com.danielfreeman.madcomponents {
 			_attributes.width = value;
 			_label.x = (_attributes.width - _label.width) / 2;
 			_shadowLabel.x=_label.x-1;
-			_rightButton.x = _attributes.width - _rightButton.width - 6;
-			_rightArrow.x = _attributes.width - _rightArrow.width - 6;
+			adjustButtons();
 			drawBar();
 		}
 		

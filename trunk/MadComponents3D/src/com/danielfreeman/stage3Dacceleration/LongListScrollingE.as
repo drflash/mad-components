@@ -25,6 +25,7 @@
 
 package com.danielfreeman.stage3Dacceleration {
 
+	import com.danielfreeman.extendedMadness.*;
 	import com.danielfreeman.madcomponents.*;
 	
 	import flash.display.Bitmap;
@@ -48,7 +49,7 @@ package com.danielfreeman.stage3Dacceleration {
 	import flash.utils.Dictionary;
 
 
-	public class LongListScrolling extends ListScrolling {
+	public class LongListScrollingE extends ListScrolling {
 		
 		protected static const STRIP_HEIGHT:Number = 128.0;
 		protected static const MOTION_BLUR_DIVISOR:Number = 16.0;
@@ -75,7 +76,11 @@ package com.danielfreeman.stage3Dacceleration {
 		protected static const DEBUG:Boolean = false;
 		
 		protected var _listRowBitmapData:Vector.<Vector.<BitmapData>> = new Vector.<Vector.<BitmapData>>();
+		protected var _listRowBitmapDataTail:Vector.<Vector.<BitmapData>> = new Vector.<Vector.<BitmapData>>();
+		
 		protected var _listRowTextures:Vector.<Vector.<Texture>> = new Vector.<Vector.<Texture>>();
+		protected var _listRowTexturesTail:Vector.<Vector.<Texture>> = new Vector.<Vector.<Texture>>();
+		
 		protected var _recycleRow:Vector.<Vector.<uint>> = new Vector.<Vector.<uint>>();
 		protected var _scrollbarTextures:Vector.<Texture> = new Vector.<Texture>();
 		
@@ -95,6 +100,8 @@ package com.danielfreeman.stage3Dacceleration {
 		protected var _wasGoingVeryFast:Boolean = false;
 		protected var _reloadIncremental:int = -1;
 		protected var _quality:Number = QUALITY;
+		
+		protected var _indexBufferRectangle:IndexBuffer3D;
 
 		
 /**
@@ -112,7 +119,7 @@ package com.danielfreeman.stage3Dacceleration {
  * (This won't usually be a problem).
  * 
  **/
-		public function LongListScrolling() {
+		public function LongListScrollingE() {
 			super();
 			_supportedLists.push("longList", "tickList", "tickOneList");
 		}
@@ -162,8 +169,12 @@ package com.danielfreeman.stage3Dacceleration {
 			_listScrollingShaderProgram = _context3D.createProgram();
 			_listScrollingShaderProgram.upload( _listScrollingVertexShader.agalcode, _listScrollingFragmentShader.agalcode);
 		
-			_indexBuffer = _context3D.createIndexBuffer(6);
-			_indexBuffer.uploadFromVector(Vector.<uint>([0, 1, 2,  0, 2, 3]), 0, 6);
+			_indexBuffer = _context3D.createIndexBuffer(12);
+			_indexBuffer.uploadFromVector(Vector.<uint>([0, 1, 2,  0, 2, 3,  4, 5, 6,  4, 6, 7]), 0, 12);
+		
+			_indexBufferRectangle = _context3D.createIndexBuffer(6);
+			_indexBufferRectangle.uploadFromVector(Vector.<uint>([0, 1, 2,  0, 2, 3]), 0, 6);
+
 		}
 		
 /**
@@ -208,26 +219,39 @@ package com.danielfreeman.stage3Dacceleration {
  * Vertices of a list strip quad
  */
 		protected function pushVerticesAndUV(listRecord:ListRecord, listWidth:Number):void {
+			var listWidthHead:Number = power2(listWidth) / 2;
 			var pointList:Point = Sprite(listRecord.container).localToGlobal(new Point(0, 0));
+
 			var left:Number = 2 * pointList.x / _screen.stage.stageWidth - 1.0;
 			var top:Number = - 2 * pointList.y / _screen.stage.stageHeight + 1.0;
+			var mid:Number = left + 2 * listWidthHead / _screen.stage.stageWidth;
 			var right:Number = left + 2 * listWidth / _screen.stage.stageWidth;
 			var bottom:Number = top - 2 * STRIP_HEIGHT / (_screen.stage.stageHeight * _quality);
 
-			var xyzVertexBuffer:VertexBuffer3D = _context3D.createVertexBuffer(4, 3);
+			var xyzVertexBuffer:VertexBuffer3D = _context3D.createVertexBuffer(8, 3);
 			xyzVertexBuffer.uploadFromVector(Vector.<Number>([
 				left, 		bottom, 	0.02,
+				mid,		bottom,		0.02,
+				mid,		top,		0.02,
+				left,		top,		0.02,
+				
+				mid, 		bottom, 	0.02,
 				right,		bottom,		0.02,
 				right,		top,		0.02,
-				left,		top,		0.02	]), 0, 4);
+				mid,		top,		0.02	]), 0, 8);
 			_xyzVertexBuffersAll.push(xyzVertexBuffer);
 
-			var uvVertexBuffer:VertexBuffer3D = _context3D.createVertexBuffer(4, 2);
+			var uvVertexBuffer:VertexBuffer3D = _context3D.createVertexBuffer(8, 2);
 			uvVertexBuffer.uploadFromVector(Vector.<Number>([
+				0, 						1,
+				1,						1,
+				1,						0,
+				0,						0,
+				
 				0, 						1,
 				listRecord.uvWidth,		1,
 				listRecord.uvWidth,		0,
-				0,						0	]), 0, 4);
+				0,						0	]), 0, 8);
 			_uvVertexBuffersAll.push(uvVertexBuffer);
 		}
 		
@@ -251,6 +275,7 @@ package com.danielfreeman.stage3Dacceleration {
 /**
  * Recycle a bitmapdata if available - or create a new one.  (Not sure how much more efficient it is to recycle rather than reinstanciate bitmapdata).
  */
+ /*
 		protected function newRowBitmapData(listRowBitmapData:Vector.<BitmapData>, recycleRow:Vector.<uint>, index:int, listWidth:Number, backgroundColour:uint = 0xFFFFFF, background:BitmapData = null):BitmapData {
 			var result:BitmapData;
 			if (recycleRow.length > 0) {
@@ -265,10 +290,41 @@ package com.danielfreeman.stage3Dacceleration {
 				listRowBitmapData[copyIndex] = null;
 			}
 			else {
-				result = background ? background.clone() : new BitmapData(power2(listWidth), STRIP_HEIGHT, false, DEBUG ? 0xffff00 : backgroundColour);
+				result = background ? background.clone() : new BitmapData(listWidth, STRIP_HEIGHT, false, DEBUG ? 0xffff00 : backgroundColour);
 			}
 			listRowBitmapData[index] = result;
 			return result;
+		}*/
+		
+/**
+ * Recycle a bitmapdata if available - or create a new one.  (Not sure how much more efficient it is to recycle rather than reinstanciate bitmapdata).
+ */
+		protected function newRowBitmapDataHeadTail(listRowBitmapData:Vector.<BitmapData>, listRowBitmapDataTail:Vector.<BitmapData>, recycleRow:Vector.<uint>, index:int, listWidth:Number, backgroundColour:uint = 0xFFFFFF, background:BitmapData = null):void {
+			var head:BitmapData;
+			var tail:BitmapData;
+			var listWidthHead:Number = power2(listWidth) / 2;
+			var listWidthTail:Number = power2(listWidth - listWidthHead);
+			if (recycleRow.length > 0) {
+				var copyIndex:uint = recycleRow[0];
+				head = listRowBitmapData[copyIndex];
+				tail = listRowBitmapDataTail[copyIndex];
+				if (background) {
+					head.copyPixels(background, new Rectangle(0, 0, listWidthHead, STRIP_HEIGHT), new Point(0, 0));
+					tail.copyPixels(background, new Rectangle(listWidthHead, 0, listWidthTail, STRIP_HEIGHT), new Point(0, 0));
+				}
+				else {
+					head.floodFill(0, 0, backgroundColour);
+					tail.floodFill(0, 0, backgroundColour);
+				}
+				listRowBitmapData[copyIndex] = null;
+				listRowBitmapDataTail[copyIndex] = null;
+			}
+			else {
+				head = background ? background.clone() : new BitmapData(listWidthHead, STRIP_HEIGHT, false, DEBUG ? 0xffff00 : backgroundColour);
+				tail = background ? background.clone() : new BitmapData(listWidthTail, STRIP_HEIGHT, false, DEBUG ? 0xffff00 : backgroundColour);
+			}
+			listRowBitmapData[index] = head;
+			listRowBitmapDataTail[index] = tail;
 		}
 		
 		
@@ -284,7 +340,7 @@ package com.danielfreeman.stage3Dacceleration {
 			
 /**
   * Recycle a Texture if available - or create a new one
-  */
+  *//*
 		protected function newRowTexture(listRowTexture:Vector.<Texture>, recycleRow:Vector.<uint>, index:int, bitmapData:BitmapData):Texture {
 			var result:Texture;
 			if (recycleRow.length > 0) {
@@ -299,7 +355,35 @@ package com.danielfreeman.stage3Dacceleration {
 			result.uploadFromBitmapData(bitmapData);
 			listRowTexture[index] = result;
 			return result;
+		}*/
+		
+/**
+  * Recycle a Texture if available - or create a new one
+  */
+		protected function newRowTextureHeadTail(listWidth:Number, listRowTextureHead:Vector.<Texture>, listRowTextureTail:Vector.<Texture>, recycleRow:Vector.<uint>, index:int, bitmapData:BitmapData, bitmapDataTail:BitmapData):void {
+			var head:Texture;
+			var tail:Texture;
+			var listWidthHead:Number = power2(listWidth) / 2;
+			var listWidthTail:Number = power2(listWidth - listWidthHead);
+			if (recycleRow.length > 0) {
+				var copyIndex:uint = recycleRow.shift();
+				head = listRowTextureHead[copyIndex];
+				tail = listRowTextureTail[copyIndex];
+				listRowTextureHead[copyIndex] = null;
+				listRowTextureTail[copyIndex] = null;
+			}
+			else {
+				head = _context3D.createTexture(listWidthHead, bitmapData.height, Context3DTextureFormat.BGRA, false);
+				tail = _context3D.createTexture(listWidthTail, bitmapDataTail.height, Context3DTextureFormat.BGRA, false);
+			}
+			removeRecycle(recycleRow, index);
+			head.uploadFromBitmapData(bitmapData);
+			tail.uploadFromBitmapData(bitmapDataTail);
+			
+			listRowTextureHead[index] = head;
+			listRowTextureTail[index] = tail;
 		}
+		
 		
 /**
  * Dynamically create a new list row
@@ -308,15 +392,21 @@ package com.danielfreeman.stage3Dacceleration {
 			var list:IContainerUI = listRecord.container;
 			var isScrolling:Boolean = list is UIScrollVertical;
 			var listWidth:Number = _quality * UI.scale * theWidth(list);
+			var listWidthHead:Number = power2(listWidth) / 2;
+			var listWidthTail:Number = power2(listWidth - listWidthHead);
 			
 			var listRowBitmapData:Vector.<BitmapData> = _listRowBitmapData[listRecord.textureIndex];
+			var listRowBitmapDataTail:Vector.<BitmapData> = _listRowBitmapDataTail[listRecord.textureIndex];
 			var listRowTextures:Vector.<Texture> = _listRowTextures[listRecord.textureIndex];
+			var listRowTexturesTail:Vector.<Texture> = _listRowTexturesTail[listRecord.textureIndex];
 			var recycleRow:Vector.<uint> = _recycleRow[listRecord.textureIndex];
 			var y:Number = newRowIndex * STRIP_HEIGHT;
 			
 			if (newRowIndex >= listRowBitmapData.length) {
 				listRowBitmapData.push(null);
+				listRowBitmapDataTail.push(null);
 				_listRowTextures[listRecord.textureIndex].push(null);
+				_listRowTexturesTail[listRecord.textureIndex].push(null);
 			}
 			
 			if (overwrite && listRowBitmapData[newRowIndex]) {
@@ -327,9 +417,14 @@ package com.danielfreeman.stage3Dacceleration {
 				var slider:Sprite = isScrolling ? Sprite(list.pages[0]) : Sprite(list);
 				var backgroundColour:uint = list.attributes.backgroundColours.length > 0 ? list.attributes.backgroundColours[0] : 0xFFFFFF;
 				
-				var bitmapData:BitmapData = newRowBitmapData(listRowBitmapData, recycleRow, newRowIndex, listWidth, backgroundColour, listRecord.background);
-				saveTexture(bitmapData, slider, new Rectangle(0, 0, listWidth, STRIP_HEIGHT), 0, -y, _quality);
-				newRowTexture(listRowTextures, recycleRow, newRowIndex, bitmapData);
+				newRowBitmapDataHeadTail(listRowBitmapData, listRowBitmapDataTail, recycleRow, newRowIndex, listWidth, backgroundColour, listRecord.background);
+				var bitmapData:BitmapData = listRowBitmapData[newRowIndex];
+				var bitmapDataTail:BitmapData = listRowBitmapDataTail[newRowIndex];
+
+				saveTexture(bitmapData, slider, new Rectangle(0, 0, listWidthHead, STRIP_HEIGHT), 0, -y, _quality);
+				saveTexture(bitmapDataTail, slider, new Rectangle(0, 0, listWidthTail, STRIP_HEIGHT), -listWidthHead, -y, _quality);
+
+				newRowTextureHeadTail(listWidth, listRowTextures, listRowTexturesTail, recycleRow, newRowIndex, bitmapData, bitmapDataTail);
 
 				if (newRowIndex == 0) {
 					bitmapData.fillRect(
@@ -352,7 +447,7 @@ package com.danielfreeman.stage3Dacceleration {
 			var scroller:Sprite = Sprite(list.pages[0]);
 			scroller.visible = false;
 			list.drawComponent();
-			listRecord.background = new BitmapData(power2(listWidth), STRIP_HEIGHT, false, DEBUG ? 0xffff00 : backgroundColour);
+			listRecord.background = new BitmapData(listWidth, STRIP_HEIGHT, false, DEBUG ? 0xffff00 : backgroundColour);
 			saveTexture(listRecord.background, list, new Rectangle(0, 0, listWidth, STRIP_HEIGHT), 0, 0, _quality);
 			scroller.visible = true;
 		}
@@ -364,11 +459,14 @@ package com.danielfreeman.stage3Dacceleration {
 	
 			_xyzVertexBuffersAll = new Vector.<VertexBuffer3D>;
 			_uvVertexBuffersAll = new Vector.<VertexBuffer3D>;
+			_listRecords = new Vector.<ListRecord>();
 			
 			for each (var list:IContainerUI in lists) {
 				var listWidth:Number = UI.scale*theWidth(list);
-				var textureWidth:Number = power2(listWidth);
-				var listRecord:ListRecord = new ListRecord(list, _listRecords.length, list is UIList && UIList(list).showPressed, _quality * listWidth/textureWidth);
+				var listWidthTail:Number = listWidth - power2(listWidth) / 2;
+				var textureWidth:Number = power2(listWidthTail);
+
+				var listRecord:ListRecord = new ListRecord(list, _listRecords.length, list is UIList && UIList(list).showPressed, _quality * listWidthTail/textureWidth);
 				if (list is UIGroupedList) {
 					saveBackgroundBitmap(listRecord, listWidth);
 				}
@@ -381,7 +479,9 @@ package com.danielfreeman.stage3Dacceleration {
 				var isScrolling:Boolean = list is UIScrollVertical;
 				var length:int = Math.ceil((isScrolling ? Sprite(list.pages[0]).height : theHeight(list))/STRIP_HEIGHT);
 				_listRowBitmapData.push(new Vector.<BitmapData>(length));
+				_listRowBitmapDataTail.push(new Vector.<BitmapData>(length));
 				_listRowTextures.push(new Vector.<Texture>(length));
+				_listRowTexturesTail.push(new Vector.<Texture>(length));
 				_recycleRow.push(new Vector.<uint>);
 				
 				pushVerticesAndUV(listRecord, listWidth);
@@ -422,24 +522,36 @@ package com.danielfreeman.stage3Dacceleration {
 			_uvVertexBuffersAll = new Vector.<VertexBuffer3D>;
 
 			for each (var listRecord:ListRecord in _listRecords) {
+				var listWidth:Number = UI.scale*theWidth(listRecord.container);
+				var listWidthHead:Number = power2(listWidth) / 2;
+				 var listWidthTail:Number = power2(listWidth - listWidthHead);
 				var listRowBitmapData:Vector.<BitmapData> = _listRowBitmapData[listRecord.textureIndex];
+				var listRowBitmapDataTail:Vector.<BitmapData> = _listRowBitmapDataTail[listRecord.textureIndex];
 				var listRowTextures:Vector.<Texture> = _listRowTextures[listRecord.textureIndex];
+				var listRowTexturesTail:Vector.<Texture> = _listRowTexturesTail[listRecord.textureIndex];
 				for (var i:int = 0; i<= listRowBitmapData.length; i++) {
-					pushVerticesAndUV(listRecord, UI.scale * theWidth(listRecord.container));
+					pushVerticesAndUV(listRecord, listWidth);
 					var bitmapData:BitmapData = listRowBitmapData[i];
+					var bitmapDataTail:BitmapData = listRowBitmapDataTail[i];
 					if (bitmapData) {
-						var texture:Texture = _context3D.createTexture(bitmapData.width, bitmapData.height, Context3DTextureFormat.BGRA, false);
-						texture.uploadFromBitmapData(bitmapData);
-						listRowTextures[i] = texture;
+						var head:Texture = _context3D.createTexture(listWidthHead, bitmapData.height, Context3DTextureFormat.BGRA, false);
+						var tail:Texture = _context3D.createTexture(listWidthTail, bitmapDataTail.height, Context3DTextureFormat.BGRA, false);
+						
+						head.uploadFromBitmapData(bitmapData);
+						tail.uploadFromBitmapData(bitmapDataTail);
+						
+						listRowTextures[i] = head;
+						listRowTexturesTail[i] = tail;
 					}
 					else {
 						listRowTextures[i] = null;
+						listRowTexturesTail[i] = null;
 					}
 				}
 			}
 			
-			_indexBuffer = _context3D.createIndexBuffer(6);
-			_indexBuffer.uploadFromVector(Vector.<uint>([0, 1, 2,  0, 2, 3]), 0, 6);
+			_indexBuffer = _context3D.createIndexBuffer(12);
+			_indexBuffer.uploadFromVector(Vector.<uint>([0, 1, 2,  0, 2, 3,  4, 5, 6,  4, 6, 7]), 0, 12);
 			
 			renderCursorBuffers();
 			
@@ -629,7 +741,9 @@ package com.danielfreeman.stage3Dacceleration {
 							_context3D.setTextureAt(0, _listRowTextures[listRecord.textureIndex][textureIndex + count]);
 							count = Math.max((count + 1) % numberOfTextures, 1);
 							_context3D.setProgramConstantsFromVector(Context3DProgramType.VERTEX, 0, Vector.<Number>([ xPosition, yPosition - i * 2 * STRIP_HEIGHT / (_screen.stage.stageHeight * _quality) , 0.0, 0.0 ]) );	// vc0
-							_context3D.drawTriangles(_indexBuffer, 0, 2);
+							_context3D.drawTriangles(_indexBuffer, 0, 0);
+							_context3D.setTextureAt(0, _listRowTexturesTail[listRecord.textureIndex][j]);
+							_context3D.drawTriangles(_indexBuffer, 6, 2);
 						}
 					}
 					else {
@@ -637,6 +751,8 @@ package com.danielfreeman.stage3Dacceleration {
 							_context3D.setTextureAt(0, _listRowTextures[listRecord.textureIndex][j]);
 							_context3D.setProgramConstantsFromVector(Context3DProgramType.VERTEX, 0, Vector.<Number>([ xPosition, yPosition - j * 2 * STRIP_HEIGHT / (_screen.stage.stageHeight * _quality) , 0.0, 0.0 ]) );	// vc0
 							_context3D.drawTriangles(_indexBuffer, 0, 2);
+							_context3D.setTextureAt(0, _listRowTexturesTail[listRecord.textureIndex][j]);
+							_context3D.drawTriangles(_indexBuffer, 6, 2);
 						}
 					}
 					_context3D.setProgramConstantsFromVector(Context3DProgramType.VERTEX, 0, Vector.<Number>([ xPosition, yPosition, 0.0, 0.0 ]) );
@@ -659,6 +775,11 @@ package com.danielfreeman.stage3Dacceleration {
 			for each (var listRowBitmapData:Vector.<BitmapData> in _listRowBitmapData) {
 				for each (var bitmapData:BitmapData in listRowBitmapData) {
 					bitmapData.dispose();
+				}
+			}
+			for each (var listRowBitmapDataTail:Vector.<BitmapData> in _listRowBitmapDataTail) {
+				for each (var bitmapDataTail:BitmapData in listRowBitmapDataTail) {
+					bitmapDataTail.dispose();
 				}
 			}
 			for each (var listRowTextures:Vector.<Texture> in _listRowTextures) {
@@ -755,7 +876,7 @@ package com.danielfreeman.stage3Dacceleration {
 			_context3D.setVertexBufferAt( 0, _cursorVertices,  0, Context3DVertexBufferFormat.FLOAT_3 ); //va0
 			_context3D.setVertexBufferAt( 1, _cursorUV,  0, Context3DVertexBufferFormat.FLOAT_2 ); //va1
 			
-			_context3D.drawTriangles(_indexBuffer, 0, 2);
+			_context3D.drawTriangles(_indexBufferRectangle, 0, 2);
 
 		}
 		
@@ -818,6 +939,58 @@ package com.danielfreeman.stage3Dacceleration {
 				_context3D.setTextureAt(0, _scrollbarTextures[listRecord.textureIndex]);
 				renderRectangle(left, top, right, bottom );
 			}
+		}
+		
+		
+		public static const READY:String = "listReady";
+		
+		protected static var _listScrolling:LongListScrollingE;
+		protected static var _pages:UIPages = null;
+		protected static var _screenS:Sprite;
+		
+		
+		public static function create(screen:Sprite, xml:XML, width:Number = -1, height:Number = -1):Sprite {
+			_screenS = screen;
+			var result:Sprite = UIe.create(screen, xml, width, height);
+			var list:UIList = UIList(UI.findViewById("@listLoad"));
+			screen.addEventListener(Stage3DAcceleration.CONTEXT_COMPLETE, contextComplete);
+			if (list) {
+				list.model.addEventListener(Model.LOADED, listLoaded);
+			}
+			else {
+				Stage3DAcceleration.startStage3D(screen);
+			}
+			
+			return result;
+		}
+		
+		
+		protected static function listLoaded(event:Event):void {
+			Stage3DAcceleration.startStage3D(_screenS);
+		}
+		
+		
+		protected static function contextComplete(event:Event):void {
+			_screenS.removeEventListener(Stage3DAcceleration.CONTEXT_COMPLETE, contextComplete);
+			_pages = UIPages(UI.findViewById("@pages"));
+			_listScrolling = new LongListScrollingE();
+			if (_pages) {
+				_listScrolling.containerPageTextures(_pages);
+			}
+			else {
+				_listScrolling.allListTextures();
+			}
+			_screenS.dispatchEvent(new Event(READY));
+		}
+		
+		
+		public static function get listScrolling():LongListScrollingE {
+			return _listScrolling;
+		}
+		
+		
+		public static function get pages():UIPages {
+			return _pages;
 		}
 
 	}

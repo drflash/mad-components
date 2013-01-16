@@ -33,7 +33,25 @@ package com.danielfreeman.extendedMadness
 	import flash.geom.ColorTransform;
 	import flash.text.TextFormat;
 
-	
+/**
+ *  MadComponents tabbed pages container
+ * <pre>
+ * &lt;tabPages
+ *    id = "IDENTIFIER"
+ *    colour = "#rrggbb"
+ *    background = "#rrggbb, #rrggbb, ..."
+ *    tabButtonColours = "#rrggbb, #rrggbb, ..."
+ *    visible = "true|false"
+ *    gapV = "NUMBER"
+ *    gapH = "NUMBER"
+ *    alignH = "left|right|centre"
+ *    alignV = "top|bottom|centre"
+ *    border = "true|false"
+ *    mask = "true|false"
+ *    alt = "true|false"
+ * /&gt;
+ * </pre>
+ */
 	public class UITabPagesTop extends UITabPages
 	{
 		protected static const LABEL_Y:Number = 40.0;
@@ -49,9 +67,10 @@ package com.danielfreeman.extendedMadness
 			_alt = xml.@alt == "true";
 			xml.@alt = "";
 			super(screen, xml, attributes);
-			for each(var page:DisplayObject in _pages)
-				page.y = _buttonBar.height+1;
-			_attributes.y = _buttonBar.height+1;
+			for each(var page:DisplayObject in _pages) {
+				page.y = _buttonBar.height;
+			}
+			_attributes.y = _buttonBar.height;
 			if (!_alt) {
 				_onFormat.color = UITabButtonRow(_buttonBar).offColour;
 				_offFormat.color = UITabButtonRow(_buttonBar).onColour;
@@ -65,7 +84,7 @@ package com.danielfreeman.extendedMadness
 				_buttonBar.y = 0;
 			}
 			else {
-				addChild(_buttonBar=new UITabButtonRow(this,xml,attributes));
+				addChild(_buttonBar = new UITabButtonRow(this, xml, attributes));
 				attributes.height -= _buttonBar.height;
 			}
 		}
@@ -100,15 +119,20 @@ package com.danielfreeman.extendedMadness
 				_buttonBar.y = 0;
 			}
 			else {
-				attributes.height -= _buttonBar.height;
-				superLayout(attributes);
+				_pagesAttributes = attributes.copy();
+				_pagesAttributes.height -= _buttonBar.height;
+				_pagesAttributes.y = _buttonBar.height+1;
+				superLayout(_pagesAttributes);
 			}
-			for each(var page:DisplayObject in _pages)
-				page.y = _buttonBar.height+1;
-			_attributes.y = _buttonBar.height+1;
-			if (!_alt)
+			for each(var page:DisplayObject in _pages) {
+				page.y = _buttonBar.height;
+			}
+			if (!_alt) {
 				UITabButtonRow(_buttonBar).layout(attributes);
-				spacing();
+			}
+			spacing();
+			_attributes = attributes.copy();
+			_attributes.y = _buttonBar.height;
 		}
 		
 		

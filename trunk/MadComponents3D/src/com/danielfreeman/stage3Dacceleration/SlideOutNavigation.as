@@ -277,5 +277,33 @@ package com.danielfreeman.stage3Dacceleration {
 			_positionNext = 2.0 * UI.scale * _listWidth * (_back ? (1-shift) : shift) / _screen.stage.stageWidth;
 			drawLists();
 		}
+		
+		
+		public static const READY:String = "slideOutReady";
+				
+		protected static var _slideOutNavigation:SlideOutNavigation;
+		protected static var _screenS:Sprite;
+
+		
+		public static function create(screen:Sprite, xml:XML, width:Number = -1, height:Number = -1):Sprite {
+			_screenS = screen;
+			var result:Sprite = UIe.create(screen, xml, width, height);
+			screen.addEventListener(Stage3DAcceleration.CONTEXT_COMPLETE, contextComplete);
+			Stage3DAcceleration.startStage3D(screen);
+			return result;
+		}
+		
+		
+		protected static function contextComplete(event:Event):void {
+			_screenS.removeEventListener(Stage3DAcceleration.CONTEXT_COMPLETE, contextComplete);
+			_slideOutNavigation = new SlideOutNavigation();
+			_slideOutNavigation.allListTextures();
+			_screenS.dispatchEvent(new Event(READY));
+		}
+		
+		
+		public static function get slideOutNavigation():SlideOutNavigation {
+			return _slideOutNavigation;
+		}
 	}
 }

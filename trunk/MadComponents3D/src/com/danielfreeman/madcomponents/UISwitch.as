@@ -231,7 +231,7 @@ package com.danielfreeman.madcomponents {
 				_move = _state ? -MOVE_X : MOVE_X;
 			else
 				_move = (_button.x < (WIDTH-BUTTON_WIDTH+_extra) / 2) ? -MOVE_X : MOVE_X;
-			if (event.target==_button || event.target==this ||_delta>0) {
+			if (mouseX > 0 && mouseX < WIDTH && mouseY > 0 && mouseY < HEIGHT || _delta>0) {
 				_timer.reset();
 				_timer.start();
 			}
