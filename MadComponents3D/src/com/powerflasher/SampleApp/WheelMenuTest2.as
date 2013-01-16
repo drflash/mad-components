@@ -50,7 +50,7 @@ package com.powerflasher.SampleApp {
 		protected static const LAYOUT:XML =
 		
 			<vertical stageColour="#333333" >
-				<wheelMenu id="@menu" motionBlur="true" orientation="left"
+				<wheelMenu id="@menu" orientation="left"
 				skin = {getQualifiedClassName(MARBLE)}
 				alignV="centre" alignH="centre"
 				rim="15" radius="130" imagePosition="0.9"
