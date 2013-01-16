@@ -97,7 +97,7 @@ package com.powerflasher.SampleApp {
 		</data>;
 
 			
-		protected static const LIST:XML = <dividedList id="list" colour="#666677" background="#EEEEFF,#FFFFFF,#EEEEFF" headingTextColour="#EEEEFF" headingShadowColour="#333344" mask="true">												
+		protected static const LIST:XML = <dividedList id="list" colour="#666677" background="#EEEEFF,#FFFFFF,#EEEEFF" headingTextColour="#EEEEFF" headingShadowColour="#333344">												
 												<horizontal>
 													<image id="image">48</image>
 													<vertical>
@@ -127,7 +127,7 @@ package com.powerflasher.SampleApp {
 			
 		protected static const LAYOUT:XML =
 		
-			<navigation title="Navigation Test" id="pages" colour="#334433" background="#FFCCFF">
+			<navigation title="Navigation Test" id="pages" colour="#334433">
 				{LIST}
 				{PAGE}
 			</navigation>;		
@@ -136,7 +136,7 @@ package com.powerflasher.SampleApp {
 		protected var _pages:UINavigation;
 		protected var _list:UIDividedList;
 		
-		protected var _listScrolling:LongListScrolling;
+		protected var _listScrolling:LongListScrollingE;
 
 
 		public function LongNavigationTest(screen:Sprite = null) {
@@ -164,11 +164,12 @@ package com.powerflasher.SampleApp {
 			
 			addEventListener(Stage3DAcceleration.CONTEXT_COMPLETE, contextComplete);
 			Stage3DAcceleration.startStage3D(this);
+			
 		}
 
 
 		protected function contextComplete(event:Event):void {
-			_listScrolling = new LongListScrolling();
+			_listScrolling = new LongListScrollingE();
 			_listScrolling.containerPageTextures(_pages);
 		}
 

@@ -25,14 +25,9 @@
 
 package com.danielfreeman.stage3Dacceleration {
 
+	import com.danielfreeman.extendedMadness.UIPanel;
 	import com.adobe.utils.AGALMiniAssembler;
-	import com.danielfreeman.madcomponents.IContainerUI;
-	import com.danielfreeman.madcomponents.UI;
-	import com.danielfreeman.madcomponents.UIForm;
-	import com.danielfreeman.madcomponents.UIList;
-	import com.danielfreeman.madcomponents.UIPages;
-	import com.danielfreeman.madcomponents.UIPicker;
-	import com.danielfreeman.madcomponents.UIScrollVertical;
+	import com.danielfreeman.madcomponents.*;
 	
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
@@ -48,10 +43,12 @@ package com.danielfreeman.stage3Dacceleration {
 	import flash.display3D.textures.Texture;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
+	import flash.events.TimerEvent;
 	import flash.geom.Matrix;
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
 	import flash.utils.Dictionary;
+	import flash.utils.Timer;
 
 /**
  * Accelerated list scrolling.
@@ -124,6 +121,8 @@ package com.danielfreeman.stage3Dacceleration {
 		protected var _frameCount:int = 0;
 		protected var _lastPositionY:Number;
 		protected var _searchHit:DisplayObject;
+		protected var _searchHitComponent:DisplayObject;
+		protected var _listenForChange:UISwitch;
 		protected var _clicked:Boolean = false;
 		protected var _notTooFastForClick:Boolean = true;
 		
@@ -133,9 +132,14 @@ package com.danielfreeman.stage3Dacceleration {
 		protected var _autoUpdateComponents:Boolean = true;
 		protected var _componentChanged:DisplayObject;
 		protected var _stopping:Boolean;
+		protected var _activeListTextureIndex:int = -1;
+		
+		protected var _delayedStage3D:Timer = new Timer(50,1);
+	
 		
 		public function ListScrolling() {
 			initialise();
+			_delayedStage3D.addEventListener(TimerEvent.TIMER, showStage3D);
 		}
 		
 /**
@@ -372,8 +376,8 @@ package com.danielfreeman.stage3Dacceleration {
 			_centre = new Rectangle(
 					point.x,
 					point.y,
-					UI.scale*page0.attributes.width,
-					UI.scale*page0.attributes.height
+					UI.scale * page0.attributes.width,
+					UI.scale * page0.attributes.height
 				);
 			for each (var page:Sprite in container.pages ) {
 				if (page.getChildAt(0) is UIScrollVertical && _supportedLists.indexOf(UIScrollVertical(page.getChildAt(0)).xml.localName())>=0) {
@@ -479,7 +483,6 @@ package com.danielfreeman.stage3Dacceleration {
  * Sliding transition is complete
  */	
 		protected function slideComplete():void {
-			
 			setRegisters();
 			_listRecordCurrent = null;
 			_listRecordNext = null;
@@ -521,10 +524,11 @@ package com.danielfreeman.stage3Dacceleration {
  * Cut a hole in a particular container background so that the accelerated list is visible underneath.
  */	
 		public function cutRectangle(container:Sprite, rectangle:Rectangle):void {
-			if (container is UIList) {
-				return;
-			}
+		//	if (container is UIList) {
+		//		return;
+		//	}
 			var topLeft:Point = container.globalToLocal(new Point(rectangle.x, rectangle.y));
+			if (container is com.danielfreeman.extendedMadness.UIPanel) container.graphics.beginFill(0xffff00, 0);
 			container.graphics.drawRect(topLeft.x, topLeft.y, rectangle.width, rectangle.height);
 			if (container is IContainerUI && _holes.indexOf(IContainerUI(container)) < 0) {
 				_holes.push(container);
@@ -540,9 +544,15 @@ package com.danielfreeman.stage3Dacceleration {
 				var point:Point = component.localToGlobal(new Point(0,0));
 				rectangle = new Rectangle(point.x, point.y, component.attributes.width, component.height);
 				container = component;
+			//	cutRectangle(container, rectangle);
 			}
-			else if (container != UI.uiLayer && container is IContainerUI && IContainerUI(container).attributes.backgroundColours.length> 0 && !(container is UIForm && UIForm(container).hasPickerBackground)) {
+			if (container.name=="+" || container.name=="-") {
+				container.graphics.clear();
+			}
+			else {
+				if (container != UI.uiLayer && container is IContainerUI && IContainerUI(container).attributes.backgroundColours.length> 0 && !(container is UIForm && UIForm(container).hasPickerBackground)) {
 				cutRectangle(container, rectangle);
+			}
 			}
 			if (container == UI.uiLayer) {
 				cutRectangle(UI.uiLayer, rectangle);
@@ -652,6 +662,15 @@ package com.danielfreeman.stage3Dacceleration {
 		}
 		
 /**
+ * Update texture for last component clicked
+ */
+		public function updateClickedComponent():void {
+			if (_activeListTextureIndex >= 0 && _componentChanged) {
+				updateComponent(_activeListTextureIndex, _componentChanged);
+			}
+		}
+		
+/**
  * Mouse up handler
  */
 		protected function mouseUp(event:MouseEvent):void {
@@ -661,18 +680,21 @@ package com.danielfreeman.stage3Dacceleration {
 			if (_activeList) {
 				var noMove:Boolean = Math.abs(_screen.stage.mouseY - _startMouseY) < UI.scale;
 				
-				if (_searchHit) {
-					_componentChanged = _searchHit;
+				if (_searchHitComponent) {
+					_componentChanged = _searchHitComponent;
 					_screen.stage.dispatchEvent(new MouseEvent(MouseEvent.MOUSE_UP, false));
 					_searchHit.dispatchEvent(new MouseEvent(MouseEvent.MOUSE_UP));
 					_screen.stage.dispatchEvent(new Event(COMPONENT_CHANGED));
+					_activeListTextureIndex = _activeList.textureIndex;
 					
-					if (_autoUpdateComponents) {
-						updateComponent(_activeList.textureIndex, _searchHit);
-					}
+					if (!_listenForChange) {
+						if (_autoUpdateComponents) {
+							updateComponent(_activeList.textureIndex, _componentChanged);
+						}
 
-					if (ALTERNATIVE_SCHEME) {
-						takeOverFromListScroller(_activeList);
+						if (ALTERNATIVE_SCHEME) {
+							takeOverFromListScroller(_activeList);
+						}
 					}
 				}
 				else if (_clicked && _activeList.container is UIList && !_activeList.showPressed) {
@@ -689,7 +711,7 @@ package com.danielfreeman.stage3Dacceleration {
 					_activeList = null;
 					return;
 				}
-				else if (!_clicked && !_searchHit) {
+				else if (!_clicked) {  //  && !_searchHit
 					_somethingMoving++;
 					_activeList.inertia = true;
 					_activeList.delta = (_screen.stage.mouseY - _lastPositionY) * MOVE_FACTOR / UI.scale;
@@ -706,6 +728,7 @@ package com.danielfreeman.stage3Dacceleration {
 				}
 	
 				_searchHit = null;
+				_searchHitComponent = null;
 				_clicked = false;
 				_oldActiveList = _activeList;
 				_activeList = null;
@@ -723,9 +746,17 @@ package com.danielfreeman.stage3Dacceleration {
 					if (ALTERNATIVE_SCHEME && list is UIList) {
 						UIList(list).sliderVisible = false;
 					}
-					_searchHit = UIScrollVertical.searchHit(list.pages[0]);
-					if (_searchHit) {
-						_searchHit = UIScrollVertical.searchHitChild(_searchHit);
+					_searchHitComponent = UIScrollVertical.searchHit(list.pages[0]);
+					if (_searchHitComponent is UISwitch && _autoUpdateComponents) {
+						if (_listenForChange) {
+							_listenForChange.removeEventListener(Event.CHANGE, changeHandler);
+							_listenForChange = null;
+						}
+						_listenForChange = UISwitch(_searchHitComponent);
+						_listenForChange.addEventListener(Event.CHANGE, changeHandler);
+					}
+					if (_searchHitComponent) {
+						_searchHit = UIScrollVertical.searchHitChild(_searchHitComponent);
 						if (ALTERNATIVE_SCHEME) {
 							showRealListScroller(listRecord);
 						}
@@ -733,7 +764,25 @@ package com.danielfreeman.stage3Dacceleration {
 				}
 				else {
 					_searchHit = null;
+					_searchHitComponent = null;
 				}
+		}
+		
+		
+		protected function changeHandler(event:Event):void {
+			if (_autoUpdateComponents && _componentChanged) {
+				updateComponent(_activeListTextureIndex, _componentChanged);
+			}
+			_listenForChange.removeEventListener(Event.CHANGE, changeHandler);
+			_listenForChange = null;
+		//	takeOverFromListScroller(_oldActiveList);
+			_delayedStage3D.reset();
+			_delayedStage3D.start();
+		}
+		
+		
+		protected function showStage3D(event:TimerEvent):void {
+			takeOverFromListScroller(_oldActiveList);
 		}
 		
 /**
@@ -845,7 +894,7 @@ package com.danielfreeman.stage3Dacceleration {
 				if (!_clicked) {
 					UIScrollVertical(_activeList.container).sliderY = _startSliderY + (_screen.stage.mouseY - _startMouseY); 
 				}
-				else if (_searchHit) {
+				else if (_searchHitComponent) {
 					_screen.stage.dispatchEvent(new MouseEvent(MouseEvent.MOUSE_MOVE, false));
 				}
 				_frameCount++;
@@ -919,9 +968,10 @@ package com.danielfreeman.stage3Dacceleration {
 /**
  * Show the accelerated Stage3D list
  */
-		protected function doTakeOverFromListScroller(list:UIScrollVertical):void {
+		protected function doTakeOverFromListScroller(list:UIScrollVertical):void {//UI.uiLayer.visible = false;return;
 			if (!(list is UIPicker)) {
 				list.visible = false;
+				list.mouseEnabled = list.mouseChildren = false;
 			}
 			else if (list.sliderVisible) {
 				list.sliderVisible = false;
@@ -934,10 +984,11 @@ package com.danielfreeman.stage3Dacceleration {
 /**
  * Show the display-list list (you are interacting with it - not scrolling it)
  */
-		protected function showRealListScroller(listRecord:ListRecord):void {
+		protected function showRealListScroller(listRecord:ListRecord):void {//UI.uiLayer.visible = true;return;
 			var list:UIScrollVertical = UIScrollVertical(listRecord.container);
 			if (!(list is UIPicker)) {
 				list.visible = true;
+				list.mouseEnabled = list.mouseChildren = true;
 			}
 			else if (!list.sliderVisible) {
 				list.drawComponent();
@@ -975,6 +1026,7 @@ package com.danielfreeman.stage3Dacceleration {
 			super.destructor();
 			_screen.stage.removeEventListener(MouseEvent.MOUSE_UP, mouseUp);
 			_screen.stage.removeEventListener(MouseEvent.MOUSE_DOWN, mouseDown);
+			_delayedStage3D.removeEventListener(TimerEvent.TIMER, showStage3D);
 		}
 	}
 }

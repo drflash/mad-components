@@ -75,7 +75,7 @@ package com.danielfreeman.extendedMadness {
 		}
 		
 		
-		protected function mouseUp(event:MouseEvent):void {trace("event.target.name=",event.target.name);
+		protected function mouseUp(event:MouseEvent):void {
 			value=parseInt(event.target.name) + 1.0;
 			dispatchEvent(new Event(Event.CHANGE));
 		}

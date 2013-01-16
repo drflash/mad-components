@@ -154,7 +154,7 @@ package com.danielfreeman.stage3Dacceleration {
 /**
  * Extract a texture from a Sprite, and save it to a bitmapdata
  */
-		protected static function saveTexture(textureBitMapData:BitmapData, panel:Sprite, rectangle:Rectangle, x:Number = 0, y:Number = 0, qualityScale:Number = 1.0):void {
+		protected static function saveTexture(textureBitMapData:BitmapData, panel:DisplayObject, rectangle:Rectangle, x:Number = 0, y:Number = 0, qualityScale:Number = 1.0):void {
 			var matrix:Matrix = new Matrix();
 			matrix.identity();
 			matrix.scale(qualityScale * scale, qualityScale * scale);

@@ -59,6 +59,7 @@ package com.danielfreeman.madcomponents {
 		protected var _mouseDownTarget:UITabButton = null;
 		protected var _colour:uint;
 		protected var _alt:Boolean;
+		protected var _pagesAttributes:Attributes;
 		
 
 		public function UITabPages(screen:Sprite, xml:XML, attributes:Attributes) {
@@ -75,8 +76,9 @@ package com.danielfreeman.madcomponents {
 		protected function initialiseButtonBar(xml:XML, attributes:Attributes):void {
 			addChild(_buttonBar=new Sprite());
 			makeTabButtons(attributes, xml.children().length(), _alt);
-			attributes.height -= (_buttonBar.height - (_alt ? 1 : TWEAK));
-			_buttonBar.y = attributes.height;
+			_pagesAttributes = attributes.copy();
+			_pagesAttributes.height -= (_buttonBar.height - (_alt ? 1 : TWEAK));
+			_buttonBar.y = _pagesAttributes.height;
 		}
 		
 		
@@ -113,9 +115,10 @@ package com.danielfreeman.madcomponents {
  *  Rearrange the layout to new screen dimensions
  */	
 		override public function layout(attributes:Attributes):void {
-			attributes.height -= _buttonBar.height - (_alt ? 1 : TWEAK);
-			_buttonBar.y = attributes.height;
-			superLayout(attributes);
+			_pagesAttributes = attributes.copy();
+			_pagesAttributes.height -= _buttonBar.height - (_alt ? 1 : TWEAK);
+			_buttonBar.y = _pagesAttributes.height;
+			superLayout(_pagesAttributes);
 			var buttonWidth:Number = attributes.width / _buttonBar.numChildren;
 			for (var i:int=0; i<_buttonBar.numChildren; i++) {
 				var button:UITabButton = UITabButton(_buttonBar.getChildAt(i));
@@ -123,6 +126,12 @@ package com.danielfreeman.madcomponents {
 				button.fixwidth = buttonWidth;
 			}
 			drawTabButtonBackground();
+			_attributes = attributes;
+		}
+		
+		
+		public function doLayout():void {
+			layout(_attributes);
 		}
 		
 /**

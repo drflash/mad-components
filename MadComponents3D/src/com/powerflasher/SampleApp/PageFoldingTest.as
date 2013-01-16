@@ -166,7 +166,7 @@ package com.powerflasher.SampleApp {
 			
 			
 		protected static const LAYOUT:XML =
-			<pages id="views" background="#FFCCFF">
+			<pages id="@pages" background="#FFCCFF">
 				{PAGE}
 				{formatForPage(PAGE0, "3D Bar Chart")}
 				{formatForPage(PAGE1, "3D Bar Charts")}
@@ -191,20 +191,7 @@ package com.powerflasher.SampleApp {
 			stage.align = StageAlign.TOP_LEFT;  
 			stage.scaleMode = StageScaleMode.NO_SCALE;
 
-			UIe.create(this, LAYOUT);
-			
-			_pages = UIPages(UI.findViewById("views"));
-			
-			addEventListener(Stage3DAcceleration.CONTEXT_COMPLETE, contextComplete);
-			Stage3DAcceleration.startStage3D(this);
-		}
-
-
-		protected function contextComplete(event:Event):void {
-			removeEventListener(Stage3DAcceleration.CONTEXT_COMPLETE, contextComplete);
-			_pageFolding = new PageFolding();
-			_pageFolding.containerPageTextures(_pages);
-			_pageFolding.start();
+			PageFolding.create(this, LAYOUT);
 		}
 	}
 }

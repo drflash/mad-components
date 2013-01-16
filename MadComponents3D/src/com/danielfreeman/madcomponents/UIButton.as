@@ -75,7 +75,7 @@ package com.danielfreeman.madcomponents {
 		protected static const CURVE:Number = 16.0;
 		protected static const SIZE_X:Number = 10.0;
 		protected static const SIZE_Y:Number = 7.0;
-		protected static const TINY_SIZE_Y:Number = 6.0;
+		protected static const TINY_SIZE_Y:Number = 7.0;
 		
 		protected var _format:TextFormat = FORMAT;
 		protected var _darkFormat:TextFormat = DARK_FORMAT;

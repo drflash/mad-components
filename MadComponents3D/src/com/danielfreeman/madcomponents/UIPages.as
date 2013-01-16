@@ -191,7 +191,7 @@ package com.danielfreeman.madcomponents {
 					var page:IContainerUI = _pages[idx];
 					page.layout(newAttributes);
 					if (page == _drawer) {
-						_drawer.y = _attributes.height  + _attributes.x - DRAWER_HEIGHT;
+						_drawer.y = _attributes.height  + _attributes.y - DRAWER_HEIGHT;
 						drawShade();
 					}
 					else {

@@ -65,7 +65,7 @@ package com.danielfreeman.madcomponents {
 		protected static const TOKENS:Array = ["scrollVertical","viewFlipper","list","groupedList","dividedList","pages","tabPages","navigation","navigationPages","longList"];
 		protected static const CLASSES:Array = [UIScrollVertical,UIViewFlipper,UIList,UIGroupedList,UIDividedList,UIPages,UITabPages,UINavigation,UINavigationPages,UILongList];
 
-		protected static const DEBUG_SCALE:Number = -1;
+		protected static const DEBUG_SCALE:Number = -1.0;
 
 		protected static var _tokens:Array = TOKENS;
 		protected static var _classes:Array = CLASSES;
@@ -180,6 +180,7 @@ package com.danielfreeman.madcomponents {
  * Convert #rrggbb string to uint
  */
 		public static function toColourValue(value:String):uint {
+			value.replace(/ /gi,"");
 			if (value.substr(0,1)=="#")
 				return parseInt(value.substr(1,6),16);
 			else if (value.substr(0,1)>="0" && value.substr(0,1)<="9")
@@ -192,6 +193,7 @@ package com.danielfreeman.madcomponents {
  * Convert a comma seperated list of #rrggbb string colour values to a uint vector
  */
 		public static function toColourVector(value:String):Vector.<uint> {
+			value.replace(/ /gi,"");
 			var splitValues:Array = value.split(",");
 			var result:Vector.<uint> = new Vector.<uint>;
 			for each (var colour:String in splitValues) {
@@ -455,6 +457,9 @@ package com.danielfreeman.madcomponents {
 					Object(child).destructor();
 				}
 				item.removeChildAt(i);
+			}
+			if (item==_root && _root) {
+				_screen.removeChild(_root);
 			}
 		}
 	}
