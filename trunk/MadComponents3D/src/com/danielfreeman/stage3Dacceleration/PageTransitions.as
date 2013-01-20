@@ -72,6 +72,10 @@ package com.danielfreeman.stage3Dacceleration {
 		public static const DRAWER_DOWN:String = "drawerDown";
 		public static const TRASH_UP:String = "trashUp";
 		public static const TRASH_DOWN:String = "trashDown";
+		public static const SLIDE_OVER_UP:String = "slide3dUp";
+		public static const SLIDE_OVER_DOWN:String = "slide3dDown";
+		public static const SLIDE_OVER_LEFT:String = "slide3dLeft";
+		public static const SLIDE_OVER_RIGHT:String = "slide3dRight";
 
 		public static const TRANSITION_INITIAL:String = "transitionInitial";		
 		public static const TRANSITION_COMPLETE:String = "transitionComplete";
@@ -85,7 +89,6 @@ package com.danielfreeman.stage3Dacceleration {
 			Vector.<uint> ([ 0, 1, 2,	0, 2, 3,    4, 5, 6,	4, 6, 7]);
 
 
-	
 		protected static const SCREEN_REGION:Vector.<Number> =	
 		
 			Vector.<Number> ([
@@ -215,6 +218,17 @@ package com.danielfreeman.stage3Dacceleration {
 				1.0,	-1.0,	0.0,
 				1.0,	1.0,	0.0,
 				1.0,	1.0,	2.0
+			]);
+			
+			
+		protected static const SCREEN_RECESSED:Vector.<Number> =	
+		
+			Vector.<Number> ([
+			//	X,		Y,		Z,
+				-1.0,	-1.0,	0.2,
+				1.0,	-1.0,	0.2,
+				1.0,	1.0,	0.2,
+				-1.0,	1.0,	0.2
 			]);
 
 
@@ -484,8 +498,41 @@ package com.danielfreeman.stage3Dacceleration {
 					_startKeyVertices.uploadFromVector(FLIPPED.concat(SCREEN_REGION), 0, 8);
 					_finishKeyVertices.uploadFromVector(FLIPPED.concat(SCREEN_REGION), 0, 8);
 		 		break;
+				
+				case SLIDE_OVER_UP:
+					_startKeyVertices.uploadFromVector(SCREEN_REGION.concat(SCREEN_RECESSED), 0, 8);
+					_finishKeyVertices.uploadFromVector(BELOW_REGION.concat(SCREEN_REGION), 0, 8);
+		 		break;
+				
+				case SLIDE_OVER_DOWN:
+					_startKeyVertices.uploadFromVector(SCREEN_REGION.concat(BELOW_REGION), 0, 8);
+					_finishKeyVertices.uploadFromVector(SCREEN_RECESSED.concat(SCREEN_REGION), 0, 8);
+				break;
+				
+				case SLIDE_OVER_LEFT:
+					_startKeyVertices.uploadFromVector(SCREEN_REGION.concat(SCREEN_RECESSED), 0, 8);
+					_finishKeyVertices.uploadFromVector(RIGHT_REGION.concat(SCREEN_REGION), 0, 8);
+		 		break;
+				
+				case SLIDE_OVER_RIGHT:
+					_startKeyVertices.uploadFromVector(SCREEN_REGION.concat(RIGHT_REGION), 0, 8);
+					_finishKeyVertices.uploadFromVector(SCREEN_RECESSED.concat(SCREEN_REGION), 0, 8);
+				break;
 			}
 
+			_count = INCREMENT;
+			setTransformation();
+
+			UI.uiLayer.visible = false;
+			activate(this);
+			onEnterFrame(this, onEnterFramePageTransition);
+		}
+		
+		
+		public function customPageTransition(fromQuads:Vector.<Number>, toQuads:Vector.<Number>):void {
+			_startKeyVertices.uploadFromVector(fromQuads, 0, 8);
+			_finishKeyVertices.uploadFromVector(toQuads, 0, 8);
+			
 			_count = INCREMENT;
 			setTransformation();
 
