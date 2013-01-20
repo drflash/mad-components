@@ -41,12 +41,13 @@ package com.powerflasher.SampleApp {
 
 			<navigation id="page0" title="transitions" background="#CCCCCC">
 				<clickableGroup id="clickableGroup" gapV="30">
-					<label >Slide</label>
-                	<label >Cube</label>
-					<label >Door</label>
-					<label >Flip</label>
-					<label >Swap</label>
-					<label >Trash</label>
+					<label>Slide</label>
+					<label>Slide Over</label>
+                	<label>Cube</label>
+					<label>Door</label>
+					<label>Flip</label>
+					<label>Swap</label>
+					<label>Trash</label>
 				</clickableGroup>
 			</navigation>;
 			
@@ -70,6 +71,7 @@ package com.powerflasher.SampleApp {
 		
 			Vector.<String>([
 				PageTransitions.SLIDE_LEFT,
+				PageTransitions.SLIDE_OVER_LEFT,
 				PageTransitions.CUBE_LEFT,
 				PageTransitions.DOOR_LEFT,
 				PageTransitions.FLIP_LEFT,
