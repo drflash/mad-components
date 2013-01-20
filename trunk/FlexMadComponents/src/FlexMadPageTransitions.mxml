@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx" width="400" height="600"
+			   addedToStage="start()"
+			   xmlns:mad="custom.*"
+			   skinClass="AppTransparentSkin">
+	
+	<fx:Script>
+		<![CDATA[
+			
+			import com.danielfreeman.extendedMadness.UIe;
+			import com.danielfreeman.madcomponents.*;
+			import com.danielfreeman.stage3Dacceleration.*;
+			
+			import mx.core.FlexGlobals;
+
+			protected static const TRANSITIONS:Vector.<String> =
+				
+				Vector.<String>([
+					PageTransitions.SLIDE_LEFT,
+					PageTransitions.SLIDE_OVER_LEFT,
+					PageTransitions.CUBE_LEFT,
+					PageTransitions.DOOR_LEFT,
+					PageTransitions.FLIP_LEFT,
+					PageTransitions.SWAP_LEFT,
+					PageTransitions.TRASH_DOWN
+				]);
+			
+			protected var _pageTransitions:PageTransitions;
+			protected var _textures:Boolean = false;
+
+
+			protected function start():void {
+				addEventListener(Stage3DAcceleration.CONTEXT_COMPLETE, contextComplete);
+				Stage3DAcceleration.startStage3D(this);
+			}
+			
+			
+			protected function contextComplete(event:Event):void {
+				removeEventListener(Stage3DAcceleration.CONTEXT_COMPLETE, contextComplete);
+				_pageTransitions = new PageTransitions();
+				viewStack.selectedIndex=0;
+				addEventListener(PageTransitions.TRANSITION_COMPLETE, transitionComplete);
+			}
+			
+			
+			protected function doTransition(transitionIndex:int):void {
+				FlexGlobals.topLevelApplication.visible = false;
+				viewStack.selectedIndex=1;
+				if (!_textures) {
+					_pageTransitions.pageTransitionTextures(page1, page0);
+					_textures = true;
+				}
+				_pageTransitions.pageTransition(null, null, TRANSITIONS[transitionIndex]);
+			}
+			
+			
+			protected function transitionComplete(event:Event):void {
+				FlexGlobals.topLevelApplication.visible = true;
+			}
+			
+			
+			protected function goBack():void {
+				FlexGlobals.topLevelApplication.visible = false;
+				viewStack.selectedIndex=0;
+				_pageTransitions.goBack();
+			}
+
+		]]>
+	</fx:Script>
+
+	
+	<mx:ViewStack id="viewStack" width="100%" height="100%" selectedIndex="1" creationPolicy="all">
+		
+		<mx:Canvas id="page0" backgroundColor="#CCCCCC">
+			<s:VGroup width="100%" paddingTop="20" paddingLeft="20" paddingRight="20">
+				<mx:Spacer height="40"/>
+				<mx:Button label="Slide" width="100%" height="40" click="doTransition(0)" />
+				<mx:Button label="Slide Over" width="100%" height="40" click="doTransition(1)" />
+				<mx:Button label="Cube" width="100%" height="40" click="doTransition(2)" />
+				<mx:Button label="Door" width="100%" height="40" click="doTransition(3)" />
+				<mx:Button label="Flip" width="100%" height="40" click="doTransition(4)" />
+				<mx:Button label="Swap" width="100%" height="40" click="doTransition(5)" />
+				<mx:Button label="Trash" width="100%" height="40" click="doTransition(6)" />
+			</s:VGroup>	
+		</mx:Canvas>				
+		
+		<mx:Canvas id="page1" backgroundColor="#666666" creationPolicy="all">
+			<s:VGroup paddingTop="20" paddingLeft="20">
+				<s:BitmapImage source="@Embed(source='images/dragon.jpg')" />
+				<mx:Button label="Back" height="40" click="goBack()" />
+			</s:VGroup>			
+		</mx:Canvas>
+		
+	</mx:ViewStack>
+
+</s:Application>
