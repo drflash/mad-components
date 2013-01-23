@@ -337,25 +337,6 @@ package com.danielfreeman.stage3Dacceleration {
 				recycleRow.splice(pos, 1);
 			}
 		}
-			
-/**
-  * Recycle a Texture if available - or create a new one
-  *//*
-		protected function newRowTexture(listRowTexture:Vector.<Texture>, recycleRow:Vector.<uint>, index:int, bitmapData:BitmapData):Texture {
-			var result:Texture;
-			if (recycleRow.length > 0) {
-				var copyIndex:uint = recycleRow.shift();
-				result = listRowTexture[copyIndex];
-				listRowTexture[copyIndex] = null;
-			}
-			else {
-				result = _context3D.createTexture(bitmapData.width, bitmapData.height, Context3DTextureFormat.BGRA, false);
-			}
-			removeRecycle(recycleRow, index);
-			result.uploadFromBitmapData(bitmapData);
-			listRowTexture[index] = result;
-			return result;
-		}*/
 		
 /**
   * Recycle a Texture if available - or create a new one
@@ -947,6 +928,7 @@ package com.danielfreeman.stage3Dacceleration {
 		protected static var _listScrolling:LongListScrollingE;
 		protected static var _pages:UIPages = null;
 		protected static var _screenS:Sprite;
+		protected static var _pageIndex = 0;
 		
 		
 		public static function create(screen:Sprite, xml:XML, width:Number = -1, height:Number = -1):Sprite {
@@ -976,6 +958,12 @@ package com.danielfreeman.stage3Dacceleration {
 			_listScrolling = new LongListScrollingE();
 			if (_pages) {
 				_listScrolling.containerPageTextures(_pages);
+				if (_pages is UINavigation) {
+					UINavigation(_pages).autoForward = false;
+					UINavigation(_pages).autoBack = false;
+					UINavigation(_pages).navigationBar.backButton.addEventListener(MouseEvent.MOUSE_UP, goBack);
+					UINavigation(_pages).addEventListener(UIList.CLICKED_END, goForward);
+				}
 			}
 			else {
 				_listScrolling.allListTextures();
@@ -991,6 +979,18 @@ package com.danielfreeman.stage3Dacceleration {
 		
 		public static function get pages():UIPages {
 			return _pages;
+		}
+		
+		
+		protected static function goForward(event:Event):void {
+			_listScrolling.slidePage(_pageIndex, _pageIndex + 1);
+			_pageIndex++;
+		}
+		
+		
+		protected static function goBack(event:Event):void {
+			_listScrolling.slidePage(_pageIndex, _pageIndex - 1, true);
+			_pageIndex--;
 		}
 
 	}
