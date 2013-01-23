@@ -400,6 +400,11 @@ package com.danielfreeman.stage3Dacceleration {
 			_slideIndexBuffer.uploadFromVector(Vector.<uint>([0, 1, 2,  0, 2, 3,  4, 5, 6,  4, 6, 7]), 0, 12 );
 		}
 		
+		
+		public function get lists():Vector.<IContainerUI> {
+			return _lists;
+		}
+		
 /**
  * Perform an accelerated slide transitions.
  */		
