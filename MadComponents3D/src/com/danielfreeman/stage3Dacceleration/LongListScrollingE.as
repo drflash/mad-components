@@ -271,30 +271,7 @@ package com.danielfreeman.stage3Dacceleration {
 				recycleRow.push(index);
 			}
 		}
-		
-/**
- * Recycle a bitmapdata if available - or create a new one.  (Not sure how much more efficient it is to recycle rather than reinstanciate bitmapdata).
- */
- /*
-		protected function newRowBitmapData(listRowBitmapData:Vector.<BitmapData>, recycleRow:Vector.<uint>, index:int, listWidth:Number, backgroundColour:uint = 0xFFFFFF, background:BitmapData = null):BitmapData {
-			var result:BitmapData;
-			if (recycleRow.length > 0) {
-				var copyIndex:uint = recycleRow[0];
-				result = listRowBitmapData[copyIndex];
-				if (background) {
-					result.copyPixels(background, new Rectangle(0, 0, listWidth, STRIP_HEIGHT), new Point(0, 0));
-				}
-				else {
-					result.floodFill(0, 0, backgroundColour);
-				}
-				listRowBitmapData[copyIndex] = null;
-			}
-			else {
-				result = background ? background.clone() : new BitmapData(listWidth, STRIP_HEIGHT, false, DEBUG ? 0xffff00 : backgroundColour);
-			}
-			listRowBitmapData[index] = result;
-			return result;
-		}*/
+
 		
 /**
  * Recycle a bitmapdata if available - or create a new one.  (Not sure how much more efficient it is to recycle rather than reinstanciate bitmapdata).
@@ -741,7 +718,7 @@ package com.danielfreeman.stage3Dacceleration {
 					if (renderCursorCondition) {
 						renderCursor(listRecord);
 					}
-					else if (!(listRecord.container is UIPicker) && (listRecord == _activeList || Math.abs(listRecord.delta) > SHOW_SCROLLBAR_DELTA || !isNaN(listRecord.destination))) {
+					else if (!(listRecord.container is UIPicker) && (listRecord == _activeList || Math.abs(listRecord.delta) > SHOW_SCROLLBAR_DELTA || !isNaN(listRecord.destination)) && !UIList(listRecord.container).sliderVisible) {
 						renderScrollbar(listRecord);
 					}
 				}
@@ -928,7 +905,7 @@ package com.danielfreeman.stage3Dacceleration {
 		protected static var _listScrolling:LongListScrollingE;
 		protected static var _pages:UIPages = null;
 		protected static var _screenS:Sprite;
-		protected static var _pageIndex = 0;
+		protected static var _pageIndex:int = 0;
 		
 		
 		public static function create(screen:Sprite, xml:XML, width:Number = -1, height:Number = -1):Sprite {
