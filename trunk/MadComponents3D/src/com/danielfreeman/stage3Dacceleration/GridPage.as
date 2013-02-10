@@ -285,7 +285,7 @@ package com.danielfreeman.stage3Dacceleration {
 			}
 			
 			for (var i:int = fromX; i <= toX; i++) {
-				for (var j:int = fromY; j <= toY; j++) {trace(i,j);
+				for (var j:int = fromY; j <= toY; j++) {
 					var bitmapData:BitmapData = _gridBitmapdata[i][j];
 					saveTexture(bitmapData, Sprite(_page), new Rectangle(0, 0, GRID_SIZE * UI.scale, GRID_SIZE * UI.scale), -i * GRID_SIZE - _offsetX, -j * GRID_SIZE - _offsetY);	
 					_gridTexture[i][j].uploadFromBitmapData(bitmapData);

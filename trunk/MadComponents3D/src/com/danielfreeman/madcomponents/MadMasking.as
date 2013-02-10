@@ -28,6 +28,8 @@ package com.danielfreeman.madcomponents {
 	import flash.display.Sprite;
 	import flash.display.Shape;
 	import flash.geom.Rectangle;
+	import flash.geom.Point;
+	
 
 	public class MadMasking extends MadSprite {
 
@@ -35,11 +37,13 @@ package com.danielfreeman.madcomponents {
 	protected var _mask:Shape = null;
 	protected var _xml:XML;
 	protected var _attributes:Attributes;
+	protected var _maskSize:Point;
 	
 		
 		public function MadMasking(xml:XML, attributes:Attributes) {
 			_xml = xml;
-			_attributes = attributes;
+			_attributes = attributes.copy();
+			_maskSize = new Point(attributes.widthH, attributes.heightV);
 		}
 		
 		
@@ -59,12 +63,22 @@ package com.danielfreeman.madcomponents {
 		}
 		
 		
-		public function refreshMasking():void {
+		public function refreshMasking(attributes:Attributes = null):void {
+			setMaskSize(attributes ? attributes : _attributes);
 			masking = _masking;
 		}
 		
 		
-		protected function doMasking():void {
+		public function setMaskSize(attributes:Attributes):void {
+			_maskSize.x = attributes.widthH;
+			_maskSize.y = attributes.heightV;
+		}
+		
+		
+		protected function doMasking(attributes:Attributes = null):void {
+			if (!attributes) {
+				attributes = _attributes;
+			}
 			if (!_mask) {
 				_mask = new Shape();
 				addChild(mask = _mask);
@@ -72,9 +86,8 @@ package com.danielfreeman.madcomponents {
 			else {
 				_mask.graphics.clear();
 			}
-				
 			_mask.graphics.beginFill(0);
-			_mask.graphics.drawRect(0, 0, _attributes.widthH, _attributes.heightV);
+			_mask.graphics.drawRect(0, 0, _maskSize.x, _maskSize.y);
 		}
 		
 		

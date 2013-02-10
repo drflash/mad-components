@@ -584,9 +584,11 @@ package com.danielfreeman.stage3Dacceleration {
 		protected static var _pageFolding:PageFolding;
 		protected static var _pages:UIPages = null;
 		protected static var _screenS:Sprite;
+		protected static var _horizontal:Boolean = false;
 		
-		public static function create(screen:Sprite, xml:XML, width:Number = -1, height:Number = -1):Sprite {
+		public static function create(screen:Sprite, xml:XML, width:Number = -1, height:Number = -1, horizontal:Boolean = false):Sprite {
 			_screenS = screen;
+			_horizontal = horizontal;
 			var result:Sprite = UIe.create(screen, xml, width, height);
 			screen.addEventListener(Stage3DAcceleration.CONTEXT_COMPLETE, contextComplete);
 			Stage3DAcceleration.startStage3D(screen);
@@ -599,7 +601,7 @@ package com.danielfreeman.stage3Dacceleration {
 			_pages = UIPages(UI.findViewById("@pages"));
 			_pageFolding = new PageFolding();
 			_pageFolding.containerPageTextures(_pages);
-			_pageFolding.start();
+			_pageFolding.start(_horizontal);
 			_screenS.dispatchEvent(new Event(READY));
 		}
 		
