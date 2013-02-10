@@ -76,6 +76,8 @@ package com.danielfreeman.stage3Dacceleration {
 		public static const SLIDE_OVER_DOWN:String = "slide3dDown";
 		public static const SLIDE_OVER_LEFT:String = "slide3dLeft";
 		public static const SLIDE_OVER_RIGHT:String = "slide3dRight";
+		public static const ZOOM_RIGHT:String = "zoomRight";
+		public static const ZOOM_LEFT:String = "zoomLeft";		
 
 		public static const TRANSITION_INITIAL:String = "transitionInitial";		
 		public static const TRANSITION_COMPLETE:String = "transitionComplete";
@@ -122,6 +124,17 @@ package com.danielfreeman.stage3Dacceleration {
 			]);
 			
 			
+		protected static const LEFT_REGION_SMALL:Vector.<Number> =
+		
+			Vector.<Number> ([
+			//	X,		Y,		Z,
+				-1.4,	-0.2,	0.0,
+				-1.0,	-0.2,	0.0,
+				-1.0,	0.2,	0.0,
+				-1.4,	0.2,	0.0
+			]);
+			
+			
 		protected static const RIGHT_REGION:Vector.<Number> =
 		
 			Vector.<Number> ([
@@ -130,6 +143,17 @@ package com.danielfreeman.stage3Dacceleration {
 				3.0,	-1.0,	0.0,
 				3.0,	1.0,	0.0,
 				1.0,	1.0,	0.0
+			]);
+			
+			
+		protected static const RIGHT_REGION_SMALL:Vector.<Number> =
+		
+			Vector.<Number> ([
+			//	X,		Y,		Z,
+				1.0,	-0.2,	0.0,
+				1.4,	-0.2,	0.0,
+				1.4,	0.2,	0.0,
+				1.0,	0.2,	0.0
 			]);
 			
 
@@ -518,6 +542,16 @@ package com.danielfreeman.stage3Dacceleration {
 					_startKeyVertices.uploadFromVector(SCREEN_REGION.concat(RIGHT_REGION), 0, 8);
 					_finishKeyVertices.uploadFromVector(SCREEN_RECESSED.concat(SCREEN_REGION), 0, 8);
 				break;
+			
+				case ZOOM_LEFT:
+					_startKeyVertices.uploadFromVector(SCREEN_REGION.concat(SCREEN_RECESSED), 0, 8);
+					_finishKeyVertices.uploadFromVector(LEFT_REGION_SMALL.concat(SCREEN_REGION), 0, 8);
+				break;
+				
+				case ZOOM_RIGHT:
+					_startKeyVertices.uploadFromVector(SCREEN_REGION.concat(SCREEN_RECESSED), 0, 8);
+					_finishKeyVertices.uploadFromVector(RIGHT_REGION_SMALL.concat(SCREEN_REGION), 0, 8);
+		 		break;
 			}
 
 			_count = INCREMENT;

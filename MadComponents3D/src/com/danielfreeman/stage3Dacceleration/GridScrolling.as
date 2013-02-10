@@ -136,7 +136,8 @@ package com.danielfreeman.stage3Dacceleration {
 		protected var _moving:int;
 
 
-		public function GridScrolling() {
+		public function GridScrolling(colour:uint = 0) {
+			_backgroundColour = colour;
 			initialise();
 		}
 		
@@ -264,7 +265,7 @@ package com.danielfreeman.stage3Dacceleration {
 /**
  * Define the grid interface with a 2D vector of MadComponents Layout XML.
  */
-		public function defineGrid(grid:Vector.<Vector.<XML>>, gridPageWidth:int = 0):void {
+		public function defineGrid(grid:Vector.<Vector.<XML>>, gridPageWidth:int = 0, sideGap:Number = SIDE_GAP):void {
 			_gridPageWidth = gridPageWidth;
 			translationMatrix();
 			_screenEdge = screenRangeAtDepth(0.0);
@@ -295,8 +296,8 @@ package com.danielfreeman.stage3Dacceleration {
 					insertNulls(grid, gridPageWidth);
 					gridWidth = _aspectRatio*(_cellWidth + (grid[0].length-1)*(_cellWidth + GAP))/(2 * _screen.stage.stageWidth);
 				}
-				_maximumPosition = 2 * _scale * (_screenEdge.x - gridWidth) - 2 * SIDE_GAP/_screen.stage.stageWidth;
-				_sideGap = SIDE_GAP/_screen.stage.stageWidth;
+				_maximumPosition = 2 * _scale * (_screenEdge.x - gridWidth) - 2 * sideGap / _screen.stage.stageWidth;
+				_sideGap = sideGap / _screen.stage.stageWidth;
 			}
 			
 			_widthIndices = grid[0].length;
@@ -327,8 +328,8 @@ package com.danielfreeman.stage3Dacceleration {
 							cellWidth = _cellWidth + (tileSize[0]-1)*(_cellWidth + GAP);
 							cellHeight = _cellHeight + (tileSize[1]-1)*(_cellHeight + GAP);
 							
-							for (var jj:int = 0; jj < tileSize[0] ; jj++) {
-								for (var ii:int = 0; ii < tileSize[1] ; ii++) {
+							for (var jj:int = 0; jj < tileSize[1] ; jj++) {
+								for (var ii:int = 0; ii < tileSize[0] ; ii++) {
 									_gridPositionToArrayIndex[j+jj][i+ii] = _count;
 								}
 							}
@@ -353,15 +354,15 @@ package com.danielfreeman.stage3Dacceleration {
 						var quadWidth:Number = cellWidth/_screen.stage.stageWidth;
 						var quadHeight:Number = cellHeight/_screen.stage.stageHeight;
 						_vertices.push(
-							//	X,						Y,				Z,
-							x,							y-quadHeight,				0,
-							x+_aspectRatio*quadWidth,	y-quadHeight,				0,
-							x+_aspectRatio*quadWidth,	y,	0,
-							x,							y,	0
+							//	X,						Y,						Z,
+							x,							y-quadHeight,			0,
+							x+_aspectRatio*quadWidth,	y-quadHeight,			0,
+							x+_aspectRatio*quadWidth,	y,						0,
+							x,							y,						0
 						);
 
-						var u:Number = UI.scale*cellWidth*QUALITY_SCALE/bitmapData.width;
-						var v:Number = UI.scale*cellHeight*QUALITY_SCALE/bitmapData.height;
+						var u:Number = Math.min(UI.scale*cellWidth * QUALITY_SCALE / bitmapData.width, 0.99);
+						var v:Number = Math.min(UI.scale*cellHeight * QUALITY_SCALE / bitmapData.height, 0.99);
 						_uv.push(
 							0, 		v,
 							u,		v,

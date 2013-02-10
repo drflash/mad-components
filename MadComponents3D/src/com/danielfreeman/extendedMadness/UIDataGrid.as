@@ -124,7 +124,6 @@ package com.danielfreeman.extendedMadness {
 				var lastX:Number=0; 
 				for (var j:int=0;j<dataRow.length;j++) { 
 					var wdth:Number=(_cellWidths) ? _tableWidth*_cellWidths[Math.min(_cellWidths.length-1,j)]/100 : wdth0;
-					trace(j,wdth, _cellWidths[j]);
 					row.push(txt=new UIBlueText(this,lastX,_last,dataRow[j],wdth,format)); 
 					txt.fixwidth = wdth;
 					txt.border = true;

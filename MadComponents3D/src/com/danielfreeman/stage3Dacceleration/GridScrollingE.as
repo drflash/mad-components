@@ -77,8 +77,8 @@ package com.danielfreeman.stage3Dacceleration {
 		protected var _swapState:Boolean = true;
 		
 
-		public function GridScrollingE() {
-			super();
+		public function GridScrollingE(colour:uint = 0) {
+			super(colour);
 		}
 		
 /**
@@ -167,6 +167,13 @@ package com.danielfreeman.stage3Dacceleration {
 			}
 		}
 		
+/**
+ * Update the appearance of a component on a particular page.
+ */
+		public function updatePage(pageNumber:int, component:DisplayObject = null):void {
+			_pages[pageNumber].updatePage(component);
+		}
+		
 		
 		protected function flipTransformation(frame:Number, angle:Number, axis:Vector3D, scaleX:Number = 1.0, scaleY:Number = 1.0):void {
 			if (_reverse) {
@@ -200,7 +207,7 @@ package com.danielfreeman.stage3Dacceleration {
 				_axis = Vector3D.Y_AXIS;
 				var direction:Boolean = (xMid + _position/_scale < 0);
 				_rotation = direction ? -180 : 180;
-				_offset = UI.scale * (direction ? 0.5 : -0.5) * _aspectRatio * _cellWidth / _screen.stage.stageWidth; //(_vertices[vertexIndex + 3] - _vertices[vertexIndex]); //_pages[pageIndex].width/_screen.stage.stageWidth; 
+				_offset = (direction ? 0.5 : -0.5) * _aspectRatio * _pages[pageIndex].width / _screen.stage.stageWidth; //(_vertices[vertexIndex + 3] - _vertices[vertexIndex]); //_pages[pageIndex].width/_screen.stage.stageWidth;
 				var pivotX:Number = _position/_scale + (direction ? _vertices[vertexIndex + 3] : _vertices[vertexIndex]);
 				_pivotPoint = new Vector3D(pivotX, yMid);
 				_pages[pageIndex].pageCorners(
