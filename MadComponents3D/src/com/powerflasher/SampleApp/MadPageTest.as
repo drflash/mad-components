@@ -186,7 +186,7 @@ package com.powerflasher.SampleApp {
 		protected var _columns1:UIForm;
 
 		protected var _pageFlipping:PageFlippingE;
-		protected var _listScrolling:LongListScrolling;
+		protected var _listScrolling:LongListScrollingE;
 		
 		
 		public function MadPageTest(screen:Sprite = null) {
@@ -225,7 +225,7 @@ package com.powerflasher.SampleApp {
 		protected function contextComplete(event:Event):void {
 			_pageFlipping = new PageFlippingE();
 			_pageFlipping.containerPageTextures(_pages);
-			_listScrolling = new LongListScrolling();
+			_listScrolling = new LongListScrollingE();
 			_listScrolling.allListTextures();
 		}
 
