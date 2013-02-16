@@ -533,7 +533,7 @@ package com.danielfreeman.stage3Dacceleration {
 		//		return;
 		//	}
 			var topLeft:Point = container.globalToLocal(new Point(rectangle.x, rectangle.y));
-			if (container is com.danielfreeman.extendedMadness.UIPanel) container.graphics.beginFill(0xffff00, 0);
+		//	if (container is com.danielfreeman.extendedMadness.UIPanel) container.graphics.beginFill(0xffff00, 1.0);
 			container.graphics.drawRect(topLeft.x, topLeft.y, rectangle.width, rectangle.height);
 			if (container is IContainerUI && _holes.indexOf(IContainerUI(container)) < 0) {
 				_holes.push(container);
@@ -557,7 +557,7 @@ package com.danielfreeman.stage3Dacceleration {
 			else {
 				if (container != UI.uiLayer && container is IContainerUI && IContainerUI(container).attributes.backgroundColours.length> 0 && !(container is UIForm && UIForm(container).hasPickerBackground)) {
 				cutRectangle(container, rectangle);
-			}
+				}
 			}
 			if (container == UI.uiLayer) {
 				cutRectangle(UI.uiLayer, rectangle);
@@ -983,6 +983,7 @@ package com.danielfreeman.stage3Dacceleration {
 				list.graphics.clear();
 				list.graphics.beginFill(0,0);
 				list.graphics.drawRect(0, 0, list.attributes.width, list.attributes.height);
+				
 			}
 		}
 		
