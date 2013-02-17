@@ -515,6 +515,7 @@ package com.danielfreeman.madcomponents {
 				var length:int = groupDetails.length;
 				var top:Number = autoLayout ? _row.y - _attributes.paddingV +1 : groupDetails.top + _pressedCell * groupDetails.cellHeight;
 				var bottom:Number = top + (autoLayout ? _row.height + 2*_attributes.paddingV -1 : groupDetails.cellHeight);
+				_highlight.graphics.clear();
 				_highlight.graphics.beginFill(HIGHLIGHT);
 				if (length==1) {
 					_highlight.graphics.drawRoundRect(_cellLeft, top, _cellWidth, bottom - top, 1.5 * CURVE);
