@@ -193,7 +193,7 @@ Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deseru
 		
 		protected static const LAYOUT:XML =
 		
-			<pageTurn id="pageTurn">
+			<pageTurn id="pageTurn" sound="pageflip.mp3">
 				<vertical background="#CCCCFF">
 					<label alignH="centre" alignV="centre">Rollover or click the top right corner</label>
 				</vertical>
