@@ -360,9 +360,9 @@ package com.danielfreeman.madcomponents {
 		public function set dataXML(xml:XML):void {
 			var schema:XML = _schema;
 				xml=xmlPath(xml,_path);
-				if (_path!="" && _schema!=null)
+				if (_path!="" && _schema!=null) {
 					schema = _schema.parent();
-
+				}
 			if (_parent is UIList) {
 				var arrayCollectionList:Array = listData(xml,schema);
 				UIList(_parent).data = arrayCollectionList;
@@ -435,8 +435,13 @@ package com.danielfreeman.madcomponents {
  * Convert XML branch to an array of objects
  */	
 		protected function listObject(item:XML, childSchema:XMLList, result:Object = null):Object {
+			
 			if (!result) {
 				result = new Object();
+				if (item.hasSimpleContent() && childSchema.length() == 1 && childSchema.nodeKind() == "text") {
+					result[childSchema.toString()] = item.toString();
+					return result;
+				}
 			}
 			
 			for each (var child:XML in childSchema) if (child.nodeKind() != "text") { //?
@@ -461,8 +466,13 @@ package com.danielfreeman.madcomponents {
 		protected function xmlToObject(xml:XML):Object {
 			var result:Object = {};
 			var children:XMLList = xml.children();
-			for each (var child:XML in children) if (child.nodeKind() != "text") {
-				result[child.localName().toString()] = child.hasSimpleContent() ? child.toString() : xmlToObject(child);
+			if (children.length()==1 && children.nodeKind() == "text") {
+				result[xml.localName().toString()] = children.toString();
+			}
+			else {
+				for each (var child:XML in children) if (child.nodeKind() != "text") {
+					result[child.localName().toString()] = child.hasSimpleContent() ? child.toString() : xmlToObject(child);
+				}
 			}
 			return result;
 		}
