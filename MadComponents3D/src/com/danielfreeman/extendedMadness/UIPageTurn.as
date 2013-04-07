@@ -172,7 +172,7 @@ package com.danielfreeman.extendedMadness
 			
 			if (xml.@sound.length() > 0) {
 				_swish = new Sound();
-				_swish.load(new URLRequest(xml.@sound));
+				_swish.load(new URLRequest(xml.@sound[0]));
 			}
 			layout(attributes);
 		}
