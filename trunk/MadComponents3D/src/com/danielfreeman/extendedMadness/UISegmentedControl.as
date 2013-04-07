@@ -55,7 +55,7 @@ package com.danielfreeman.extendedMadness
 		
 		protected var _attributes:Attributes;
 		protected var _xml:XML;
-
+		protected var _ready:Boolean = false;
 		
 		
 		public function UISegmentedControl(screen:Sprite, xml:XML, attributes:Attributes)
@@ -75,6 +75,7 @@ package com.danielfreeman.extendedMadness
 
 
 		protected function mouseDown(event:MouseEvent):void {
+			_ready = true;
 			event.stopPropagation();											
 		}
 		
@@ -125,11 +126,14 @@ package com.danielfreeman.extendedMadness
 		
 		
 		override protected function mouseUp(event:MouseEvent):void {
-			if (_index>=0 && !_font)
-				_labels[_index].textColor = TEXT_COLOUR;
-			updateIndex();
-			dispatchEvent(new Event(Event.CHANGE));
-			showPressed();
+			if (_ready) {
+				if (_index>=0 && !_font)
+					_labels[_index].textColor = TEXT_COLOUR;
+				updateIndex();
+				dispatchEvent(new Event(Event.CHANGE));
+				showPressed();
+				_ready = false;
+			}
 		}
 		
 		

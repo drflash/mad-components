@@ -136,17 +136,22 @@ package com.danielfreeman.madcomponents {
 					_pages.push(page);
 				}
 			}
-			if (_pages.length>0) {
-				_thisPage = _pages[0];
-				_page = 0;
-				_thisPage.visible = true;
-			}
+			setInitialPage();
 			_slideTimer.addEventListener(TimerEvent.TIMER, slide);
 			
 		//	if (xml.@mask.length()>0 && xml.@mask[0]!="false")
 		//		scrollRect = new Rectangle(0,0,_attributes.width, _attributes.height);	
 			
 			startMasking();
+		}
+		
+		
+		protected function setInitialPage():void {
+			if (_pages.length>0) {
+				_thisPage = _pages[0];
+				_page = 0;
+				_thisPage.visible = true;
+			}
 		}
 		
 /**

@@ -156,7 +156,8 @@ package com.danielfreeman.madcomponents {
 				_root.addChild(mask);
 			}
 			
-			screen.setChildIndex(_windowLayer, screen.numChildren-1);
+			screen.setChildIndex(_windowLayer, screen.numChildren-2);
+			screen.setChildIndex(_activityIndicator, screen.numChildren-1);
 
 			return _root;
 		}
@@ -172,7 +173,7 @@ package com.danielfreeman.madcomponents {
 /**
  * Filter an XML String, removing odd unprintable characters.  (Unprintable characters often result from copy and paste of XML data)
  */
-		public static function clean(xml:String):XML {
+		public static function clean(xml:XML):XML {
 			return XML(xml.replace(/[^\x{20}-\x{7E}]/g,""));
 		}
 		
@@ -271,6 +272,11 @@ package com.danielfreeman.madcomponents {
 		public static function redraw():Sprite {
 			return create(_screen, FormClass(_root).xml);
 		}
+		
+		
+		public static function get attributes():Attributes {
+			return _attributes;
+		}
 
 /**
  * Handler for orientation change
@@ -341,14 +347,14 @@ package com.danielfreeman.madcomponents {
 /**
  * Create a pop-up dialogue window
  */	
-		public static function createPopUp(xml:XML, width:Number = -1, height:Number = -1, curve:Number = 10.0):UIWindow {
+		public static function createPopUp(xml:XML, width:Number = -1, height:Number = -1, curve:Number = 10.0, centre:Boolean = true):UIWindow {
 			if (width<0) {
 				width = 0.8 * _attributes.width;
 			}
 			if (height<0) {
 				height = 0.8 * _attributes.height;
 			}
-			var window:UIWindow = new UIWindow(_windowLayer, xml, new Attributes(0, 0, width, height), curve);
+			var window:UIWindow = new UIWindow(_windowLayer, xml, new Attributes(0, 0, width, height), curve, centre);
 			window.x = _root.x + _attributes.x + (_attributes.width - width) / 2;
 			window.y = _root.y + _attributes.y + (_attributes.height - height) / 2;
 			_popUps++;
@@ -420,9 +426,11 @@ package com.danielfreeman.madcomponents {
  */	
 		public static function centrePopUps():void {
 			for (var i:int = 0; i<_windowLayer.numChildren;i++) {
-				var window:UIWindow = UIWindow(_windowLayer.getChildAt(i));
-				window.x = _attributes.x + (_attributes.width - window.attributes.width) / 2;
-				window.y = _attributes.y + (_attributes.height - window.attributes.height) / 2;
+				var window:DisplayObject = _windowLayer.getChildAt(i);
+				if (window is UIWindow && UIWindow(window).centred) {
+					window.x = _attributes.x + (_attributes.width - UIWindow(window).attributes.width) / 2;
+					window.y = _attributes.y + (_attributes.height - UIWindow(window).attributes.height) / 2;
+				}
 			}
 			_activityIndicator.x = _scale*(_attributes.x + _attributes.width/2);
 			_activityIndicator.y = _scale*(_attributes.y + _attributes.height/2);

@@ -45,8 +45,9 @@ package com.danielfreeman.extendedMadness
 
 		public function UIDropWindow(screen:Sprite, xml:XML, attributes:Attributes=null) {
 			_arrowPosition = xml.@arrowPosition.length()>0 ? parseFloat(xml.@arrowPosition) : 0;
-			super(screen, xml, attributes);
+			super(screen, xml, attributes, -1, false);
 		}
+		
 		
 		override public function layout(attributes:Attributes):void {
 			super.layout(attributes);

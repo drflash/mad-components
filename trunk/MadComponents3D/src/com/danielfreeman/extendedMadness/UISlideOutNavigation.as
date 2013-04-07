@@ -57,13 +57,29 @@ package com.danielfreeman.extendedMadness {
 			if (_detailXML.@border!="false") {
 				addPadding(_detailXML.localName(), formAttributes);
 			}
-
+			formAttributes.height -= UINavigationBar.HEIGHT;
 			_list = UIList(UI.containers(this, _listXML, listAttributes));
 			_form = new UI.FormClass(this, _detailXML, formAttributes);
 			
 			_navigationBar = new UINavigationBar(this, attributes);
 			if (xml.@title.length()>0) {
 				_navigationBar.text = xml.@title[0].toString();
+			}
+			if (xml.@leftButton.length()>0) {
+				_navigationBar.leftButtonText = xml.@leftButton[0].toString();
+				_navigationBar.leftButton.visible = true;
+			}
+			if (xml.@rightButton.length()>0) {
+				_navigationBar.rightButtonText = xml.@rightButton[0].toString();
+				_navigationBar.rightButton.visible = true;
+			}
+			if (xml.@rightArrow.length()>0) {
+				_navigationBar.rightButtonText = xml.@rightArrow[0].toString();
+				_navigationBar.rightButton.visible = false;
+				_navigationBar.rightArrow.visible = true;
+			}
+			if (xml.@leftArrow.length()>0) {
+				_navigationBar.backButton.text = xml.@leftArrow[0].toString();
 			}
 			this.setChildIndex(_navigationBar, numChildren-1);
 			_navigationBar.backButton.visible = false;
@@ -107,6 +123,8 @@ package com.danielfreeman.extendedMadness {
 		
 		
 		public function open(animated:Boolean = true):void {
+			if (!_form.clickable)
+				return;
 			_form.clickable = _form.mouseEnabled = _form.mouseChildren = false;
 			if (animated) {
 				_slideTimer.repeatCount = Math.max(Math.floor(STEPS * (1 - _form.x / _listWidth)), 1);
@@ -129,6 +147,20 @@ package com.danielfreeman.extendedMadness {
 			else {
 				_form.x = 0;
 			}
+		}
+		
+		
+		override public function findViewById(id:String, row:int = -1, group:int = -1):DisplayObject {
+			var result:DisplayObject = _form.findViewById(id, row, group);
+			if (!result) {
+				result = _list.findViewById(id, row, group);
+			}
+			return result;
+		}
+		
+		
+		protected function setFormEnabled(value:Boolean):void {
+			
 		}
 		
 		
@@ -156,6 +188,7 @@ package com.danielfreeman.extendedMadness {
 			_listWidth = Math.min(MAXIMUM_LIST_WIDTH, attributes.width - LEFT_OVER);
 			var listAttributes:Attributes = new Attributes(0, 0, _listWidth - SHADOW_WIDTH/2, attributes.height - _navigationBar.height);
 			var formAttributes:Attributes = attributes.copy(_detailXML);
+			formAttributes.height -= UINavigationBar.HEIGHT;
 			if (_detailXML.@border!="false") {
 				addPadding(_detailXML.localName(), formAttributes);
 			}
@@ -184,6 +217,7 @@ package com.danielfreeman.extendedMadness {
 		
 		
 		protected function slideComplete(event:TimerEvent):void {
+			removeEventListener(MouseEvent.MOUSE_DOWN, mouseDown);
 			if (!_form.mouseEnabled) {
 				addEventListener(MouseEvent.MOUSE_DOWN, mouseDown);
 			}

@@ -49,6 +49,8 @@ package com.danielfreeman.madcomponents
  *   clickable = "true|false"
  *   width = "NUMBER"
  *   alt = "true|false"
+ *   value = "NUMBER"
+ *   curve = "NUMBER"
  * /&gt;
  * </pre>
  */
@@ -70,6 +72,7 @@ package com.danielfreeman.madcomponents
 		protected var _value:Number = 0.5;
 		protected var _radius:Number;
 		protected var _sliderHeight:Number = SLIDER_HEIGHT;
+		protected var _curve:Number = SLIDER_HEIGHT;
 		
 		
 		public function UISlider(screen:Sprite, xx:Number, yy:Number, colours:Vector.<uint> = null, alt:Boolean = false) {
@@ -78,14 +81,15 @@ package com.danielfreeman.madcomponents
 			
 			_radius = alt ? ALT_RADIUS : RADIUS;
 
-			if (!colours)
+			if (!colours) {
 				colours = new <uint>[];
+			}
 			
 			_highlightColour = (colours.length>0) ? colours[0] : HIGHLIGHT_COLOUR;
 			_knobColour = (colours.length>1) ? colours[1] : KNOB_COLOUR;
 			_sliderColour = (colours.length>2) ? colours[2] : SLIDER_COLOUR;
 
-			drawKnob();
+			createKnob();
 			value = _value;
 			_knob.addEventListener(MouseEvent.MOUSE_DOWN, mouseDown);
 			_knob.buttonMode = _knob.useHandCursor = true;
@@ -117,8 +121,13 @@ package com.danielfreeman.madcomponents
 		}
 		
 		
-		protected function drawKnob():void {
+		protected function createKnob():void {
 			addChild(_knob=new Sprite());
+			drawKnob();
+		}
+		
+		
+		protected function drawKnob():void {
 			var matr:Matrix = new Matrix();
 			matr.createGradientBox(_radius*2, _radius*2, Math.PI/2, 0, -_radius);
 			_knob.graphics.beginFill(Colour.darken(_knobColour));
@@ -137,9 +146,10 @@ package com.danielfreeman.madcomponents
 			matr.createGradientBox(_width, _sliderHeight, Math.PI/2, 0, _radius - _sliderHeight/2);
 			graphics.clear();
 			graphics.beginGradientFill(GradientType.LINEAR, [Colour.darken(_sliderColour,-64),_sliderColour,Colour.lighten(_sliderColour,64),Colour.lighten(_sliderColour,64)], [1.0,1.0,1.0,1.0], [0x00,0x00,0x80,0xff], matr);
-			graphics.drawRoundRect(0, _radius - _sliderHeight/2, _width, _sliderHeight, _sliderHeight);
+			graphics.drawRoundRect(0, _radius - _sliderHeight/2, _width, _sliderHeight, _curve);
 			graphics.beginGradientFill(GradientType.LINEAR, [Colour.darken(_highlightColour,-64),_highlightColour,Colour.lighten(_highlightColour,64),Colour.lighten(_highlightColour,64)], [1.0,1.0,1.0,1.0], [0x00,0x00,0x80,0xff], matr);
-			graphics.drawRoundRect(0, _radius - _sliderHeight/2, _width * _value, _sliderHeight, _sliderHeight);
+		//	graphics.drawRoundRect(0, _radius - _sliderHeight/2, _width * _value, _sliderHeight, _sliderHeight);
+			graphics.drawRoundRect(0, _radius - _sliderHeight/2, _knob.x + _curve/2 , _sliderHeight, _curve);
 		}
 		
 /**
