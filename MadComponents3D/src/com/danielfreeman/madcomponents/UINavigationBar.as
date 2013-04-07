@@ -43,7 +43,7 @@ package com.danielfreeman.madcomponents {
 		protected static const LEFTCOLOUR:uint = 0x7777AA;
 		protected static const DONECOLOUR:uint = 0xAA7777;
 		protected static const SIDES:Number = 100.0;
-		protected static const Y:Number = 6;
+		protected static const Y:Number = 5;
 		
 		protected var _label:UILabel;
 		protected var _shadowLabel:UILabel;
@@ -53,6 +53,7 @@ package com.danielfreeman.madcomponents {
 		protected var _rightButton:UIButton;
 		protected var _rightArrow:UIBackButton;
 		protected var _colour:uint;
+		protected var _centrePanel:Sprite;
 		
 	
 		public function UINavigationBar(screen:Sprite, attributes:Attributes) {
@@ -67,6 +68,7 @@ package com.danielfreeman.madcomponents {
 			_backButton = new UIBackButton(this, 4, Y, "back", COLOUR);
 			_rightArrow = new UIBackButton(this, 200, Y, "next", COLOUR, true);
 			_rightButton = new UIButton(this, 200, Y, '<font size="14">done</font>', DONECOLOUR, new <uint>[], true);
+			addChild(_centrePanel = new Sprite());
 			adjustButtons();
 			_rightButton.visible = _rightArrow.visible = false;
 		}
@@ -75,6 +77,7 @@ package com.danielfreeman.madcomponents {
 		protected function adjustButtons():void {
 			_rightArrow.x = _attributes.width - _rightArrow.width - 6;
 			_rightButton.x = _attributes.width - _rightButton.width - 8;
+			_centrePanel.x = _attributes.width / 2;
 		}
 		
 /**
@@ -156,6 +159,18 @@ package com.danielfreeman.madcomponents {
 			_shadowLabel.x=_label.x-1;
 			adjustButtons();
 			drawBar();
+		}
+		
+		
+		public function get centrePanel():Sprite {
+			return _centrePanel;	
+		}
+		
+		
+		public function set centrePanel(value:Sprite):void {
+			_centrePanel.addChild(value);
+			value.x = -value.width / 2;
+			value.y = (HEIGHT - value.height) / 2;
 		}
 		
 /**

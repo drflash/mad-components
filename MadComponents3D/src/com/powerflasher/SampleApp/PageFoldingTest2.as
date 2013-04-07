@@ -27,7 +27,6 @@ package com.powerflasher.SampleApp {
 	
 	[SWF(frameRate="60", backgroundColor="#FFFFFF")]	
 	
-
 	import com.danielfreeman.extendedMadness.UIe;
 	import com.danielfreeman.madcomponents.*;
 	import com.danielfreeman.stage3Dacceleration.*;
@@ -38,7 +37,7 @@ package com.powerflasher.SampleApp {
 	import flash.events.Event;
 	import flash.events.TimerEvent;
 	import flash.utils.Timer;
-		import flash.utils.getQualifiedClassName;
+	import flash.utils.getQualifiedClassName;
 
 
 	public class PageFoldingTest2 extends Sprite {

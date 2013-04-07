@@ -41,12 +41,14 @@ package com.danielfreeman.madcomponents {
 		protected static const SHADOW_ALPHA:Number = 0.2;
 		
 		protected var _curve:Number = CURVE;
+		protected var _centred:Boolean = false;
 
 /**
  *  A MadComponents pop-up window
  */
-		public function UIWindow(screen:Sprite, xml:XML, attributes:Attributes = null, curve:Number = -1) {
+		public function UIWindow(screen:Sprite, xml:XML, attributes:Attributes = null, curve:Number = -1, centre:Boolean = true) {
 			super(screen,xml,attributes);
+			_centred = centre;
 			if (curve>=0)
 				_curve = curve;
 			drawBackground();
@@ -89,6 +91,11 @@ package com.danielfreeman.madcomponents {
 			}
 			
 			graphics.drawRoundRect(attributes.x-_curve, attributes.y-_curve, attributes.width + 2 * _curve, attributes.height + 2 * _curve, _curve);
+		}
+		
+		
+		public function get centred():Boolean {
+			return _centred;
 		}
 
 	}

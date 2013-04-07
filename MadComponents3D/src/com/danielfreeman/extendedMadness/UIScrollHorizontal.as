@@ -68,6 +68,7 @@ package com.danielfreeman.extendedMadness
 				_maximumSlide = 0;
 			if (_slider.x < -_maximumSlide)
 				_slider.x = -_maximumSlide;
+trace("adjust maximumSlide=",_maximumSlide, _slider.width, stage.stageWidth);
 		}
 
 /**

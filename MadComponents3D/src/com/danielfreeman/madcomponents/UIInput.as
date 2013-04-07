@@ -62,6 +62,7 @@ package com.danielfreeman.madcomponents {
  *   alt = "true|false"
  *   prompt = "TEXT"
  *   promptColour = "#rrggbb"
+ *   password = "true|false"
  * /&gt;
  * </pre>
  */

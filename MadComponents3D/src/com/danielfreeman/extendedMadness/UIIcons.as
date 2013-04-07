@@ -18,16 +18,23 @@ package com.danielfreeman.extendedMadness
 		protected var _icons:Vector.<DisplayObject>;
 		protected var _timer:Timer = new Timer(50,1);
 		protected var _index:int = -1;
+		protected var _iconColour:uint = uint.MAX_VALUE;
 		protected var _highlightColour:uint = UIList.HIGHLIGHT;
 		
 		public function UIIcons(screen:Sprite, xml:XML, attributes:Attributes) {
-			if (xml.@highlightColour.length()>0)
+			
+			if (xml.@highlightColour.length()>0) {
 				_highlightColour = UI.toColourValue(xml.@highlightColour);
+			}
+			if (xml.@iconColour.length()>0) {
+				_iconColour = UI.toColourValue(xml.@iconColour);
+			}
 			super(screen, xml, attributes);
 			addEventListener(MouseEvent.MOUSE_DOWN, mouseDown);
 			addEventListener(MouseEvent.MOUSE_UP, mouseUp);
 			_timer.addEventListener(TimerEvent.TIMER, unHighlight);
-			text = xml.toString();
+			text = xml.toString().replace(/[\s\r\n\t]/g,"");
+			unHighlight();
 		}
 		
 		
@@ -58,9 +65,14 @@ package com.danielfreeman.extendedMadness
 		}
 		
 		
-		protected function unHighlight(event:TimerEvent):void {
-			for each (var icon:DisplayObject in _icons)
-				icon.transform.colorTransform = new ColorTransform();
+		protected function unHighlight(event:TimerEvent = null):void {
+			for each (var icon:DisplayObject in _icons) {
+				var colour:ColorTransform = new ColorTransform();
+				if (_iconColour < uint.MAX_VALUE) {
+					colour.color = _iconColour;
+				}
+				icon.transform.colorTransform = colour;
+			}
 		}
 		
 		

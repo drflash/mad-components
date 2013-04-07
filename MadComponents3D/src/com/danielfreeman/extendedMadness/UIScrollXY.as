@@ -49,6 +49,7 @@ package com.danielfreeman.extendedMadness
  *    border = "true|false"
  *    autoLayout = "true|false"
  *    tapToScale = "NUMBER"
+ *    auto = "true|false"
  * /&gt;
  * </pre>
  */
@@ -67,6 +68,7 @@ package com.danielfreeman.extendedMadness
 		protected var _sliderPoint:Point;
 		protected var _oldScale:Number;
 		protected var _newScale:Number;
+		protected var _auto:Boolean;
 		
 /**
  *  XY scrolling container
@@ -90,6 +92,7 @@ package com.danielfreeman.extendedMadness
 		public function UIScrollXY(screen:Sprite, xml:XML, attributes:Attributes)
 		{
 			super(screen, xml, attributes);
+			_auto = xml.@auto == "true";
 			if (xml.@tapToScale.length()>0) {
 				_tapToScale = parseFloat(xml.@tapToScale[0]);
 				_slider.doubleClickEnabled = true;
@@ -157,7 +160,7 @@ package com.danielfreeman.extendedMadness
  */
 		override protected function adjustMaximumSlide():void {
 			super.adjustMaximumSlide();
-			var sliderWidth:Number = _scrollerWidth>0 ? _scrollerWidth*_scale : _slider.width;
+			var sliderWidth:Number = _scrollerWidth>0 ? _scrollerWidth*_scale : _slider.getBounds(this).right;
 			_maximumSlideX = sliderWidth - _width + PADDING * (_border=="false" ? 0 : 1);
 			if (_maximumSlideX < 0)
 				_maximumSlideX = 0;
@@ -173,13 +176,17 @@ package com.danielfreeman.extendedMadness
 			if (_scaleTimer.running)
 				return;
 			if (!_noScroll) {
-				_deltaX = -_slider.x;
-				sliderX = _startSlider.x + (mouseX - _startMouse.x);
-				_deltaX += _slider.x;
+				if (!_auto || _maximumSlideX > 0) {
+					_deltaX = -_slider.x;
+					sliderX = _startSlider.x + (mouseX - _startMouse.x);
+					_deltaX += _slider.x;
+				}
 				
-				_delta = -_slider.y;
-				sliderY = _startSlider.y + (mouseY - _startMouse.y);
-				_delta += _slider.y;
+				if (!_auto || _maximumSlide > 0) {
+					_delta = -_slider.y;
+					sliderY = _startSlider.y + (mouseY - _startMouse.y);
+					_delta += _slider.y;
+				}
 				
 				_distance += Math.abs(_deltaX) + Math.abs(_delta);
 			}
@@ -229,50 +236,63 @@ package com.danielfreeman.extendedMadness
  *  Animate scrolling movement
  */
 		override protected function movement(event:TimerEvent):void {
-			_stopY = false;
-			var stopX:Boolean = false;
-			super.movement(event);
-			if (_endSliderX<FINISHED) {
-				_deltaX *= _decay;
-				sliderX = _slider.x + _deltaX;
-				if (_distance > THRESHOLD)
+			if (_scaleTimer.running)
+				return;
+			if (!_noScroll) {
+				_stopY = false;
+				var stopX:Boolean = false;
+				super.movement(event);
+				if (_endSliderX<FINISHED) {
+					_deltaX *= _decay;
+					sliderX = _slider.x + _deltaX;
+					if (_distance > THRESHOLD)
+						showScrollBar();
+						if (Math.abs(_deltaX) < _deltaThreshold || _slider.x > 0 || _slider.x < -_maximumSlideX) {
+							if (!startMovement0())
+								stopX = true;
+						}
+				}
+				else {
+					_deltaX = (-_endSliderX - _slider.x) * BOUNCE;
+					sliderX = _slider.x + _deltaX;
 					showScrollBar();
-					if (Math.abs(_deltaX) < _deltaThreshold || _slider.x > 0 || _slider.x < -_maximumSlideX) {
-						if (!startMovement0())
-							stopX = true;
+					if (Math.abs(_deltaX) < _deltaThreshold) {
+						stopX = true;
+						sliderX = -_endSliderX;
 					}
-			}
-			else {
-				_deltaX = (-_endSliderX - _slider.x) * BOUNCE;
-				sliderX = _slider.x + _deltaX;
-				showScrollBar();
-				if (Math.abs(_deltaX) < _deltaThreshold) {
-					stopX = true;
-					sliderX = -_endSliderX;
+				}
+				if (stopX && _stopY) {
+					super.stopMovement();
 				}
 			}
-			if (stopX && _stopY)
-				super.stopMovement();
 		}
 		
 /**
  *  Show scroll bar
  */
 		override public function showScrollBar():void {
-			super.showScrollBar();
-			var sliderWidth:Number = _scrollerWidth>0 ? _scrollerWidth*_scale : _slider.width;
-			var barWidth:Number = (_width / sliderWidth) * _width;
-			var barPositionX:Number = (- _slider.x / sliderWidth) * _width + 2 * SCROLLBAR_POSITION;
-			if (barPositionX < SCROLLBAR_POSITION) {
-				barWidth += barPositionX;
-				barPositionX = SCROLLBAR_POSITION;
+			if (!_auto || _maximumSlide > 0) {
+				super.showScrollBar();
 			}
-			if (barPositionX + barWidth > _width - 4 * SCROLLBAR_POSITION) {
-				barWidth -= barPositionX + barWidth - _width + 4 * SCROLLBAR_POSITION;
+			else {
+				_scrollBarLayer.graphics.clear();
+				_scrollBarVisible = true;
 			}
-			if (barWidth > 0 && barPositionX >= 0) {
-				_scrollBarLayer.graphics.beginFill(_scrollBarColour);
-				_scrollBarLayer.graphics.drawRoundRect(barPositionX, _height - SCROLLBAR_WIDTH - SCROLLBAR_POSITION, barWidth, SCROLLBAR_WIDTH, SCROLLBAR_WIDTH);
+			if (!_auto || _maximumSlideX > 0) {
+				var sliderWidth:Number = _scrollerWidth>0 ? _scrollerWidth*_scale : _slider.getBounds(this).right;
+				var barWidth:Number = (_width / sliderWidth) * _width;
+				var barPositionX:Number = (- _slider.x / sliderWidth) * _width + 2 * SCROLLBAR_POSITION;
+				if (barPositionX < SCROLLBAR_POSITION) {
+					barWidth += barPositionX;
+					barPositionX = SCROLLBAR_POSITION;
+				}
+				if (barPositionX + barWidth > _width - 4 * SCROLLBAR_POSITION) {
+					barWidth -= barPositionX + barWidth - _width + 4 * SCROLLBAR_POSITION;
+				}
+				if (barWidth > 0 && barPositionX >= 0) {
+					_scrollBarLayer.graphics.beginFill(_scrollBarColour);
+					_scrollBarLayer.graphics.drawRoundRect(barPositionX, _height - SCROLLBAR_WIDTH - SCROLLBAR_POSITION, barWidth, SCROLLBAR_WIDTH, SCROLLBAR_WIDTH);
+				}
 			}
 			_slider.cacheAsBitmap = true;
 		}

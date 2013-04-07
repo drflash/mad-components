@@ -91,6 +91,7 @@ package com.danielfreeman.madcomponents {
 		protected var _shadowFormat:TextFormat = WHITE;
 		protected var _autoLayoutGroup:Boolean;
 		protected var _gapBetweenGroups:Number = 0;
+		protected var _alwaysAutoLayout:Boolean = false;
 		
 		
 		public function UIGroupedList(screen:Sprite, xml:XML, attributes:Attributes) {
@@ -142,7 +143,7 @@ package com.danielfreeman.madcomponents {
 				else {
 					_suffix = "_"+_group.toString();
 					_length = group.length;
-					_groupDetails = {top:_cellTop, length:_length, bottom:0, cellHeight:0};
+					_groupDetails = {top:_cellTop, length:_length, bottom:0, cellHeight:0, visible:true};
 					if (!_heading)
 						_heading = " ";
 					super.data0 = group;
@@ -197,7 +198,7 @@ package com.danielfreeman.madcomponents {
  */
 		
 		override protected function redrawCells():void {
-			var autoLayout:Boolean = !_simple && _autoLayoutGroup;
+			var autoLayout:Boolean = _alwaysAutoLayout || !_simple && _autoLayoutGroup;
 			_cellLeft = _attributes.x + _attributes.paddingH - PADDING;
 			_cellWidth = _attributes.width - 2 * _attributes.paddingH + 2 * PADDING;
 			_group = 0;
@@ -218,21 +219,29 @@ package com.danielfreeman.madcomponents {
 				}
 				_cellTop = groupDetails.top;
 				headingChrome();
-				for (var i:int=0; i<_length; i++) {
-					var cellHeight:Number = groupDetails.cellHeight;
-					if (autoLayout) {
-						var renderer:DisplayObject = byGroupAndRow(group,i);
-						cellHeight = renderer.height+2*_attributes.paddingV;
-						renderer.y = last + _attributes.paddingV;
-						last += cellHeight;
+				if (groupDetails.visible) {
+					for (var i:int=0; i<_length; i++) {
+						var cellHeight:Number = groupDetails.cellHeight;
+						if (autoLayout) {
+							var renderer:DisplayObject = byGroupAndRow(group,i);
+							if (!_simple) {
+								cellHeight = renderer.height + 2 * _attributes.paddingV;
+							}
+							renderer.y = last + _attributes.paddingV * (_simple ? 2.0 : 1.0);
+							last += cellHeight;
+						}
+						drawCell(_cellTop + cellHeight, i);
 					}
-					drawCell(_cellTop + cellHeight, i);
 				}
 				_group++;
 				last += _attributes.paddingV;
-				if (autoLayout) {
-					last += _gapBetweenGroups;
+				if (!_simple && autoLayout && groupDetails.visible) {
+					last += 2 * _gapBetweenGroups;
+					groupDetails.bottom = last - (_alwaysAutoLayout ? _gapBetweenGroups : 0);
+				}
+				if (_alwaysAutoLayout && (_simple || !groupDetails.visible)) {
 					groupDetails.bottom = last;
+					last += 2.0*_gapBetweenGroups;
 				}
 			}
 		}
@@ -385,7 +394,7 @@ package com.danielfreeman.madcomponents {
 			var sliderMouseY:Number = _slider.visible ? _slider.mouseY : mouseY - _sliderPosition;
 			_group = 0;
 			for each(var detail:Object in _groupPositions) {
-				if (sliderMouseY >= detail.top && sliderMouseY <= detail.bottom) {
+				if (sliderMouseY >= detail.top && sliderMouseY <= detail.bottom && detail.visible) {
 					
 					if (_autoLayoutGroup && !_simple) {
 						_row = null;
@@ -441,6 +450,11 @@ package com.danielfreeman.madcomponents {
 			_group = value;
 		}
 		
+		
+		protected function headingClicked():void {
+			dispatchEvent(new Event(HEADING_CLICKED));
+		}
+		
 /**
  *  Return DisplyObject of button pressed
  */
@@ -457,7 +471,7 @@ package com.danielfreeman.madcomponents {
 					activate();
 				}
 				else if (sliderMouseY > _top) {
-					dispatchEvent(new Event(HEADING_CLICKED));
+					headingClicked();
 				}
 			}
 			return _pressButton;

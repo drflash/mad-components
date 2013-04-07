@@ -51,6 +51,7 @@ package com.danielfreeman.madcomponents {
  *    alignV = "scroll|no scroll"
  *    highlightPressed = "true|false"
  *    autoLayout = "true|false"
+ *    headingColour = "#rrggbb"
  *    headingTextColour = "#rrggbb"
  *    headingShadowColour = "#rrggbb"
  * /&gt;
@@ -59,9 +60,10 @@ package com.danielfreeman.madcomponents {
 	public class UIDividedList extends UIGroupedList {
 		
 		protected var _headingColour:uint;
+		protected var _headingOffColour:uint;
 		
 		public function UIDividedList(screen:Sprite, xml:XML, attributes:Attributes) {
-			_headingColour = (xml.@headingColour.length() > 0) ? UI.toColourValue(xml.@headingColour) : attributes.colour;
+			_headingOffColour = _headingColour = (xml.@headingColour.length() > 0) ? UI.toColourValue(xml.@headingColour) : attributes.colour;
 			super(screen, xml, attributes);
 			doLayout();
 		}
@@ -96,7 +98,8 @@ package com.danielfreeman.madcomponents {
 		override protected function initDraw():void {
 			var top:Number = _cellTop - 5 * _attributes.paddingV;
 			var matr:Matrix=new Matrix();
-			var gradient:Array = [Colour.lighten(_headingColour,64),_headingColour];
+			var headingColour:uint = (_groupPositions.length > _group ? _groupPositions[_group].visible : false) ? _headingColour : _headingOffColour;
+			var gradient:Array = [Colour.lighten(headingColour,64), headingColour];
 			var autoLayout:Boolean = (!_simple && _autoLayoutGroup);
 			super.initDraw();
 			var last:Number = _group>0 ? _groupPositions[_group-1].bottom + (autoLayout ? _attributes.paddingV : 0) : 0;
