@@ -340,7 +340,8 @@ package com.danielfreeman.madcomponents {
  * XML data loaded handler
  */	
 		protected function isLoaded(event:Event):void {
-			dataXML = XML(htmlDecode(data));
+			var stringData:String = String(data).replace(/xmlns=[^\"]*\"[^\"]*\"/g, "");
+			dataXML = XML(htmlDecode(stringData));
 			dispatchEvent(new Event(LOADED));
 			removeEventListener(Event.COMPLETE, isLoaded);
 		}
@@ -451,6 +452,8 @@ package com.danielfreeman.madcomponents {
 					if (field == "")
 						field = tagName;
 					var head:String = result[field];
+					trace(item.toXMLString());
+					trace(item["food_name"]);
 					result[field] = (head ? head+" " : "") + item.child(tagName)[0].toString();
 				}
 				else {
