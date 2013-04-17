@@ -12,26 +12,48 @@ package com.danielfreeman.extendedMadness
 	import flash.utils.Timer;
 	import flash.utils.getDefinitionByName;
 
-
+/**
+ *  MadComponents icons component
+ * <pre>
+ * &lt;icons
+ *    id = "IDENTIFIER"
+ *    highlightColour = "#rrggbb"
+ *    iconColour = "#rrggbb"
+ *    background = "#rrggbb, #rrggbb, …"
+ *    gapV = "NUMBER"
+ *    gapH = "NUMBER"
+ *    alignH = "left|right|centre|fill"
+ *    alignV = "top|bottom|centre|fill"
+ *    visible = "true|false"
+ *    border = "true|false"
+ *    leftMargin = "NUMBER"
+ * /&gt;
+ * </pre>
+ */	
 	public class UIIcons extends UIContainerBaseClass {
 
 		protected var _icons:Vector.<DisplayObject>;
 		protected var _timer:Timer = new Timer(50,1);
 		protected var _index:int = -1;
+		protected var _pressIndex:int = -1;
 		protected var _iconColour:uint = uint.MAX_VALUE;
 		protected var _highlightColour:uint = UIList.HIGHLIGHT;
+		protected var _leftMargin:Number = 0;
+		
 		
 		public function UIIcons(screen:Sprite, xml:XML, attributes:Attributes) {
 			
-			if (xml.@highlightColour.length()>0) {
+			if (xml.@highlightColour.length() > 0) {
 				_highlightColour = UI.toColourValue(xml.@highlightColour);
 			}
-			if (xml.@iconColour.length()>0) {
+			if (xml.@iconColour.length() > 0) {
 				_iconColour = UI.toColourValue(xml.@iconColour);
+			}
+			if (xml.@leftMargin.length() > 0) {
+				_leftMargin = parseFloat(xml.@leftMargin);
 			}
 			super(screen, xml, attributes);
 			addEventListener(MouseEvent.MOUSE_DOWN, mouseDown);
-			addEventListener(MouseEvent.MOUSE_UP, mouseUp);
 			_timer.addEventListener(TimerEvent.TIMER, unHighlight);
 			text = xml.toString().replace(/[\s\r\n\t]/g,"");
 			unHighlight();
@@ -39,29 +61,44 @@ package com.danielfreeman.extendedMadness
 		
 		
 		protected function mouseDown(event:MouseEvent):void {
-			_index = -1;
+			_pressIndex = -1;
 			for (var i:int = 0; i < _icons.length; i++) {
 				var icon:DisplayObject = _icons[i];
 				if (mouseX < icon.x + icon.width + _attributes.paddingH/2) {
-					_index = i;
+					_pressIndex = i;
 					highlight();
-					dispatchEvent(new Event(Event.CHANGE));
-					return;
+					break;
 				}
-			}					
+			}
+			stage.removeEventListener(MouseEvent.MOUSE_UP, mouseUp);
+			stage.addEventListener(MouseEvent.MOUSE_UP, mouseUp);					
 		}
 		
 		
 		protected function mouseUp(event:MouseEvent):void {
+			stage.removeEventListener(MouseEvent.MOUSE_UP, mouseUp);
+			var index:int = -1;
+			for (var i:int = 0; i < _icons.length; i++) {
+				var icon:DisplayObject = _icons[i];
+				if (mouseX < icon.x + icon.width + _attributes.paddingH/2) {
+					index = i;
+					break;
+				}
+			}
+			if (_pressIndex == index) {
+				_index = _pressIndex;
+				dispatchEvent(new Event(Event.CHANGE));
+			}
 			_timer.reset();
 			_timer.start();
+			_pressIndex = -1;
 		}
 		
 		
 		protected function highlight():void {
 			var colour:ColorTransform = new ColorTransform();
 			colour.color = _highlightColour;
-			DisplayObject(_icons[_index]).transform.colorTransform = colour;
+			DisplayObject(_icons[_pressIndex]).transform.colorTransform = colour;
 		}
 		
 		
@@ -97,7 +134,7 @@ package com.danielfreeman.extendedMadness
 		
 		
 		public function set text(source:String):void {
-			var position:Number = 0;
+			var position:Number = _leftMargin;
 			var dimensions:Array = source.split(",");
 			if (_icons)
 				clear();

@@ -68,7 +68,6 @@ package com.danielfreeman.extendedMadness
 				_maximumSlide = 0;
 			if (_slider.x < -_maximumSlide)
 				_slider.x = -_maximumSlide;
-trace("adjust maximumSlide=",_maximumSlide, _slider.width, stage.stageWidth);
 		}
 
 /**
@@ -83,6 +82,9 @@ trace("adjust maximumSlide=",_maximumSlide, _slider.width, stage.stageWidth);
 			}
 			if (_distance > THRESHOLD) {
 				showScrollBar();
+			}
+			else if (_touchTimer.currentCount == MAXIMUM_TICKS) {
+				pressButton();
 			}
 		}
 		
@@ -130,7 +132,7 @@ trace("adjust maximumSlide=",_maximumSlide, _slider.width, stage.stageWidth);
 /**
  *  Show scroll bar
  */
-		override public function showScrollBar():void {
+		override protected function drawScrollBar():void {
 			var sliderWidth:Number = _scrollerWidth>0 ? _scrollerWidth*_scale : _slider.width;
 			_scrollBarLayer.graphics.clear();
 			var barWidth:Number = (_width / sliderWidth) * _width;
@@ -146,7 +148,7 @@ trace("adjust maximumSlide=",_maximumSlide, _slider.width, stage.stageWidth);
 				_scrollBarLayer.graphics.beginFill(_scrollBarColour);
 				_scrollBarLayer.graphics.drawRoundRect(barPositionX, _height - SCROLLBAR_WIDTH - SCROLLBAR_POSITION, barWidth, SCROLLBAR_WIDTH, SCROLLBAR_WIDTH);
 			}
-			_slider.cacheAsBitmap = true;
+		//	_slider.cacheAsBitmap = true;
 		}
 		
 

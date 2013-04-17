@@ -32,7 +32,7 @@ package com.danielfreeman.extendedMadness
 	import flash.events.MouseEvent;
 	import flash.geom.Matrix;
 	
-	public class UITabButtonRow extends Sprite
+	public class UITabButtonRow extends MadSprite
 	{
 		public static const OFF_COLOUR:uint = 0x999999;
 		public static const ON_COLOUR:uint = 0xF9F9F9;

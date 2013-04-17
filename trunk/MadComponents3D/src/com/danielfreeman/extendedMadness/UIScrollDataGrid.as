@@ -86,6 +86,7 @@ package com.danielfreeman.extendedMadness {
 				_fixedColumnColours = UI.toColourVector(xml.@fixedColumnColours);
 			}
 			super(screen, noChildren(xml), attributes);
+			super.layout(attributes);
 		}
 
 
@@ -109,8 +110,9 @@ package com.danielfreeman.extendedMadness {
 			if (xml.@fixedColumns.length() > 0 && !_fixedColumnSlider) {
 				_fixedColumns = parseInt(xml.@fixedColumns);
 				addChild(_fixedColumnSlider = new Sprite());
-				addChild(_headerFixedColumnSlider = new Sprite());
+				
 			}
+			addChild(_headerFixedColumnSlider = new Sprite());
 			if (_fixedColumns > 0 && dataGrid.tableCells.length > 0) {
 				
 				var rowIndex:int = 0;

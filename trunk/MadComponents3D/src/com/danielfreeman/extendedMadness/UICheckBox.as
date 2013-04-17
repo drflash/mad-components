@@ -64,6 +64,7 @@ package com.danielfreeman.extendedMadness
 		protected var _offColour:uint;
 		protected var _alt:Boolean = false;
 		protected var _label:UILabel;
+		
 
 		public function UICheckBox(screen:Sprite, xml:XML, attributes:Attributes)
 		{
@@ -77,7 +78,7 @@ package com.danielfreeman.extendedMadness
 			makeTick();
 			state = xml.@state=="true";
 			buttonMode = mouseEnabled = true;
-			addEventListener(MouseEvent.MOUSE_UP, mouseUp);
+			addEventListener(MouseEvent.MOUSE_DOWN, mouseDown);
 			_label = new UILabel(this, (_alt ? ALT_SIZE+SMALL_GAP  : SIZE+GAP), 0, xml.toString());
 			assignToLabel(xml, _label);
 		}
@@ -152,10 +153,18 @@ package com.danielfreeman.extendedMadness
 		}
 		
 		
+		protected function mouseDown(event:MouseEvent):void {
+			stage.addEventListener(MouseEvent.MOUSE_UP, mouseUp);
+		}
+		
+		
 		protected function mouseUp(event:MouseEvent):void {
-			_state = !_state;
-			redraw();
-			dispatchEvent(new Event(Event.CHANGE));
+			stage.removeEventListener(MouseEvent.MOUSE_UP, mouseUp);
+			if (event.target == this) {
+				_state = !_state;
+				redraw();
+				dispatchEvent(new Event(Event.CHANGE));
+			}
 		}
 		
 /**

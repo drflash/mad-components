@@ -193,6 +193,9 @@ package com.danielfreeman.extendedMadness
 			if (_distance > THRESHOLD) {
 				showScrollBar();
 			}
+			else if (_touchTimer.currentCount == MAXIMUM_TICKS) {
+				pressButton();
+			}
 		}
 		
 /**
@@ -294,7 +297,7 @@ package com.danielfreeman.extendedMadness
 					_scrollBarLayer.graphics.drawRoundRect(barPositionX, _height - SCROLLBAR_WIDTH - SCROLLBAR_POSITION, barWidth, SCROLLBAR_WIDTH, SCROLLBAR_WIDTH);
 				}
 			}
-			_slider.cacheAsBitmap = true;
+		//	_slider.cacheAsBitmap = true;
 		}
 		
 

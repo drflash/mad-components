@@ -123,9 +123,9 @@ package com.danielfreeman.extendedMadness {
 		
 		
 		public function open(animated:Boolean = true):void {
-			if (!_form.clickable)
+			if (!_form.mouseEnabled)
 				return;
-			_form.clickable = _form.mouseEnabled = _form.mouseChildren = false;
+			_form.mouseEnabled = _form.mouseChildren = false;
 			if (animated) {
 				_slideTimer.repeatCount = Math.max(Math.floor(STEPS * (1 - _form.x / _listWidth)), 1);
 				_slideTimer.reset();
@@ -138,7 +138,7 @@ package com.danielfreeman.extendedMadness {
 		
 		
 		public function close(animated:Boolean = true):void {
-			_form.clickable = _form.mouseEnabled = _form.mouseChildren = true;
+			_form.mouseEnabled = _form.mouseChildren = true;
 			if (animated) {
 				_slideTimer.repeatCount = Math.max(Math.floor(STEPS * _form.x / _listWidth), 1);
 				_slideTimer.reset();
@@ -200,7 +200,7 @@ package com.danielfreeman.extendedMadness {
 		
 		protected function slideButtonHandler(event:Event):void {
 			dispatchEvent(new Event(CLICKED));
-			_form.clickable = _form.mouseEnabled = _form.mouseChildren = !_form.mouseEnabled;
+			_form.mouseEnabled = _form.mouseChildren = !_form.mouseEnabled;
 			if (_buttonEnabled) {
 				_slideTimer.repeatCount = STEPS;
 				_slideTimer.reset();
@@ -236,7 +236,7 @@ package com.danielfreeman.extendedMadness {
 		protected function mouseUp(event:MouseEvent):void {
 			stage.removeEventListener(MouseEvent.MOUSE_UP, mouseUp);
 			stage.removeEventListener(MouseEvent.MOUSE_MOVE, mouseMove);
-			_form.clickable = _form.mouseEnabled = _form.mouseChildren = mouseX < _listWidth / 2;
+			_form.mouseEnabled = _form.mouseChildren = mouseX < _listWidth / 2;
 			_slideTimer.repeatCount = Math.max(_form.mouseEnabled ? Math.floor(STEPS * _form.x / _listWidth) : Math.floor(STEPS * (1 - _form.x / _listWidth)), 1);
 			_slideTimer.reset();
 			_slideTimer.start();

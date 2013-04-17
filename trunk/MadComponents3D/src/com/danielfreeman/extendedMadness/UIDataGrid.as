@@ -57,7 +57,7 @@ package com.danielfreeman.extendedMadness {
  * /&gt;
  * </pre>
  */
-	public class UIDataGrid extends Sprite implements IContainerUI { 
+	public class UIDataGrid extends MadSprite implements IContainerUI { 
 		
 		protected static const DEFAULT_HEADER_COLOUR:uint=0x9999AA; //0x4481c1; 
 		protected static const DEFAULT_COLOURS:Array=[0xe8edf5,0xcfd8e9]; 

@@ -38,8 +38,8 @@ package com.danielfreeman.extendedMadness {
 
 	public class UIe extends UI {
 
-		protected static const DESKTOP_TOKENS:Array = ["tickList","tickOneList","tabPagesTop","scrollXY","scrollBarVertical","scrollBarHorizontal","scrollBarPanel","dataGrid","menu","segmentedControl","checkBox","radioButton","treeNavigation","pieChart","barChart","lineChart","scatterChart","horizontalChart","splitView","starRating","field","scrollHorizontal","listHorizontal","detailList","image9","imageX","skin","progressBar","line","icons","touch","popUpButton","slideOutNavigation","wheelMenu","pageTurn","scrollDataGrid","scrollDataGrids","scrollTouchGrids","accordionList","screens","textSlider"];
-		protected static const DESKTOP_CLASSES:Array = [UITickList,UITickOneList,UITabPagesTop,UIScrollXY,UIScrollBarVertical,UIScrollBarHorizontal,UIScrollBarPanel,UIDataGrid,UIMenu,UISegmentedControl,UICheckBox,UIRadioButton,UITreeNavigation,UIPieChart,UIBarChart,UILineChart,UIScatterChart,UIHorizontalChart,UISplitView,UIStarRating,UIField,UIScrollHorizontal,UIListHorizontal,UIDetailList,UIImage9,UIImageX,UISkin,UIProgressBar,UILine,UIIcons,UITouch,UIPopUpButton,UISlideOutNavigation,UIWheelMenu,UIPageTurn,UIScrollDataGrid,UIScrollDataGrids,UIScrollTouchGrids,UIAccordionList,UIScreens,UITextSlider];
+		protected static const DESKTOP_TOKENS:Array = ["tickList","tickOneList","tabPagesTop","scrollXY","scrollBarVertical","scrollBarHorizontal","scrollBarPanel","dataGrid","menu","segmentedControl","checkBox","radioButton","treeNavigation","pieChart","barChart","lineChart","scatterChart","horizontalChart","splitView","starRating","field","scrollHorizontal","listHorizontal","detailList","image9","imageX","skin","progressBar","line","icons","touch","popUpButton","slideOutNavigation","wheelMenu","pageTurn","scrollDataGrid","scrollDataGrids","scrollTouchGrids","accordionList","screens","textSlider","labelScroller"];
+		protected static const DESKTOP_CLASSES:Array = [UITickList,UITickOneList,UITabPagesTop,UIScrollXY,UIScrollBarVertical,UIScrollBarHorizontal,UIScrollBarPanel,UIDataGrid,UIMenu,UISegmentedControl,UICheckBox,UIRadioButton,UITreeNavigation,UIPieChart,UIBarChart,UILineChart,UIScatterChart,UIHorizontalChart,UISplitView,UIStarRating,UIField,UIScrollHorizontal,UIListHorizontal,UIDetailList,UIImage9,UIImageX,UISkin,UIProgressBar,UILine,UIIcons,UITouch,UIPopUpButton,UISlideOutNavigation,UIWheelMenu,UIPageTurn,UIScrollDataGrid,UIScrollDataGrids,UIScrollTouchGrids,UIAccordionList,UIScreens,UITextSlider,UILabelScroller];
 		protected static const COLOUR:uint = 0x666666;
 		
 		protected static var _cursor:Cursor = null;
@@ -113,7 +113,6 @@ package com.danielfreeman.extendedMadness {
 				result = new UIDropWindow(_windowLayer, xml, attributes);
 				result.x = x-arrowPosition - (arrowPosition==0 ? UIDropWindow.ARROW : 0) + UIDropWindow.CURVE;
 				result.y = y + UIDropWindow.ARROW + UIDropWindow.CURVE;
-				
 			}
 			return result;
 		}
