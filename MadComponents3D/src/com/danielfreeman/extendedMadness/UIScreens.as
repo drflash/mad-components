@@ -22,13 +22,20 @@ package com.danielfreeman.extendedMadness {
 	
 	
 		protected function useThisOne(option:String):Boolean {
-			switch(option) {
-				case "smallPortrait": return UI.attributes.width < 260 && UI.attributes.height < 340;
-				case "smallLandscape": return UI.attributes.width < 340 && UI.attributes.height < 260;
-				case "portrait": return UI.attributes.width <= UI.attributes.height;
-				case "landscape": return UI.attributes.width >= UI.attributes.height;
+			var result:Boolean = true;
+			if (option.substr(0,1) == "L") {
+				result = UI.attributes.width >= UI.attributes.height;
+				option = option.substr(1);
 			}
-			return true;
+			else if (option.substr(0,1) == "R") {
+				result = UI.attributes.width <= UI.attributes.height;
+				option = option.substr(1);
+			}
+			var size:int = parseInt(option);
+			if (!isNaN(size)) {
+				result = result && (UI.attributes.width <= size);
+			}
+			return result;
 		}
 		
 		

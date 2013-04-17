@@ -61,7 +61,7 @@ package com.danielfreeman.extendedMadness
 		public function UIRadioButton(screen:Sprite, xml:XML, attributes:Attributes)
 		{
 			_group = screen;
-			if (xml.@group.length()>0) {
+			if (xml.@group.length() > 0) {
 				var key:String = xml.@group;
 				_group = GROUPS[key];
 				if (!_group)

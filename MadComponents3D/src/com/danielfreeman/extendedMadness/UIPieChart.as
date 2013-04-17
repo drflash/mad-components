@@ -49,7 +49,7 @@ package com.danielfreeman.extendedMadness
 	 * /&gt;
 	 * </pre>
 	 * */	
-	public class UIPieChart extends Sprite implements IContainerUI
+	public class UIPieChart extends MadSprite implements IContainerUI
 	{
 		protected static const OFFSET:Number = 38.0;
 		
