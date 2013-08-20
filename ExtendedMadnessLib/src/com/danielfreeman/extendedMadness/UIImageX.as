@@ -178,6 +178,10 @@ package com.danielfreeman.extendedMadness
 		}
 		
 		
+		public function drawComponent():void {	
+		}
+		
+		
 		public function destructor():void {
 		}
 	}

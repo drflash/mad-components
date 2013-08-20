@@ -47,9 +47,10 @@ package com.danielfreeman.extendedMadness
 		protected static const GAP:Number = 10.0;
 		protected static const CURVE:Number = 16.0;
 		protected static const COLOUR:uint = 0x555555;
-		protected static const FORMAT:TextFormat = new TextFormat("_sans",16,0xFFFFFF);
 		protected static const PRESSED_COLOUR:uint = 0x6666CC;
 		protected static const PRESSED_TEXT_COLOUR:uint = 0xFFFFFF;
+		
+		protected const FORMAT:TextFormat = new TextFormat("_sans",16,0xFFFFFF);
 		
 		protected var _labels:Vector.<UILabel> = new Vector.<UILabel>();
 		protected var _arrowPosition:Number;
@@ -63,6 +64,7 @@ package com.danielfreeman.extendedMadness
 		protected var _pressedLayer:Sprite;
 		protected var _pressedColour:uint = UIList.HIGHLIGHT;
 		protected var _timer:Timer;
+		protected var _ready:Boolean = false;
 		
 /**
  * Cut / Copy / Paste style buttons
@@ -76,7 +78,7 @@ package com.danielfreeman.extendedMadness
 			addChild(_pressedLayer = new Sprite());
 			initialise(words);
 			buttonMode=useHandCursor = true;
-			addEventListener(MouseEvent.MOUSE_UP, mouseUp);
+			addEventListener(MouseEvent.MOUSE_DOWN, mouseDown);
 		}
 		
 		
@@ -92,15 +94,31 @@ package com.danielfreeman.extendedMadness
 		}
 		
 		
-		protected function mouseUp(event:MouseEvent):void {
-			updateIndex();
-			dispatchEvent(new Event(Event.CHANGE));
-			showPressed();
-			_timer.reset();
-			_timer.start();
+		protected function mouseDown(event:MouseEvent):void {
+			_ready = true;
+			stage.addEventListener(MouseEvent.MOUSE_UP, mouseUp);									
 		}
 		
 		
+		protected function mouseUp(event:MouseEvent):void {
+			stage.removeEventListener(MouseEvent.MOUSE_UP, mouseUp);
+			if (_ready && event.target == this) {
+				updateIndex();
+				dispatchEvent(new Event(Event.CHANGE));
+				showPressed();
+				_timer.reset();
+				_timer.start();
+			}
+			_ready = false;
+		}
+
+
+		override public function touchCancel():void {
+			stage.removeEventListener(MouseEvent.MOUSE_UP, mouseUp);
+			_ready = false;
+		}
+
+
 		protected function updateIndex():void {
 			for (var i:int = _labels.length-1; i>=0 ; i--) {
 				var position:Number = _labels[i].x - _gap;
@@ -152,6 +170,10 @@ package com.danielfreeman.extendedMadness
 				_labels.push(uiLabel);
 			}
 			buttonChrome(left, arrowPosition);
+		}
+		
+		
+		public function drawComponent():void {	
 		}
 
 			

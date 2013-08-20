@@ -55,7 +55,6 @@ package com.danielfreeman.extendedMadness
 		
 		protected var _attributes:Attributes;
 		protected var _xml:XML;
-
 		
 		
 		public function UISegmentedControl(screen:Sprite, xml:XML, attributes:Attributes)
@@ -70,12 +69,7 @@ package com.danielfreeman.extendedMadness
 			if (attributes.fillH)
 				fixwidth = attributes.widthH;
 			index=0;
-			addEventListener(MouseEvent.MOUSE_DOWN, mouseDown); // JSS fix
-		}
-
-
-		protected function mouseDown(event:MouseEvent):void {
-			event.stopPropagation();											
+		//	addEventListener(MouseEvent.MOUSE_DOWN, mouseDown); // JSS fix
 		}
 		
 /**
@@ -122,14 +116,18 @@ package com.danielfreeman.extendedMadness
 			}
 			return result;
 		}
-		
+				
 		
 		override protected function mouseUp(event:MouseEvent):void {
-			if (_index>=0 && !_font)
-				_labels[_index].textColor = TEXT_COLOUR;
-			updateIndex();
-			dispatchEvent(new Event(Event.CHANGE));
-			showPressed();
+			stage.removeEventListener(MouseEvent.MOUSE_UP, mouseUp);
+			if (_ready && event.target == this) {
+				if (_index>=0 && !_font)
+					_labels[_index].textColor = TEXT_COLOUR;
+				updateIndex();
+				dispatchEvent(new Event(Event.CHANGE));
+				showPressed();
+			}
+			_ready = false;
 		}
 		
 		

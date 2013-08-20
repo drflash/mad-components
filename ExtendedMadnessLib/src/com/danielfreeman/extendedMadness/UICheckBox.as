@@ -56,7 +56,7 @@ package com.danielfreeman.extendedMadness
 		protected static const COLOUR:uint = 0xFCFCFC;
 		protected static const GAP:Number = 10.0;
 		protected static const SMALL_GAP:Number = 4.0;
-		
+
 		protected var _colour:uint = COLOUR;
 		protected var _tick:UITick;
 		protected var _state:Boolean = false;
@@ -64,6 +64,8 @@ package com.danielfreeman.extendedMadness
 		protected var _offColour:uint;
 		protected var _alt:Boolean = false;
 		protected var _label:UILabel;
+		protected var _ready:Boolean = false;
+		
 
 		public function UICheckBox(screen:Sprite, xml:XML, attributes:Attributes)
 		{
@@ -77,7 +79,7 @@ package com.danielfreeman.extendedMadness
 			makeTick();
 			state = xml.@state=="true";
 			buttonMode = mouseEnabled = true;
-			addEventListener(MouseEvent.MOUSE_UP,mouseUp);
+			addEventListener(MouseEvent.MOUSE_DOWN, mouseDown);
 			_label = new UILabel(this, (_alt ? ALT_SIZE+SMALL_GAP  : SIZE+GAP), 0, xml.toString());
 			assignToLabel(xml, _label);
 		}
@@ -152,10 +154,26 @@ package com.danielfreeman.extendedMadness
 		}
 		
 		
+		protected function mouseDown(event:MouseEvent):void {
+			_ready = true;
+			stage.addEventListener(MouseEvent.MOUSE_UP, mouseUp);
+		}
+		
+		
+		override public function touchCancel():void {
+			_ready = false;
+			stage.removeEventListener(MouseEvent.MOUSE_UP, mouseUp);
+		}
+		
+		
 		protected function mouseUp(event:MouseEvent):void {
-			_state = !_state;
-			redraw();
-			dispatchEvent(new Event(Event.CHANGE));
+			stage.removeEventListener(MouseEvent.MOUSE_UP, mouseUp);
+			if (_ready && event.target == this) {
+				_state = !_state;
+				redraw();
+				dispatchEvent(new Event(Event.CHANGE));
+			}
+			_ready = false;
 		}
 		
 /**

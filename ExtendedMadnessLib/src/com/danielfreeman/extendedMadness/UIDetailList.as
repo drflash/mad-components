@@ -112,6 +112,7 @@ package com.danielfreeman.extendedMadness
 		public function UIDetailList(screen:Sprite, xml:XML, attributes:Attributes) {
 			_autoFill = xml.@autoFill == "true";
 			super(screen, xml, attributes);
+		//	_classic = true;
 			if (xml.detail) {
 				var detailXML:XML = xml.detail[0];					
 				addChild(_detailLayer=new Sprite());
@@ -157,6 +158,7 @@ package com.danielfreeman.extendedMadness
 				else if (mouseY < _splitFinish - _splitHeight || mouseY > _detailBottom.y) {
 					_startY = mouseY;
 					calculateRowIndex();
+					super.mouseDown(event);
 					stage.addEventListener(MouseEvent.MOUSE_UP, detailMouseUp);
 					hideDetail();
 				}
@@ -191,23 +193,19 @@ package com.danielfreeman.extendedMadness
 			stage.removeEventListener(MouseEvent.MOUSE_UP, detailMouseUp);
 		}
 		
-/**
- * Activate detail page when highlight disappears
- */
-		override protected function clickUp(event:TimerEvent):void {
+		
+		override protected function dispatchClickedEnd():void {
 			var pressButton:DisplayObject = _pressButton;
-			super.clickUp(event);
-			if  (!pressButton && _clickRow) {
-				if (_doOpen) {
-					hideDetail();
-				}
-				else {
-					if (_autoFill)
-						_detailPage.data = row;
-					showDetail();
-				}
+			super.dispatchClickedEnd();
+			if (_doOpen) {
+				hideDetail();
 			}
-			
+			else {
+				if (_autoFill) {
+					_detailPage.data = row;
+				}
+				showDetail();
+			}
 		}
 		
 /**
@@ -222,8 +220,9 @@ package com.danielfreeman.extendedMadness
 				if (_xml.detail.length()>0)
 					_detailAttributes.parse(_xml.detail[0]);
 				_detailPage.layout(_detailAttributes);
-				if (_detailShadow)
+				if (_detailShadow) {
 					makeDetailShadow();
+				}
 			}
 			super.layout(attributes);
 			UI.drawBackgroundColour(_detailAttributes.backgroundColours, _attributes.width, _detailAttributes.height+UI.PADDING, _detailPage);
@@ -259,12 +258,12 @@ package com.danielfreeman.extendedMadness
 			_scrollBarLayer.graphics.clear();
 			var bitmapAll:BitmapData = new BitmapData(_attributes.widthH, _attributes.heightV);
 			bitmapAll.draw(this);
-			if (_darkenColour!=uint.MAX_VALUE)
+			if (_darkenColour!=uint.MAX_VALUE) {
 				bitmapAll.applyFilter(bitmapAll, bitmapAll.rect, new Point(), new ColorMatrixFilter([(_darkenColour>>16 & 0xff)/0xff, 0, 0, 0, 0,
 																								0, (_darkenColour>>8 & 0xff)/0xff, 0, 0, 0,
 																								0, 0, (_darkenColour & 0xff)/0xff, 0, 0,
 																								0, 0, 0, 1.0, 0]));
-
+			}
 
 			
 			var bitmapTop:BitmapData = new BitmapData(_attributes.widthH, _slider.y + _splitStart + 1, false, 0xffff00);
@@ -336,8 +335,9 @@ package com.danielfreeman.extendedMadness
  */
 		public function set detail(value:UIForm):void {
 			_detailPage = value;
-			if (!_detailLayer)
+			if (!_detailLayer) {
 				addChild(_detailLayer = new Sprite());
+			}
 			_detailLayer.addChild(_detailPage);
 			_detailLayer.visible = false;
 		}
@@ -347,10 +347,12 @@ package com.danielfreeman.extendedMadness
  */
 		public function set shadowColour(value:uint):void {
 			_detailShadowColour = value;
-			if (!_detailLayer)
+			if (!_detailLayer) {
 				addChild(_detailLayer = new Sprite());
-			if (!_detailShadow)
+			}
+			if (!_detailShadow) {
 				_detailLayer.addChild(_detailShadow = new Sprite());
+			}
 			makeDetailShadow();
 		}
 		
@@ -363,6 +365,7 @@ package com.danielfreeman.extendedMadness
 				t = 1 - t;
 			
 				if (Timer(event.currentTarget).currentCount==STEPS) {
+					_highlight.graphics.clear();
 						hideDetailNow();
 					//	_delta = (mouseY - _startY) / DAMPEN;
 					//	_distance = 0;
@@ -373,6 +376,9 @@ package com.danielfreeman.extendedMadness
 					//	}
 						return;
 				}
+			}
+			else if (Timer(event.currentTarget).currentCount==STEPS) {
+				_highlight.graphics.clear();
 			}
 			
 			var split:Number = t * _splitFinish + (1-t) * _splitStart;
@@ -391,10 +397,10 @@ package com.danielfreeman.extendedMadness
 		
 		
 		override protected function movement(event:TimerEvent):void {
-			if (!_noScroll)
+			if (!_noScroll) {
 				super.movement(event);
+			}
 		}
-
 		
 		
 		override public function destructor():void {

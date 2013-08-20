@@ -76,27 +76,37 @@ package com.danielfreeman.extendedMadness
 		override protected function mouseMove(event:TimerEvent):void {
 			if (!_noScroll) {
 				_delta = -_slider.x;
-				sliderX = _startSlider.x + (mouseX - _startMouse.x);
+				sliderX += (outsideSlideRangeX ? _dampen : 1.0) * (mouseX - _lastMouse.x);
 				_delta += _slider.x;
-				_distance += Math.abs(_delta);
+				_distance += Math.abs(mouseX - _lastMouse.x);
+				
+				_lastMouse.x = mouseX;
+				_lastMouse.y = mouseY;
 			}
-			if (_distance > THRESHOLD) {
+			if (!_noScroll && _distance > ABORT_THRESHOLD) {
 				showScrollBar();
+			}
+			else if (_classic && _distance < THRESHOLD && _touchTimer.currentCount == MAXIMUM_TICKS) {
+				pressButton();
 			}
 		}
 		
 		
+		protected function get outsideSlideRangeX():Boolean {
+			return _slider.x > 0 || _slider.x < -_maximumSlide;
+		}
+		
+		
 		override protected function startMovement0():Boolean {
-			var result:Boolean = false;
 			if (_slider.x > _offset) {
 				_endSlider = -_offset;
-				result = result || true;
+				return true;
 			}
 			else if (_slider.x < -_maximumSlide ) {
 				_endSlider = _maximumSlide;
-				result = result || true;
+				return true;
 			}		
-			return result;
+			return false;
 		}
 
 		
@@ -107,8 +117,9 @@ package com.danielfreeman.extendedMadness
 			if (_endSlider<FINISHED) {
 				_delta *= _decay;
 				sliderX = _slider.x + _delta;
-				if (_distance > THRESHOLD)
+				if (_distance > THRESHOLD) {
 					showScrollBar();
+				}
 				if (Math.abs(_delta) < _deltaThreshold || _slider.x > 0 || _slider.x < -_maximumSlide) {
 					if (!startMovement0())
 						stopMovement();
@@ -129,7 +140,7 @@ package com.danielfreeman.extendedMadness
 /**
  *  Show scroll bar
  */
-		override protected function showScrollBar():void {
+		override protected function drawScrollBar():void {
 			var sliderWidth:Number = _scrollerWidth>0 ? _scrollerWidth*_scale : _slider.width;
 			_scrollBarLayer.graphics.clear();
 			var barWidth:Number = (_width / sliderWidth) * _width;
@@ -145,7 +156,7 @@ package com.danielfreeman.extendedMadness
 				_scrollBarLayer.graphics.beginFill(_scrollBarColour);
 				_scrollBarLayer.graphics.drawRoundRect(barPositionX, _height - SCROLLBAR_WIDTH - SCROLLBAR_POSITION, barWidth, SCROLLBAR_WIDTH, SCROLLBAR_WIDTH);
 			}
-			_slider.cacheAsBitmap = true;
+		//	_slider.cacheAsBitmap = true;
 		}
 		
 
@@ -153,6 +164,11 @@ package com.danielfreeman.extendedMadness
 			if (Math.abs(value - _slider.x) < MAXIMUM_DY) {
 				_slider.x = value;
 			}
+		}
+		
+		
+		protected function get sliderX():Number {
+			return _slider.x;
 		}
 		
 /**
