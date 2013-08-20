@@ -79,7 +79,7 @@ package com.danielfreeman.extendedMadness
 		}
 		
 		
-		override protected function drawComponent():void {
+		override public function drawComponent():void {
 		}
 		
 		

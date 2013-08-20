@@ -95,9 +95,9 @@ package com.danielfreeman.extendedMadness
 			_list.visible = _landscape;
 			_list.y = UINavigationBar.HEIGHT;
 			_list.showPressed = true;
-			if (xml.data.length()>0)
+			if (xml.data.length()>0) {
 				_list.xmlData = xml.data[0];
-			
+			}
 			var menuAttributes:Attributes = new Attributes(PORTRAIT_MENU_X, PORTRAIT_MENU_Y, LEFT, 2/3*attributes.height);
 			menuAttributes.parse(xml);
 			_menu = new UIDropWindow(this, <image/>, menuAttributes);
@@ -114,7 +114,7 @@ package com.danielfreeman.extendedMadness
 			this.swapChildren(_menu, _list);
 			
 			_button.addEventListener(UIButton.CLICKED, showMenu);
-			_list.addEventListener(UIList.CLICKED, hideMenu);
+			_list.addEventListener(UIList.CLICKED_END, hideMenu);
 
 			layout(attributes);
 			_hideDelay.addEventListener(TimerEvent.TIMER, hideMenuDelayed);
@@ -191,6 +191,10 @@ package com.danielfreeman.extendedMadness
 		}
 		
 		
+		public function drawComponent():void {
+		}
+		
+		
 		public function layout(attributes:Attributes):void {
 			stage.removeEventListener(MouseEvent.MOUSE_UP, mouseUp);
 			_landscape = attributes.width > attributes.height;
@@ -242,7 +246,7 @@ package com.danielfreeman.extendedMadness
 			_hideDelay.removeEventListener(TimerEvent.TIMER, hideMenuDelayed);
 			stage.removeEventListener(MouseEvent.MOUSE_UP, mouseUp);
 			_button.removeEventListener(UIButton.CLICKED, showMenu);
-			_list.removeEventListener(UIList.CLICKED, hideMenu);
+			_list.removeEventListener(UIList.CLICKED_END, hideMenu);
 			_list.destructor();
 			_right.destructor();
 		}

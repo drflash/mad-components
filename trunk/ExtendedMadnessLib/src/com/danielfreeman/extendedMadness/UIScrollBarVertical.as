@@ -107,6 +107,11 @@ package com.danielfreeman.extendedMadness {
 		}
 		
 		
+		public function drawComponent():void {	
+			drawBackground(_attributes.backgroundColours);
+		}
+		
+		
 		protected function drawBackground(colours:Vector.<uint>):void {
 			graphics.clear();
 			graphics.beginFill(colours.length>0 ? colours[0] : 0xffffff);

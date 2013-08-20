@@ -49,7 +49,7 @@ package com.danielfreeman.extendedMadness
 	 * /&gt;
 	 * </pre>
 	 * */	
-	public class UIPieChart extends Sprite implements IContainerUI
+	public class UIPieChart extends MadSprite implements IContainerUI
 	{
 		protected static const OFFSET:Number = 38.0;
 		
@@ -75,7 +75,9 @@ package com.danielfreeman.extendedMadness
 			screen.addChild(this);
 			createGraph(_packet);
 			if (xml.colours.length()>0) {
-				var stValues:Array = xml.colours[0].toString().split(",");
+				var colourString:String = xml.colours[0].toString();
+				colourString.replace(/ /gi, "");
+				var stValues:Array = colourString.split(",");
 				var i:int = 0;
 				for each(var value:String in stValues) {
 					_graph.colours[i++] = UI.toColourValue(value);
@@ -146,17 +148,25 @@ package com.danielfreeman.extendedMadness
 			if (data.row.length()>0) {
 				var rows:XMLList = data.row;
 				for each(var row:XML in rows) {
-					values.push(row.toString().split(","));
+					var rowString:String = row.toString();
+					rowString.replace(/ /gi, "");
+					values.push(rowString.split(","));
 				}
 			}
 			else {
-				values.push(data.toString().split(","));
+				var dataString:String = data.toString();
+				dataString.replace(/ /gi, "");
+				values.push(dataString.split(","));
 			}
 			packet.ifrom = packet.jfrom = 0;
 			packet.ito = values.length-1;
 			packet.jto = values[0].length-1;
 			packet.localdata = values;
 			return packet;
+		}
+		
+		
+		public function drawComponent():void {	
 		}
 		
 		
@@ -236,7 +246,7 @@ package com.danielfreeman.extendedMadness
 		
 		
 		public function destructor():void {
-			
+			_graph.destructor();
 		}
 	}
 }

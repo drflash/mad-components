@@ -19,7 +19,7 @@ package com.danielfreeman.extendedMadness
 		}
 		
 		
-		override protected function drawComponent():void {
+		override public function drawComponent():void {
 			graphics.clear();
 			graphics.beginFill(_attributes.backgroundColours.length>0 ? _attributes.backgroundColours[0] : DARK);
 			graphics.drawRect(_border ? 0 : -UI.PADDING, 0, _attributes.widthH + (_border ? 0 : 2 * UI.PADDING), 1);

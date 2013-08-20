@@ -57,23 +57,29 @@ package com.danielfreeman.extendedMadness
 
 		
 		public function UIProgressBar(screen:Sprite, xml:XML, attributes:Attributes) {
+			_xml = xml;
 			super(screen, 0, 0, attributes.backgroundColours, xml.@alt == "true");
-			fixwidth = attributes.widthH;
-			if (xml.@value.length()>0)
+			if (attributes.fillH) {
+				fixwidth = attributes.widthH;
+			}
+			if (xml.@value.length() > 0) {
 				value = parseFloat(xml.@value);
-			
+			}
 		}
 		
 		
-		override protected function drawKnob():void {
+		override protected function createKnob():void {
 			_knob=new Sprite();
 			_sliderHeight = _radius;
+			_curve = (_xml.@curve.length() > 0) ? parseFloat(_xml.@curve) : _sliderHeight;
 		}
 		
 		
 		public function layout(attributes:Attributes):void {
 			_attributes = attributes;
-			fixwidth = attributes.widthH;
+			if (attributes.fillH) {
+				fixwidth = attributes.widthH;
+			}
 		}
 		
 		

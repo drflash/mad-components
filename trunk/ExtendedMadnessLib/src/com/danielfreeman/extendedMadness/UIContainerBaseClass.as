@@ -25,8 +25,7 @@ package com.danielfreeman.extendedMadness
 		}
 		
 		
-		protected function drawComponent():void {
-			
+		public function drawComponent():void {	
 		}
 		
 		

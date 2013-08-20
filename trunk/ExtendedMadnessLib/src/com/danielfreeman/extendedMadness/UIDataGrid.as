@@ -53,8 +53,9 @@ package com.danielfreeman.extendedMadness {
 		protected static const DEFAULT_COLOURS:Array=[0xe8edf5,0xcfd8e9]; 
 		protected static const TABLE_WIDTH:Number=300.0;
 		protected static const TEXT_SIZE:Number=12.0;
-		protected static const HEADER_STYLE:TextFormat = new TextFormat('Arial',TEXT_SIZE,0xFFFFFF);
-		protected static const DATA_STYLE:TextFormat = new TextFormat('Arial',TEXT_SIZE,0x333333); 
+		
+		protected const HEADER_STYLE:TextFormat = new TextFormat('Arial',TEXT_SIZE,0xFFFFFF);
+		protected const DATA_STYLE:TextFormat = new TextFormat('Arial',TEXT_SIZE,0x333333); 
 		
 		protected var _table:Array=new Array(); 
 		protected var _last:Number=0; 
@@ -115,7 +116,7 @@ package com.danielfreeman.extendedMadness {
 		
 		protected function makeTable(data:Array,colours:Array,format:TextFormat=null,editable:Boolean=false):void { 
 			var txt:UIBlueText; 
-			if (!format) format=DATA_STYLE
+			if (!format) format=DATA_STYLE;
 			format.leftMargin=_leftMargin; 
 			for (var i:int=0;i<data.length;i++) { 
 				var dataRow:Array=data[i]; 
@@ -173,6 +174,10 @@ package com.danielfreeman.extendedMadness {
 			}
 		}
 		
+		
+		public function drawComponent():void {	
+		}
+		
 /**
  * Clear the data grid
  */
@@ -198,9 +203,9 @@ package com.danielfreeman.extendedMadness {
 			if (xml.header.length()>0) {
 				return xml.header[0].toString().split(",");
 			}
-		//	else if (xml.data.length()>0 && xml.data[0].header.length()>0) {
-		//		return xml.data[0].header[0].toString().split(",");
-		//	}
+			else if (xml.data.length()>0 && xml.data[0].header.length()>0) {
+				return xml.data[0].header[0].toString().split(",");
+			}
 			else {
 				return null;
 			}

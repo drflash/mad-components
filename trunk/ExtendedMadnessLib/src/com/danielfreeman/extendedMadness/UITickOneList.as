@@ -28,6 +28,7 @@ package com.danielfreeman.extendedMadness {
 	import flash.display.Sprite;
 	import flash.display.DisplayObject;
 	import flash.events.Event;
+	import flash.events.MouseEvent;
 	import com.danielfreeman.madcomponents.*;
 	
 /**
@@ -57,16 +58,34 @@ package com.danielfreeman.extendedMadness {
  */	
 	public class UITickOneList extends UITickList {
 		
+		protected var _lastPressedCell:int;
+		
 		public function UITickOneList(screen:Sprite, xml:XML, attributes:Attributes) {
 			super(screen, xml, attributes);
 		}
 		
 		
+		override protected function mouseDown(event:MouseEvent):void {
+			_lastPressedCell = _pressedCell;
+			super.mouseDown(event);
+		}
+		
+		
+		override protected function doClick():void {
+			if (_lastPressedCell != _pressedCell && !_pressButton && _clickRow) {
+				var lastTick:UITick = UITick(_slider.getChildByName("tick_"+_lastPressedCell.toString()));
+				if (lastTick) {
+					lastTick.visible = false;
+				}
+			}
+			super.doClick();
+		}
+		
+		
 		override protected function pressButton():DisplayObject {
-			var lastPressedCell:int = _pressedCell;
 			super.pressButton();
-			if (lastPressedCell != _pressedCell && _clickRow) {
-				var lastTick:UITick = UITick(_slider.getChildByName("tick_"+lastPressedCell.toString()));
+			if (_classic && _lastPressedCell != _pressedCell && _clickRow) {
+				var lastTick:UITick = UITick(_slider.getChildByName("tick_"+_lastPressedCell.toString()));
 				if (lastTick) {
 					lastTick.visible = false;
 				}

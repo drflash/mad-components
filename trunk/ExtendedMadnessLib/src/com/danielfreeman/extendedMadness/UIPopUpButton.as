@@ -44,12 +44,11 @@ package com.danielfreeman.extendedMadness
 
 	public class UIPopUpButton extends UIContainerBaseClass {
 		
+		public static const CLICKED:String = "clicked";
 		public static const POPUP_CREATED:String = "popUpCreated";
 		
 		protected static const CURVE:Number = 4.0;
 		protected static const COLOUR:uint = 0xCCCCCC;
-		protected static const TEXT_FORMAT:TextFormat = new TextFormat("Tahoma", 17, 0x333333);
-		protected static const SHADOW_FORMAT:TextFormat = new TextFormat("Tahoma", 17, 0xEEEEEE);
 		protected static const HEIGHT:Number = 38.0;
 		protected static const ENDING:Number = 40.0;
 		protected static const ARROW:Number = 10.0;
@@ -57,6 +56,10 @@ package com.danielfreeman.extendedMadness
 		protected static const SHADOW_OFFSET:Number = 1.0;
 		protected static const X:Number = 8.0;
 		protected static const Y:Number = 6.0;
+		
+		protected const TEXT_FORMAT:TextFormat = new TextFormat("Tahoma", 17, 0x333333);
+		protected const SHADOW_FORMAT:TextFormat = new TextFormat("Tahoma", 17, 0xEEEEEE);
+		
 
 		protected var _curve:Number = CURVE;
 		protected var _height:Number = HEIGHT;
@@ -69,6 +72,7 @@ package com.danielfreeman.extendedMadness
 		protected var _label:UILabel = null;
 		protected var _shadowLabel:UILabel;
 		protected var _popUp:UIWindow = null;
+		protected var _enabled:Boolean = false;
 		
 
 		public function UIPopUpButton(screen:Sprite, xml:XML, attributes:Attributes) {
@@ -76,26 +80,43 @@ package com.danielfreeman.extendedMadness
 				_width = attributes.widthH;
 			super(screen, xml, attributes);
 			buttonMode = useHandCursor = true;
-			addEventListener(MouseEvent.MOUSE_UP, mouseUp);
+			addEventListener(MouseEvent.MOUSE_DOWN, mouseDown);
+		}
+			
+		
+		protected function mouseDown(event:MouseEvent):void {
+			_enabled = true;
+			stage.addEventListener(MouseEvent.MOUSE_UP, mouseUp);
+		}
+		
+	
+		public function createPopUp():UIWindow {	
+			var popUpXML:XML = _xml.children()[0];
+			var width:Number = popUpXML.@width.length()>0 ? parseFloat(popUpXML.@width) : -1;
+			var height:Number = popUpXML.@height.length()>0 ? parseFloat(popUpXML.@height) : -1; 
+			var curve:Number = popUpXML.@curve.length()>0 ? parseFloat(popUpXML.@curve) : -1;
+			_popUp = UI.createPopUp(popUpXML, width, height, curve);
+			dispatchEvent(new Event(POPUP_CREATED));
+			return _popUp;
 		}
 		
 		
 		protected function mouseUp(event:MouseEvent):void {
-			if (_popUp) {
-				UI.showPopUp(_popUp);
+			if (_enabled && event.target== this) {
+				if (_popUp) {
+					UI.showPopUp(_popUp);
+				}
+				else if (_xml.children().length()>0) {
+					createPopUp();
+				}
+				dispatchEvent(new Event(CLICKED));
 			}
-			else if (_xml.children().length()>0) {
-				var popUpXML:XML = _xml.children()[0];
-				var width:Number = popUpXML.@width.length()>0 ? parseFloat(popUpXML.@width) : -1;
-				var height:Number = popUpXML.@height.length()>0 ? parseFloat(popUpXML.@height) : -1; 
-				var curve:Number = popUpXML.@curve.length()>0 ? parseFloat(popUpXML.@curve) : -1;
-				_popUp = UI.createPopUp(popUpXML, width, height, curve);
-				dispatchEvent(new Event(POPUP_CREATED));
-			}
+			_enabled = false;
+			
 		}
 
 
-		override protected function drawComponent():void {
+		override public function drawComponent():void {
 
 			if (!_label) {
 				_shadowLabel = new UILabel(this, X-SHADOW_OFFSET, Y-SHADOW_OFFSET, _xml.@value, _shadowFormat);
@@ -160,6 +181,7 @@ package com.danielfreeman.extendedMadness
 		
 	
 		override public function destructor():void {
+			stage.removeEventListener(MouseEvent.MOUSE_DOWN, mouseDown);
 			removeEventListener(MouseEvent.MOUSE_UP, mouseUp);
 			if (_popUp) {
 				UI.removePopUp(_popUp);

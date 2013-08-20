@@ -25,11 +25,12 @@
 
 package com.danielfreeman.extendedMadness {
 
+	import flash.text.TextFormat;
+	import flash.text.TextField;
 	import asfiles.Cursor;
 	import asfiles.HintText;
 	
 	import com.danielfreeman.madcomponents.*;
-	
 	import flash.display.DisplayObject;
 	import flash.display.Sprite;
 	import flash.events.Event;
@@ -39,8 +40,8 @@ package com.danielfreeman.extendedMadness {
 
 	public class UIe extends UI {
 
-		protected static const DESKTOP_TOKENS:Array = ["tickList","tickOneList","tabPagesTop","scrollXY","scrollBarVertical","scrollBarHorizontal","scrollBarPanel","dataGrid","menu","segmentedControl","checkBox","radioButton","treeNavigation","pieChart","barChart","lineChart","scatterChart","horizontalChart","splitView","starRating","field","scrollHorizontal","listHorizontal","detailList","image9","imageX","skin","progressBar","line","icons","touch","popUpButton"];
-		protected static const DESKTOP_CLASSES:Array = [UITickList,UITickOneList,UITabPagesTop,UIScrollXY,UIScrollBarVertical,UIScrollBarHorizontal,UIScrollBarPanel,UIDataGrid,UIMenu,UISegmentedControl,UICheckBox,UIRadioButton,UITreeNavigation,UIPieChart,UIBarChart,UILineChart,UIScatterChart,UIHorizontalChart,UISplitView,UIStarRating,UIField,UIScrollHorizontal,UIListHorizontal,UIDetailList,UIImage9,UIImageX,UISkin,UIProgressBar,UILine,UIIcons,UITouch,UIPopUpButton];
+		protected static const DESKTOP_TOKENS:Array = ["tickList","tickOneList","tabPagesTop","scrollXY","scrollBarVertical","scrollBarHorizontal","scrollBarPanel","dataGrid","menu","segmentedControl","checkBox","radioButton","treeNavigation","pieChart","barChart","lineChart","scatterChart","horizontalChart","splitView","starRating","field","scrollHorizontal","listHorizontal","detailList","image9","imageX","skin","progressBar","line","icons","touch","popUpButton","slideOutNavigation","wheelMenu","pageTurn","fastDataGrid","scrollDataGrid","scrollDataGrids","scrollTouchGrids","screens","textSlider","arrowButton"];
+		protected static const DESKTOP_CLASSES:Array = [UITickList,UITickOneList,UITabPagesTop,UIScrollXY,UIScrollBarVertical,UIScrollBarHorizontal,UIScrollBarPanel,UIDataGrid,UIMenu,UISegmentedControl,UICheckBox,UIRadioButton,UITreeNavigation,UIPieChart,UIBarChart,UILineChart,UIScatterChart,UIHorizontalChart,UISplitView,UIStarRating,UIField,UIScrollHorizontal,UIListHorizontal,UIDetailList,UIImage9,UIImageX,UISkin,UIProgressBar,UILine,UIIcons,UITouch,UIPopUpButton,UISlideOutNavigation,UIWheelMenu,UIPageTurn,UIFastDataGrid,UIScrollDataGrid,UIScrollDataGrids,UIScrollTouchGrids,UIScreens,UITextSlider,UIArrowButton];
 		protected static const COLOUR:uint = 0x666666;
 		
 		protected static var _cursor:Cursor = null;
@@ -60,8 +61,9 @@ package com.danielfreeman.extendedMadness {
  * Create a UI layout in a resizable window
  */
 		public static function createInWindow(screen:Sprite, xml:XML):Sprite {
-			if (!_cursor)
+			if (!_cursor) {
 				activate(screen);
+			}
 			var result:Sprite = create(screen, xml, screen.stage.stageWidth, screen.stage.stageHeight);
 			if (xml.@autoResize!="false")
 				screen.stage.addEventListener(Event.RESIZE,resize);
@@ -69,7 +71,7 @@ package com.danielfreeman.extendedMadness {
 				_root.removeChild(_root.mask);
 				_root.mask = null;
 			}
-			screen.setChildIndex(_cursor,screen.numChildren-1);
+			ready(screen);
 			return result;
 		}
 
@@ -77,13 +79,21 @@ package com.danielfreeman.extendedMadness {
  * Create a UI layout with extended components
  */
 		public static function create(screen:Sprite, xml:XML, width:Number = -1, height:Number = -1):Sprite {
-			if (!_cursor)
+			if (!_cursor) {
 				activate(screen);
+			}
 			var result:Sprite = UI.create(screen, xml, width, height);
 			listListener(result, xml);
-			screen.setChildIndex(_cursor,screen.numChildren-1);
+			ready(screen);
 			return result;
-		}	
+		}
+
+/**
+ * Create a pop-up dialogue window
+ */	
+		public static function ready(screen:Sprite):void {
+			screen.setChildIndex(_cursor,screen.numChildren-1);
+		}
 
 /**
  * Create a pop-up dialogue window
@@ -105,9 +115,8 @@ package com.danielfreeman.extendedMadness {
 				var attributes:Attributes = new Attributes();
 				attributes.parse(xml);
 				result = new UIDropWindow(_windowLayer, xml, attributes);
-				result.x = x-arrowPosition - (arrowPosition==0 ? UIDropWindow.ARROW : 0) + UIDropWindow.CURVE;
-				result.y = y + UIDropWindow.ARROW + UIDropWindow.CURVE;
-				
+				result.x = x-arrowPosition - (arrowPosition==0 ? UIDropWindow.ARROW : 0) + UIDropWindow(result).curve; //UIDropWindow.CURVE;
+				result.y = y + UIDropWindow.ARROW + UIDropWindow(result).curve; //UIDropWindow.CURVE;
 			}
 			return result;
 		}
@@ -148,6 +157,16 @@ package com.danielfreeman.extendedMadness {
 		protected static function makeVisible(event:TimerEvent):void {
 			_skin.visible = true;
 			_skin = null;
+		}
+		
+		
+		public static function toTextFormat(formatXML:XML, format:TextFormat):TextFormat {
+			var textField:TextField = new TextField();
+			textField.defaultTextFormat = format;
+			var fontString:String = formatXML.toXMLString();
+			fontString = fontString.substring(fontString.indexOf(" "), fontString.length - 2);
+			textField.htmlText = "<font" + fontString + "> </font>";
+			return textField.getTextFormat();
 		}
 
 	}

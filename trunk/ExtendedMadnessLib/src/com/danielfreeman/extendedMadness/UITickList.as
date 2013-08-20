@@ -29,7 +29,7 @@ package com.danielfreeman.extendedMadness {
 	import flash.display.Sprite;
 	import flash.events.Event;
 	import com.danielfreeman.madcomponents.*;
-
+	import flash.events.MouseEvent;
 
 /**
  * The tickIndexes have changed
@@ -80,7 +80,7 @@ package com.danielfreeman.extendedMadness {
 		override protected function drawCell(position:Number, count:int):void {
 			var tick:UITick = UITick(_slider.getChildByName("tick_"+count.toString()));
 			if (tick) {
-				tick.x = _width-_attributes.paddingH-UITick.SIZE
+				tick.x = _width-_attributes.paddingH-UITick.SIZE;
 			}
 			else {
 				tick = new UITick(_slider, _width-_attributes.paddingH-UITick.SIZE, _cellTop + 2 * _attributes.paddingV + 3, _tickColour);
@@ -91,14 +91,27 @@ package com.danielfreeman.extendedMadness {
 		}
 		
 		
+		override protected function mouseUp(event:MouseEvent):void {
+			if (!_classic && _rowClick) {
+				doClick();
+			}
+			super.mouseUp(event);
+		}
+		
+		
+		protected function doClick():void {
+			var tick:UITick = UITick(_slider.getChildByName("tick_"+_pressedCell.toString()));
+			if (tick) {
+				tick.visible = !tick.visible;
+			}
+			dispatchEvent(new Event(Event.CHANGE));
+		}
+		
+		
 		override protected function pressButton():DisplayObject {
 			super.pressButton();
-			if (!_pressButton && _clickRow) {
-				var tick:UITick = UITick(_slider.getChildByName("tick_"+_pressedCell.toString()));
-				if (tick) {
-					tick.visible = !tick.visible;
-				}
-				dispatchEvent(new Event(Event.CHANGE));
+			if (_classic && !_pressButton && _clickRow) {
+				doClick();
 			}
 			return _pressButton;
 		}

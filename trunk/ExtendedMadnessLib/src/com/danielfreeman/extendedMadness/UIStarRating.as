@@ -55,6 +55,7 @@ package com.danielfreeman.extendedMadness {
 		protected var _amount:Number = 0.0;
 		protected var _backColour:uint;
 		protected var _frontColour:uint;
+		protected var _lastAmount:Number;
 		
 		
 		public function UIStarRating(screen:Sprite, xml:XML, attributes:Attributes) {
@@ -68,26 +69,54 @@ package com.danielfreeman.extendedMadness {
 				star.name=i.toString();
 				_stars.push(star);
 			}
-			addEventListener(MouseEvent.MOUSE_UP,mouseUp);
-			if (xml.@value.length()>0)
-				value = parseFloat(xml.@value[0])
+			addEventListener(MouseEvent.MOUSE_DOWN, mouseDown);
+			if (xml.@value.length()>0) {
+				value = parseFloat(xml.@value[0]);
+			}
+		}
+		
+		
+		protected function mouseDown(event:MouseEvent):void {
+			_lastAmount = _amount;
+			stage.addEventListener(MouseEvent.MOUSE_MOVE, mouseMove);
+			stage.addEventListener(MouseEvent.MOUSE_UP, mouseUp);
+		}
+		
+		
+		override public function touchCancel():void {
+			value = _lastAmount;
+			stage.removeEventListener(MouseEvent.MOUSE_MOVE, mouseMove);
+			stage.removeEventListener(MouseEvent.MOUSE_UP, mouseUp);
+		}
+		
+		
+		protected function mouseMove(event:MouseEvent):void {
+			value = Math.round(10 * mouseX / width) / 2;
 		}
 		
 		
 		protected function mouseUp(event:MouseEvent):void {
-			value=parseInt(event.target.name) + 1.0;
+			stage.removeEventListener(MouseEvent.MOUSE_MOVE, mouseMove);
+			stage.removeEventListener(MouseEvent.MOUSE_UP, mouseUp);
+			value = Math.round(10 * mouseX / width) / 2;
 			dispatchEvent(new Event(Event.CHANGE));
 		}
 		
 		
 		public function set value(valu:Number):void {
+			valu = Math.max(0,Math.min(valu, 5));
 			_amount = valu;
 			var i:int;
 			var fractional:Number=valu-Math.floor(valu);
-			for (i=0;i<Math.floor(valu);i++) Star(_stars[i]).amount=1.0;
-			for (i=Math.floor(valu)+1;i<STARS;i++) Star(_stars[i]).amount=0.0;
-			if (valu<5)
+			for (i=0;i<Math.floor(valu);i++) {
+				Star(_stars[i]).amount=1.0;
+			}
+			for (i=Math.floor(valu)+1;i<STARS;i++) {
+				Star(_stars[i]).amount=0.0;
+			}
+			if (valu<5) {
 				Star(_stars[Math.floor(valu)]).amount=fractional;
+			}
 		}
 		
 		
@@ -95,5 +124,10 @@ package com.danielfreeman.extendedMadness {
 			return _amount;
 		}
 		
+		
+		public function destructor():void {
+			stage.removeEventListener(MouseEvent.MOUSE_MOVE, mouseMove);
+			stage.removeEventListener(MouseEvent.MOUSE_UP, mouseUp);
+		}
 	}
 }

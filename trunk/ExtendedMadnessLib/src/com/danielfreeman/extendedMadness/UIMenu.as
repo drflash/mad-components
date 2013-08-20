@@ -83,11 +83,11 @@ package com.danielfreeman.extendedMadness
 				txt.scaleX=txt.scaleY=mnu.scaleX=mnu.scaleY=2.0;
 			}
 			_width = attributes.fillH ? attributes.widthH : Math.max(width+EXTRA, WIDTH);
-			drawBackground();
+			drawComponent();
 		}
 		
 		
-		protected function drawBackground():void {
+		public function drawComponent():void {
 			var matr:Matrix = new Matrix();
 			var gradient:Array = [Colour.lighten(_colour,80),_colour,Colour.darken(_colour, -32)];
 			matr.createGradientBox(_width, height, Math.PI/2, 0, 0);
