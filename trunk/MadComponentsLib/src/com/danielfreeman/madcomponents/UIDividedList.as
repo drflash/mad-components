@@ -51,13 +51,21 @@ package com.danielfreeman.madcomponents {
  *    alignV = "scroll|no scroll"
  *    highlightPressed = "true|false"
  *    autoLayout = "true|false"
+ *    headingColour = "#rrggbb"
+ *    headingTextColour = "#rrggbb"
+ *    headingShadowColour = "#rrggbb"
  * /&gt;
  * </pre>
  */	
 	public class UIDividedList extends UIGroupedList {
 		
+		protected var _headingColour:uint;
+		protected var _headingOffColour:uint;
+		
 		public function UIDividedList(screen:Sprite, xml:XML, attributes:Attributes) {
+			_headingOffColour = _headingColour = (xml.@headingColour.length() > 0) ? UI.toColourValue(xml.@headingColour) : attributes.colour;
 			super(screen, xml, attributes);
+			doLayout();
 		}
 		
 		
@@ -70,46 +78,52 @@ package com.danielfreeman.madcomponents {
  */	
 		override protected function drawHighlight():void {
 			if (_highlightPressed) {
+				_highlight.graphics.clear();
 				var groupDetails:Object = _groupPositions[_group];
-				var top:Number = groupDetails.top + _pressedCell * groupDetails.cellHeight;
-				var bottom:Number = top + groupDetails.cellHeight;
-				_highlight.graphics.beginFill(HIGHLIGHT);
-				_highlight.graphics.drawRect(_cellLeft, top, _cellWidth + 1, bottom - top);
+				var autoLayout:Boolean = _autoLayoutGroup && !_simple;
+				var top:Number = autoLayout ? _row.y - _attributes.paddingV +1 : groupDetails.top + _pressedCell * groupDetails.cellHeight;
+				var bottom:Number = top + (autoLayout ? _row.height + 2 * _attributes.paddingV - 1 : groupDetails.cellHeight);
+				_highlight.graphics.beginFill(_highlightColour);
+				_highlight.graphics.drawRect(_cellLeft, top + 1, _cellWidth + 1, bottom - top - 1);
 			}
+		}
+		
+		
+		override protected function headingChrome():void {
+			initDraw();
 		}
 		
 /**
  *  Draw a group heading
  */	
 		override protected function initDraw():void {
-			var top:Number = _cellTop - 4 * _attributes.paddingV;
+			var top:Number = _cellTop - 5 * _attributes.paddingV;
 			var matr:Matrix=new Matrix();
-			var gradient:Array = [Colour.lighten(_colour,64),_colour];
+			var headingColour:uint = (_groupPositions.length > _group ? _groupPositions[_group].visible : false) ? _headingColour : _headingOffColour;
+			var gradient:Array = [Colour.lighten(headingColour,64), headingColour];
+			var autoLayout:Boolean = (!_simple && _autoLayoutGroup);
+			super.initDraw();
+			var last:Number = _group>0 ? _groupPositions[_group-1].bottom + (autoLayout ? _attributes.paddingV : 0) : 0;
+
+			var filling:Boolean = (top-last) > 2;
 			matr.createGradientBox(_width, 4 * _attributes.paddingV, Math.PI/2, 0, top);
 			_slider.graphics.beginGradientFill(GradientType.LINEAR, gradient, [1.0,1.0], [0x00,0xff], matr);
-			_slider.graphics.drawRect(0, top, _width, 4 * _attributes.paddingH + 1);
+			_slider.graphics.drawRect(0, top, _width, 5 * _attributes.paddingV + 1);
+			if (filling) {
+				_slider.graphics.drawRect(0, last, _width, top-last);
+			}
 			_slider.graphics.beginFill(_colour);
-			_slider.graphics.drawRect(0, top, _width, 1);
+			_slider.graphics.drawRect(0, filling ? last : top, _width, 1);
 			_slider.graphics.beginFill(Colour.darken(_colour,-32));
 			_slider.graphics.drawRect(0, _cellTop, _width, 1);
-			if (_heading && _heading is String) {
-				var heading:UILabel = new UILabel(_slider, _attributes.paddingH, top+_attributes.paddingV / 2, _heading, _headingFormat); // need to save
-			}
-			_heading = null;
-		}
-		
-/**
- *  Set up the scrolling part of the list
- */	
-		override protected function createSlider(xml:XML, attributes:Attributes):void {
-			_headingFormat = WHITE;
-			super.createSlider(xml, attributes);
+		//	_gapBetweenGroups = ((autoLayout && false) ? -2 * _attributes.paddingV : -_attributes.paddingV) - 1;
+			_gapBetweenGroups = -_attributes.paddingV - 1;
 		}
 		
 /**
  *  Draw the background
  */	
-		override protected function drawBackground():void {
+		override public function drawComponent():void {
 			if (_colours && _colours.length>0) {
 				graphics.beginFill(_colours[0]);
 			}

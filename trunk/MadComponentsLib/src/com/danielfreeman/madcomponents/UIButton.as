@@ -41,7 +41,7 @@ package com.danielfreeman.madcomponents {
 /**
   * The button was clicked
  */
-	[Event( name="clicked", type="flash.events.Event" )]
+	[Event( name="buttonClicked", type="flash.events.Event" )]
 	
 
 
@@ -60,21 +60,26 @@ package com.danielfreeman.madcomponents {
  *   alt = "true|false"
  *   skin = "IMAGE_CLASS_NAME"
  *   clickable = "true|false"
+ *   curve = "NUMBER"
+ *   goTo = "ID"
+ *   transition = "TRANSITION"
  * /&gt;
  * </pre>
  */
 	
 	public class UIButton extends MadSprite {
 		
-		public static const CLICKED:String = "clicked";
+		public static const CLICKED:String = "buttonClicked";
 	
 		protected static const SHADOW_OFFSET:Number = 1.0;
-		protected static const FORMAT:TextFormat = new TextFormat("Tahoma", 17, 0xFFFFFF);
-		protected static const DARK_FORMAT:TextFormat = new TextFormat("Tahoma", 17, 0x111111);
 		protected static const CURVE:Number = 16.0;
 		protected static const SIZE_X:Number = 10.0;
 		protected static const SIZE_Y:Number = 7.0;
-		protected static const TINY_SIZE_Y:Number = 6.0;
+		protected static const TINY_SIZE_Y:Number = 7.0;
+		
+		protected const FORMAT:TextFormat = new TextFormat("Tahoma", 17, 0xFFFFFF);
+		protected const DARK_FORMAT:TextFormat = new TextFormat("Tahoma", 17, 0x111111);
+		
 		
 		protected var _format:TextFormat = FORMAT;
 		protected var _darkFormat:TextFormat = DARK_FORMAT;
@@ -95,6 +100,8 @@ package com.danielfreeman.madcomponents {
 		protected var _skinHeight:Number = -1;
 		protected var _defaultWidth:Number;
 		protected var _alt:Boolean = false;
+		protected var _goTo:String = "";
+		protected var _transition:String = "";
 
 
 		public function UIButton(screen:Sprite, xx:Number, yy:Number, text:String, colour:uint = 0x9999AA, colours:Vector.<uint> = null, tiny:Boolean = false) {
@@ -109,8 +116,9 @@ package com.danielfreeman.madcomponents {
 			_colours = colours ? colours : new <uint>[];
 			init();
 			_curve = (_colours.length>3) ? _colours[3] : CURVE;
-			if (_colours.length>4)
+			if (_colours.length>4) {
 				_colours = new <uint>[];
+			}
 			_darkFormat.color = Colour.darken(_colour,-128);
 			_format.align = _darkFormat.align = TextFormatAlign.CENTER;
 			_shadowLabel = new UILabel(this, _gap-SHADOW_OFFSET, _sizeY-SHADOW_OFFSET -1, " ", _darkFormat);
@@ -140,7 +148,7 @@ package com.danielfreeman.madcomponents {
 		
 		
 		protected function init():void {
-			if (_colours.length>3) {
+			if (_colours.length > 3) {
 				_gap=Math.max(_colours[3]/3,SIZE_X);
 			}
 		}
@@ -150,13 +158,38 @@ package com.danielfreeman.madcomponents {
 			drawButton(true);
 			_enabled=true;
 			stage.addEventListener(MouseEvent.MOUSE_UP, mouseUp);
+		//	if (clickable)
+		//		event.stopPropagation();
 		}
 		
 		
 		protected function mouseUp(event:MouseEvent):void {
 			drawButton();
-			if (_enabled && event.target== this)
+			stage.removeEventListener(MouseEvent.MOUSE_UP, mouseUp);
+			if (_enabled && event.target== this) {
+				if (_goTo != "") {
+					changePage();
+				}
 				dispatchEvent(new Event(CLICKED));
+			}
+			_enabled = false;
+		}
+		
+		
+		protected function changePage():void {
+			var level:DisplayObject = parent;
+			var found:Boolean = false;
+			while (level != stage && !found) {
+				if (level is UIPages) {
+					found = UIPages(level).goToPageId(_goTo, _transition);
+				}
+				level = level.parent;
+			}
+		}
+		
+		
+		override public function touchCancel():void {
+			drawButton();
 			stage.removeEventListener(MouseEvent.MOUSE_UP, mouseUp);
 			_enabled = false;
 		}
@@ -167,8 +200,9 @@ package com.danielfreeman.madcomponents {
 		public function set text(value:String):void {
 			if (value=="") {
 				value = " ";
-			} else if (XML(value).nodeKind() != "text") {
-				var xmlString:String = XML(value).toXMLString();
+			}
+			if (XML('<t>' + value + '</t>').hasComplexContent()) {
+			//	var xmlString:String = XML(value).toXMLString();
 				_label.htmlText = value;
 				_shadowLabel.text = "";
 			} else {
@@ -192,6 +226,20 @@ package com.danielfreeman.madcomponents {
 		public function set colour(value:uint):void {
 			_colour = value;
 			drawButton();
+		}
+		
+/**
+ * Set button curve
+ */	
+		public function set curve(value:Number):void {
+			_curve = value;
+			drawButton();
+		}
+		
+		
+		public function setGoTo(goTo:String, transition:String = ""):void {
+			_goTo = goTo;
+			_transition = transition;
 		}
 		
 		

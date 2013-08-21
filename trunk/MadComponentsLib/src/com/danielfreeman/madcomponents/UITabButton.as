@@ -39,13 +39,14 @@ package com.danielfreeman.madcomponents {
 	
 		public static const CLEAR:String="clear";
 
-		protected static const SMALL_FORMAT:TextFormat = new TextFormat("Tahoma", 12, 0xFFFFFF);
-		protected static const TAB_HEIGHT:Number = 26.0;
+		public static const TAB_HEIGHT:Number = 26.0;
 		protected static const ICON_Y:Number = 6.0;
 		protected var _state:Boolean = false;
 		protected var _screen:Sprite;
 		protected var _icon:Sprite;
 		protected var _tiny:Boolean;
+		
+		protected const SMALL_FORMAT:TextFormat = new TextFormat("Tahoma", 12, 0xFFFFFF);
 		
 		
 		public function UITabButton(screen:Sprite, xx:Number, yy:Number, text:String, colour:uint, tiny:Boolean = false) {

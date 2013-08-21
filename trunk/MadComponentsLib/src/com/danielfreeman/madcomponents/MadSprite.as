@@ -52,5 +52,9 @@ package com.danielfreeman.madcomponents
 		public function get includeInLayout():Boolean {
 			return _includeInLayout;
 		}
+		
+		public function touchCancel():void {
+			//override to implement scroll cancel
+		}
 	}
 }

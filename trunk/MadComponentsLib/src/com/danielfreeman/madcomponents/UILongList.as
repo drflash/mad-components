@@ -164,11 +164,11 @@ package com.danielfreeman.madcomponents
 			}
 		}
 
-/**xx
+/**
  *  Is this row off screen?
  */
 		protected function offScreen(cell:DisplayObject):Boolean {
-			return cell.y + cell.height < -_slider.y || cell.y + _slider.y > _attributes.height 
+			return cell.y + cell.height < -_slider.y || cell.y + _slider.y > _attributes.height;
 		}
 		
 /**

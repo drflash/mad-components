@@ -96,22 +96,33 @@ package com.danielfreeman.madcomponents {
 			}
 			
 			value = xml.@visible;
-			if (value)
+			if (value) {
 				_visible = value!="false";
+			}
 			
 			var colour:String = xml.@colour;
-			if (colour)
+			if (colour) {
 				_colour = UI.toColourValue(colour);
+			}
 			colour = xml.@scrollBarColour;
-			if (colour)
+			if (colour) {
 				_scrollBarColour = UI.toColourValue(colour);
+			}
 			colour = xml.@background;
-			if (colour)
-				_colours = UI.toColourVector(colour); 
-			if (xml.@clickable.length()>0)
+			if (colour) {
+				_colours = UI.toColourVector(colour);
+			}
+			if (xml.@clickable.length() > 0) {
 				_clickable = xml.@clickable[0].toString();
-			_alignV = xml.@alignV.length()>0 ? xml.@alignV : _alignV;
-			_alignH = xml.@alignH.length()>0 ? xml.@alignH : _alignH;
+			}
+			_alignV = (xml.@alignV.length() > 0) ? xml.@alignV : _alignV;
+			_alignH = (xml.@alignH.length() > 0) ? xml.@alignH : _alignH;
+			
+			var size:String = String(xml.@size).toUpperCase();
+			if (size.substr(-1,1) == "C") {
+				_alignH = CENTRE;
+				_alignV = CENTRE;
+			}
 			_id = xml.@id;
 		}
 		
@@ -244,8 +255,9 @@ package com.danielfreeman.madcomponents {
  * Positions a component according to its positioning attributes
  */	
 		public function position(item:DisplayObject, inhibitV:Boolean = false):void {
-			if (_id!="")
+			if (_id!="" && item.name!="+" && item.name!="-") {
 				item.name = _id;
+			}
 			switch (_alignH) {
 				case FILL:
 				case LEFT:		item.x = x;
@@ -267,13 +279,14 @@ package com.danielfreeman.madcomponents {
 					case CENTRE:	item.y = y + (height - item.height)/2;
 				}
 			}
-			if (item is MadSprite && _clickable!="")
+			if (item is MadSprite && _clickable!="") {
 				MadSprite(item).mouseEnabled = MadSprite(item).mouseChildren = MadSprite(item).clickable = _clickable == "true";
+			}
 		}
 		
 		
 		public function initPosition(item:DisplayObject):void {
-			if (_id!="")
+			if (_id!="" && item.name!="+" && item.name!="-")
 				item.name = _id;
 			item.y = y;
 		}

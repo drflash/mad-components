@@ -27,11 +27,13 @@ package com.danielfreeman.madcomponents {
 
 	import flash.display.DisplayObject;
 	import flash.display.Sprite;
+	import flash.display.Shape;
 	import flash.events.Event;
 	import flash.events.TimerEvent;
 	import flash.geom.Rectangle;
 	import flash.utils.Timer;
 	
+		
 /**
  * A page has changed
  */
@@ -63,8 +65,9 @@ package com.danielfreeman.madcomponents {
  * /&gt;
  * </pre>
  */
-	public class UIPages extends Sprite implements IContainerUI {
+	public class UIPages extends MadMasking implements IContainerUI {
 	
+		public static const STARTING:String = "changeStarting";  
 		public static const COMPLETE:String = "changeComplete";
 		
 		public static const SLIDE_LEFT:String = "left";
@@ -74,7 +77,7 @@ package com.danielfreeman.madcomponents {
 		public static const DRAWER_UP:String = "drawerUp";
 		public static const DRAWER_DOWN:String = "drawerDown";
 		
-		public static var DRAWER_HEIGHT:Number = 250;
+		public static var DRAWER_HEIGHT:Number = 220;
 		public static var SLIDE_INTERVAL:int = 40;
 		public static var STEPS:int = 8;
 		
@@ -89,8 +92,8 @@ package com.danielfreeman.madcomponents {
 		protected var _slideY:Number = 0;
 		protected var _slideTimer:Timer = new Timer(SLIDE_INTERVAL, STEPS);
 		
-		protected var _xml:XML;
-		protected var _attributes:Attributes;
+	//	protected var _xml:XML;
+	//	protected var _attributes:Attributes;
 		protected var _drawer:UIForm;
 		protected var _transition:String;
 		protected var _lastPageIndex:int;
@@ -99,12 +102,17 @@ package com.danielfreeman.madcomponents {
 		protected var _easing:Boolean = false;
 		protected var _easeIn:Number = 0.5;
 		protected var _easeOut:Number = 0.5;
+		protected var _shade:Shape = new Shape();
+		protected var _savePageIndex:int;
+		protected var _drawerHeight:Number = DRAWER_HEIGHT;
 		
 		
 		public function UIPages(screen:Sprite, xml:XML, attributes:Attributes) {
 			
-			_xml = xml;
+		//	_xml = xml;
+			super(xml, attributes);
 			_attributes = attributes.copy(xml);
+			
 			UI.drawBackgroundColour(_attributes.backgroundColours, _attributes.width, _attributes.y + _attributes.height, this);
 			_attributes.x=0;_attributes.y=0;
 
@@ -119,7 +127,7 @@ package com.danielfreeman.madcomponents {
 			for each (var child0:XML in children) if (child0.nodeKind() != "text") {
 				if (child0.localName()!="data") {
 					var childstr:String = child0.toXMLString();
-					var child:XML = XML('<page lazyRender="'+(xml.@lazyRender)+'">'+childstr+'</page>');
+					var child:XML = XML('<page lazyRender="'+(xml.@lazyRender)+'" recycle="'+(xml.@recycle)+'">'+childstr+'</page>');
 					var newAttributes:Attributes = _attributes.copy();
 					newAttributes.parse(child0);
 					if (child0.@border!="false") {
@@ -127,19 +135,39 @@ package com.danielfreeman.madcomponents {
 					}
 					var page:* = new UI.FormClass(this, child, newAttributes);
 					_attributes.position(page);
+					page.name = "+";
 					page.visible = false;
 					_pages.push(page);
 				}
 			}
+			setInitialPage();
+			_slideTimer.addEventListener(TimerEvent.TIMER, slide);
+			
+		//	if (xml.@mask.length()>0 && xml.@mask[0]!="false")
+		//		scrollRect = new Rectangle(0,0,_attributes.width, _attributes.height);	
+			
+			startMasking();
+			drawShade();
+		}
+		
+/**
+ *  Set the height of the sliding drawer
+ */
+		public function set drawerHeight(value:Number):void {
+			if (_shade.parent) {
+				_thisPage.y = _attributes.height  + _attributes.y - value;
+			}
+			_drawerHeight = value;
+			drawShade();
+		}
+		
+		
+		protected function setInitialPage():void {
 			if (_pages.length>0) {
 				_thisPage = _pages[0];
 				_page = 0;
 				_thisPage.visible = true;
 			}
-			_slideTimer.addEventListener(TimerEvent.TIMER, slide);
-			
-			if (xml.@mask.length()>0 && xml.@mask[0]!="false")
-				scrollRect = new Rectangle(0,0,_attributes.width, _attributes.height);	
 		}
 		
 /**
@@ -175,7 +203,7 @@ package com.danielfreeman.madcomponents {
 			for (var i:int = 0; i<children.length(); i++) {
 				var childXML:XML = children[i];
 				if (childXML.localName()!="data" && childXML.nodeKind() != "text") {
-					var child:XML = XML("<page>"+childXML.toXMLString()+"</page>");
+				//	var child:XML = XML("<page>"+childXML.toXMLString()+"</page>");
 					var newAttributes:Attributes = _attributes.copy();
 					newAttributes.parse(childXML);
 					if (childXML.@border!="false") {
@@ -184,8 +212,7 @@ package com.danielfreeman.madcomponents {
 					var page:IContainerUI = _pages[idx];
 					page.layout(newAttributes);
 					if (page == _drawer) {
-						_drawer.y = _attributes.height  + _attributes.x - DRAWER_HEIGHT;
-						drawShade();
+						_drawer.y = _attributes.height  + _attributes.y - _drawerHeight;
 					}
 					else {
 						_attributes.position(DisplayObject(page));
@@ -193,8 +220,11 @@ package com.danielfreeman.madcomponents {
 					idx++;
 				}
 			}
-			if (scrollRect)
-				scrollRect = new Rectangle(0,0,attributes.width,attributes.height);
+		//	if (scrollRect)
+		//		scrollRect = new Rectangle(0,0,attributes.width,attributes.height);
+		
+			refreshMasking();
+			drawShade();
 		}
 		
 /**
@@ -251,6 +281,7 @@ package com.danielfreeman.madcomponents {
  *  Page transition
  */	
 		protected function doTransition(transition:String):void {
+			stage.dispatchEvent(new Event(STARTING));
 			_transition = transition;
 			_thisPage.x = _attributes.x;
 			_thisPage.y = _attributes.y;
@@ -267,11 +298,13 @@ package com.danielfreeman.madcomponents {
 				case SLIDE_DOWN:	startSlide((_attributes.height + _attributes.y)/STEPS);
 									break;
 				case DRAWER_UP:		_drawer = UIForm(_thisPage);
-									drawShade();
 									_thisPage.y = _attributes.height  + _attributes.y;
-									startSlide(-DRAWER_HEIGHT/STEPS);
+									startSlide(-_drawerHeight/STEPS);
 									break;
-				case DRAWER_DOWN:	_thisPage.y = _attributes.height  + _attributes.y - DRAWER_HEIGHT;
+				case DRAWER_DOWN:	_thisPage.y = _attributes.height  + _attributes.y - _drawerHeight;
+									if (_shade.parent) {
+										_shade.parent.removeChild(_shade);
+									}
 									startSlide((_attributes.height + _attributes.y)/STEPS);
 									_drawer = null;
 									break;
@@ -286,20 +319,20 @@ package com.danielfreeman.madcomponents {
  *  Create a translucent shade for sliding drawer
  */	
 		protected function drawShade():void {
-			_drawer.graphics.clear();
-			_drawer.graphics.beginFill(0x000000,DIM_ALPHA);
-			var height:Number = _attributes.height - DRAWER_HEIGHT;
-			_drawer.graphics.drawRect(0, -height, _attributes.width, height);
-			_drawer.graphics.beginFill(0x000000);
-			_drawer.graphics.drawRect(0, -4, _attributes.width, 4);
+			_shade.graphics.clear();
+			_shade.graphics.beginFill(0x000000,DIM_ALPHA);
+			var height:Number = _attributes.height - _drawerHeight;
+			_shade.graphics.drawRect(0, -height, _attributes.width, height);
+			_shade.graphics.beginFill(0x000000);
+			_shade.graphics.drawRect(0, -4, _attributes.width, 4);
 		}
 		
 /**
  *  Start slide transition
  */	
 		protected function startSlide(slideY:Number = 0):void {
-			_thisPage.cacheAsBitmap=true;
-			_lastPage.cacheAsBitmap=true;
+		//	_thisPage.cacheAsBitmap=true;
+		//	_lastPage.cacheAsBitmap=true;
 			_slideX = (_attributes.x - _thisPage.x)/STEPS;
 			_slideY = (slideY==0) ? (_attributes.y - _thisPage.y)/STEPS : slideY;
 			_slideTimer.reset();
@@ -315,8 +348,18 @@ package com.danielfreeman.madcomponents {
 		}
 		
 		
+		protected function upTransition(transition:String):Boolean {
+			return transition==SLIDE_UP || transition==DRAWER_UP;
+		}
+		
+		
+		protected function downTransition(transition:String):Boolean {
+			return transition==SLIDE_DOWN || transition==DRAWER_DOWN;
+		}
+		
+		
 		protected function bezier(p0:Number,p1:Number,p2:Number,t:Number):Number {
-			return t*t*p0+2*t*(1-t)*p1+(1-t)*(1-t)*p2
+			return t*t*p0+2*t*(1-t)*p1+(1-t)*(1-t)*p2;
 		}
 		
 		
@@ -337,6 +380,38 @@ package com.danielfreeman.madcomponents {
 			}
 		}
 		
+		
+		protected function slideComplete():void {
+			_slideTimer.stop();
+		//	_thisPage.cacheAsBitmap=false;
+			if (_transition == SLIDE_DOWN || _transition == DRAWER_DOWN) {
+				_thisPage.visible = false;
+			}
+			else if (_transition != SLIDE_UP && _transition != DRAWER_UP) {
+				removeLastPage();
+				_thisPage.x = 0;
+			}
+			
+			if (upTransition(_transition)) {
+				_savePageIndex = _lastPageIndex;
+			}
+			else if (downTransition(_transition)) {
+				_page = _savePageIndex;
+			}
+			else if (!isSimpleTransition(_transition)) {
+				_page = _lastPageIndex;
+			}
+			
+			if (_layoutAfterSlide) {
+				layout(_layoutAfterSlide);
+				_layoutAfterSlide = null;
+			}
+			if (_transition == DRAWER_UP) {
+				Sprite(_thisPage).addChild(_shade);
+			}
+			dispatchEvent(new Event(COMPLETE));
+		}
+		
 /**
  *  Animate slide transition
  */	
@@ -346,25 +421,7 @@ package com.danielfreeman.madcomponents {
 			_thisPage.x += delta(t, _slideX);
 			_thisPage.y += delta(t, _slideY);
 			if (Timer(event.currentTarget).currentCount == STEPS) {
-				_slideTimer.stop();
-				_thisPage.cacheAsBitmap=false;
-				if (_transition == SLIDE_DOWN || _transition == DRAWER_DOWN) {
-					_thisPage.visible = false;
-				}
-				else if (_transition != SLIDE_UP && _transition != DRAWER_UP) {
-					removeLastPage();
-					_thisPage.x = 0;
-				}
-				
-				if (!isSimpleTransition(_transition)) {
-					_page = _lastPageIndex;
-				}
-				
-				if (_layoutAfterSlide) {
-					layout(_layoutAfterSlide);
-					_layoutAfterSlide = null;
-				}
-				dispatchEvent(new Event(COMPLETE));
+				slideComplete();
 			}
 		}
 		
@@ -391,6 +448,19 @@ package com.danielfreeman.madcomponents {
 		}
 		
 /**
+ *  Change page.  (Specify page with id name).
+ */	
+		public function goToPageId(id:String, transition:String = ""):Boolean {
+			for (var i:int = 0; i < _pages.length; i++) {
+				if (Sprite(_pages[i]).getChildAt(0).name == id) {
+					goToPage(i, transition);
+					return true;
+				}
+			}
+			return false;
+		}
+		
+/**
  *  Page number
  */	
 		public function get pageNumber():int {
@@ -400,6 +470,11 @@ package com.danielfreeman.madcomponents {
 		
 		public function set pageNumber(value:int):void {
 			goToPage(value);
+		}
+		
+		
+		public function get pageUnder():int {
+			return _savePageIndex;
 		}
 		
 /**
@@ -427,6 +502,10 @@ package com.danielfreeman.madcomponents {
 				}
 			}
 			return null;
+		}
+		
+		
+		public function drawComponent():void {	
 		}
 		
 		

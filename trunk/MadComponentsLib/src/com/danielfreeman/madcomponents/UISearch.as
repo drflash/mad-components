@@ -46,6 +46,7 @@ package com.danielfreeman.madcomponents {
  *   prompt = "TEXT"
  *   promptColour = "#rrggbb"
  *   field = "IDENTIFIER"
+ *   clearButton = "true|false"
  * /&gt;
  * </pre>
  */
@@ -58,17 +59,23 @@ package com.danielfreeman.madcomponents {
 		protected static const RADIUS:int = 9;
 		protected static const LINE:int = 6;
 		protected static const RIGHT_GAP:int = 45;
+		
 
 		protected var _attributes:Attributes;
 		protected var _over:Shape;
 		protected var _iconColour:uint;
+		protected var _clear:Sprite;
+		
 
 		public function UISearch(screen:Sprite, xml:XML, attributes:Attributes) {
 			_attributes = attributes;
 			addChild(_over = new Shape());
 			_iconColour = attributes.backgroundColours.length>2 ? attributes.backgroundColours[2] : ICON_COLOUR;
-			super(screen,attributes.x,attributes.y,xml.toString(),attributes.backgroundColours);
-			this.setChildIndex(_label,0);
+			super(screen,attributes.x,attributes.y,xml.toString(),attributes.backgroundColours, xml.@alt == "true");
+			this.setChildIndex(_label, 0);
+			if (xml.@clearButton == "true") {
+				makeClearButton();
+			}
 		}
 		
 /**
@@ -79,14 +86,15 @@ package com.danielfreeman.madcomponents {
 			var colour:uint = _colours.length>0 ? _colours[0] : _attributes.colour;
 			matr.createGradientBox(_attributes.width, HEIGHT, Math.PI/2, 0, 0);
 			_over.graphics.clear();
-			_over.graphics.beginGradientFill(GradientType.LINEAR, [Colour.lighten(colour,64),Colour.darken(colour)], [1.0,1.0], [0x00,0xff], matr);
-			_over.graphics.drawRect(0, 0, _attributes.width, HEIGHT);
-			_over.graphics.drawRoundRect(GAP, (HEIGHT-WINDOW_HEIGHT)/2, _attributes.width-2*GAP, WINDOW_HEIGHT, WINDOW_HEIGHT);
-			_over.graphics.beginFill(Colour.lighten(colour,64));
-			_over.graphics.drawRect(0,0, _attributes.width, 1);
-			_over.graphics.beginFill(Colour.darken(colour,-64));
-			_over.graphics.drawRect(0,HEIGHT, _attributes.width, 2);
-			
+			if (!_alt) {
+				_over.graphics.beginGradientFill(GradientType.LINEAR, [Colour.lighten(colour,64),Colour.darken(colour)], [1.0,1.0], [0x00,0xff], matr);
+				_over.graphics.drawRect(0, 0, _attributes.width, HEIGHT);
+				_over.graphics.drawRoundRect(GAP, (HEIGHT-WINDOW_HEIGHT)/2, _attributes.width-2*GAP, WINDOW_HEIGHT, WINDOW_HEIGHT);
+				_over.graphics.beginFill(Colour.lighten(colour,64));
+				_over.graphics.drawRect(0,0, _attributes.width, 1);
+				_over.graphics.beginFill(Colour.darken(colour,-64));
+				_over.graphics.drawRect(0,HEIGHT, _attributes.width, 2);
+			}
 			_over.graphics.beginFill(0,0);
 			_over.graphics.lineStyle(2,_iconColour);
 			_over.graphics.drawCircle(GAP+WINDOW_HEIGHT/2,HEIGHT/2-1,6);
@@ -100,8 +108,8 @@ package com.danielfreeman.madcomponents {
 			graphics.drawRoundRect(GAP+1, (HEIGHT-WINDOW_HEIGHT)/2+1, _attributes.width-2*GAP, WINDOW_HEIGHT, WINDOW_HEIGHT);
 			
 			_label.x = GAP+WINDOW_HEIGHT;
-			_label.fixwidth = _attributes.width-RIGHT_GAP;
-			_label.y = (HEIGHT-WINDOW_HEIGHT)/2+1;
+			_label.fixwidth = _attributes.width-RIGHT_GAP - (_alt ? GAP : 0);
+			_label.y = (HEIGHT-WINDOW_HEIGHT)/2 + 1.0;
 		}
 		
 /**
@@ -109,7 +117,35 @@ package com.danielfreeman.madcomponents {
  */
 		override public function set fixwidth(value:Number):void {
 			_attributes.width = value;
+			if (_clear) {
+				_clear.x = _attributes.width-GAP - WINDOW_HEIGHT/2;
+			}
 			drawOutline();
+		}
+		
+		
+		protected function clearLabel(event:MouseEvent):void {
+			_label.text = "";
+		//	_clear.visible = false;
+			super.focus();
+		}
+		
+		
+		protected function makeClearButton():void {
+			addChild(_clear = new Sprite());
+			_clear.graphics.beginFill(0,0);
+			_clear.graphics.drawCircle(0,0,2 * RADIUS);
+			_clear.graphics.beginFill(_iconColour);
+			_clear.graphics.drawCircle(0,0,RADIUS);
+			_clear.graphics.beginFill(_colours.length>1 ? _colours[1] : _attributes.colour);
+			_clear.graphics.drawRect(-1,-LINE,2,LINE-1);
+			_clear.graphics.drawRect(-1,1,2,LINE-1);
+			_clear.graphics.drawRect(-LINE,-1,2*LINE,2);
+			_clear.rotation = 45;
+			_clear.y = HEIGHT/2;
+		//	_clear.visible = false;
+		_clear.x = _attributes.width-GAP - WINDOW_HEIGHT/2;
+			_clear.addEventListener(MouseEvent.MOUSE_UP, clearLabel);
 		}
 
 	}
