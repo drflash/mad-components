@@ -52,15 +52,19 @@ package com.danielfreeman.madcomponents {
 	public class UITabPages extends UIPages {
 		
 		protected static const PADDING:Number = 1.0;
+		protected static const TWEAK:Number = 6.0;
 		
 		protected var _buttonBar:Sprite = null;
 		protected var _buttons:Array = [];
 		protected var _mouseDownTarget:UITabButton = null;
 		protected var _colour:uint;
+		protected var _alt:Boolean;
+		protected var _pagesAttributes:Attributes;
 		
 
 		public function UITabPages(screen:Sprite, xml:XML, attributes:Attributes) {
 			_colour = attributes.colour;
+			_alt = xml.@alt == "true";
 			initialiseButtonBar(xml,attributes);
 			super(screen, xml, attributes);
 			_buttonBar.addEventListener(MouseEvent.MOUSE_DOWN, mouseDown);			
@@ -71,9 +75,10 @@ package com.danielfreeman.madcomponents {
 		
 		protected function initialiseButtonBar(xml:XML, attributes:Attributes):void {
 			addChild(_buttonBar=new Sprite());
-			makeTabButtons(attributes, xml.children().length(), xml.@alt == "true");
-			attributes.height -= _buttonBar.height;
-			_buttonBar.y = attributes.y + attributes.height+2;
+			makeTabButtons(attributes, xml.children().length(), _alt);
+			_pagesAttributes = attributes.copy();
+			_pagesAttributes.height -= (_buttonBar.height - (_alt ? 1 : TWEAK));
+			_buttonBar.y = _pagesAttributes.height;
 		}
 		
 		
@@ -110,9 +115,10 @@ package com.danielfreeman.madcomponents {
  *  Rearrange the layout to new screen dimensions
  */	
 		override public function layout(attributes:Attributes):void {
-			attributes.height -= _buttonBar.height;
-			_buttonBar.y = attributes.y + attributes.height + 2;
-			superLayout(attributes);
+			_pagesAttributes = attributes.copy();
+			_pagesAttributes.height -= _buttonBar.height - (_alt ? 1 : TWEAK);
+			_buttonBar.y = _pagesAttributes.height;
+			superLayout(_pagesAttributes);
 			var buttonWidth:Number = attributes.width / _buttonBar.numChildren;
 			for (var i:int=0; i<_buttonBar.numChildren; i++) {
 				var button:UITabButton = UITabButton(_buttonBar.getChildAt(i));
@@ -120,6 +126,12 @@ package com.danielfreeman.madcomponents {
 				button.fixwidth = buttonWidth;
 			}
 			drawTabButtonBackground();
+			_attributes = attributes;
+		}
+		
+		
+		public function doLayout():void {
+			layout(_attributes);
 		}
 		
 /**
@@ -128,7 +140,7 @@ package com.danielfreeman.madcomponents {
 		override public function attachPages(pages:Array, alt:Boolean = false):void {
 			super.attachPages(pages, alt);
 			makeTabButtons(_attributes, pages.length, alt);
-			_buttonBar.y = attributes.y + attributes.height+2;
+			_buttonBar.y = attributes.height + (alt ? 1 : TWEAK);
 		}
 		
 		
@@ -179,6 +191,11 @@ package com.danielfreeman.madcomponents {
 			_buttonBar.graphics.clear();
 			_buttonBar.graphics.beginGradientFill(GradientType.LINEAR, gradient, [1.0,1.0,1.0], [0x00,0x80,0xff], matr);
 			_buttonBar.graphics.drawRect(0, -PADDING, _buttonBar.width, _buttonBar.height + PADDING);
+		}
+		
+		
+		public function button(index:int):UITabButton {
+			return UITabButton(_buttons[index]);
 		}
 		
 		

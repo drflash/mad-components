@@ -29,6 +29,7 @@ package com.danielfreeman.madcomponents {
 	import flash.display.Sprite;
 	import flash.events.MouseEvent;
 	import flash.events.TimerEvent;
+		import flash.events.Event;
 	
 /**
  *  MadComponents view flipper container
@@ -61,6 +62,7 @@ package com.danielfreeman.madcomponents {
 	
 		protected var _pages:Array = new Array();
 		protected var _page:int = 0;
+		protected var _lastPage:int = -1;
 	
 		public function UIViewFlipper(screen:Sprite, xml:XML, attributes:Attributes) {
 			var newAttributes:Attributes = attributes.copy();
@@ -77,27 +79,33 @@ package com.danielfreeman.madcomponents {
 			var attributes:Attributes = attributes0.copy();
 			attributes.x=0;
 			attributes.y=0;
+			_attributes = attributes;
 			_width = attributes.width;
 			_height = attributes.height;
-			drawBackground();
+			drawComponent();
 			var children:XMLList = xml.children();
 			for (var i:int = 0; i<children.length(); i++) {
 				var pageXML:XML = children[i];
-				var child:XML = XML("<page>"+pageXML.toXMLString()+"</page>");
+			//	var child:XML = XML("<page>"+pageXML.toXMLString()+"</page>");
 				var newAttributes:Attributes = attributes.copy();
 				var shiftX:Number = i*_width;
-				if (pageXML.@border!="false")
+				if (pageXML.@border!="false") {
 					addPadding(pageXML.localName(),newAttributes);
+				}
 				var page:UIForm = UIForm(_slider.getChildAt(i));
 				attributes.position(page);
 				page.layout(newAttributes);
 				page.x+=shiftX;
 			}
 			_maximumSlide = (_pages.length -1) * _width;
-			if (_maximumSlide < 0)
+			if (_maximumSlide < 0) {
 				_maximumSlide = 0;
+			}
 			_slider.x = - _page * _width;
+			_lastPage = -1;
 			showScrollBar();
+			_scrollBarVisible = false;
+			refreshMasking();
 		}
 		
 /**
@@ -134,8 +142,9 @@ package com.danielfreeman.madcomponents {
 				_pages.push(page);
 			}
 			_maximumSlide = (_pages.length -1) * _width;
-			if (_maximumSlide < 0)
+			if (_maximumSlide < 0) {
 				_maximumSlide = 0;
+			}
 		}
 		
 /**
@@ -156,23 +165,22 @@ package com.danielfreeman.madcomponents {
 /**
  *  Show the page indicator
  */	
-		override protected function showScrollBar():void {
-			if (!_scrollBarLayer) return;
-			_scrollBarLayer.graphics.clear();
+		override protected function drawScrollBar():void {
 			_page = Math.round( - _slider.x / _width);
-			if (_scrollBarColour!=Attributes.TRANSPARENT) {
+			if (_page == _lastPage || !_scrollBarLayer) return;
+			_scrollBarLayer.graphics.clear();
+			if (_scrollBarColour != Attributes.TRANSPARENT) {
 				var barPosition:Number = (_width - SPACING * _pages.length) / 2;
 				_scrollBarLayer.graphics.lineStyle(1.0, _scrollBarColour);
 				for (var i:int = 0; i<_pages.length; i++) {
-					var fill:Number = i == _page ? 1.0 : 0.0;
-					_scrollBarLayer.graphics.beginFill(_scrollBarColour, fill);
-					_scrollBarLayer.graphics.drawCircle(barPosition + i * SPACING + SPACING/2, _height - SCROLLBAR_GAP, RADIUS + fill);
+					if (i == _page) {
+						_scrollBarLayer.graphics.beginFill(_scrollBarColour);
+					}
+					_scrollBarLayer.graphics.drawCircle(barPosition + i * SPACING + SPACING/2, _height - SCROLLBAR_GAP, RADIUS);
+					_scrollBarLayer.graphics.endFill();
 				}
 			}
-		}
-		
-		
-		override protected function hideScrollBar():void {
+			_lastPage = _page;
 		}
 		
 		
@@ -184,13 +192,13 @@ package com.danielfreeman.madcomponents {
 			if (_distance > THRESHOLD) {
 				showScrollBar();
 			}
-			else if (_touchTimer.currentCount == MAXIMUM_TICKS) {
+			else if (_classic && _touchTimer.currentCount == MAXIMUM_TICKS) {
 				pressButton();
-				if (_pressButton) {
-					_touchTimer.stop();
-					_dragTimer.reset();
-					_dragTimer.start();
-				}
+			//	if (_pressButton) {
+			//		_touchTimer.stop();
+			//		_dragTimer.reset();
+			//		_dragTimer.start();
+			//	}
 			}
 		}
 		
@@ -279,6 +287,14 @@ package com.danielfreeman.madcomponents {
 		
 		public function get pageNumber():int {
 			return _page;
+		}
+		
+		
+		override public function hideScrollBar():void {
+			dispatchEvent(new Event(STOPPED));
+			if (_scrollBarVisible) {
+				_scrollBarVisible = false;
+			}
 		}
 		
 	}

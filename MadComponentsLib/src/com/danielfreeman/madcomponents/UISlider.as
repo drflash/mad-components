@@ -49,18 +49,21 @@ package com.danielfreeman.madcomponents
  *   clickable = "true|false"
  *   width = "NUMBER"
  *   alt = "true|false"
+ *   value = "NUMBER"
+ *   curve = "NUMBER"
  * /&gt;
  * </pre>
  */
 	public class UISlider extends MadSprite
 	{
 		protected static const WIDTH:Number = 120.0;
-		protected static const RADIUS:Number = 12.0;
-		protected static const ALT_RADIUS:Number = 8.0;
+		protected static const RADIUS:Number = 14.0;
+		protected static const ALT_RADIUS:Number = 10.0;
 		protected static const KNOB_COLOUR:uint = 0xDDDDDD;
 		protected static const HIGHLIGHT_COLOUR:uint = 0x3333CC;
 		protected static const SLIDER_COLOUR:uint = 0xAAAAAA;
 		protected static const SLIDER_HEIGHT:Number = 8.0;
+		protected static const EXTRA:Number = 30.0;
 		
 		protected var _knob:Sprite;
 		protected var _sliderColour:uint;
@@ -70,6 +73,8 @@ package com.danielfreeman.madcomponents
 		protected var _value:Number = 0.5;
 		protected var _radius:Number;
 		protected var _sliderHeight:Number = SLIDER_HEIGHT;
+		protected var _curve:Number = SLIDER_HEIGHT;
+		protected var _lastPosition:Number;
 		
 		
 		public function UISlider(screen:Sprite, xx:Number, yy:Number, colours:Vector.<uint> = null, alt:Boolean = false) {
@@ -78,35 +83,50 @@ package com.danielfreeman.madcomponents
 			
 			_radius = alt ? ALT_RADIUS : RADIUS;
 
-			if (!colours)
+			if (!colours) {
 				colours = new <uint>[];
+			}
 			
-			_highlightColour = (colours.length>0) ? colours[0] : HIGHLIGHT_COLOUR
+			_highlightColour = (colours.length>0) ? colours[0] : HIGHLIGHT_COLOUR;
 			_knobColour = (colours.length>1) ? colours[1] : KNOB_COLOUR;
 			_sliderColour = (colours.length>2) ? colours[2] : SLIDER_COLOUR;
 
-			drawKnob();
+			createKnob();
 			value = _value;
-			_knob.addEventListener(MouseEvent.MOUSE_DOWN, mouseDown);
+			addEventListener(MouseEvent.MOUSE_DOWN, mouseDown);
 			_knob.buttonMode = _knob.useHandCursor = true;
 		}
-		
-		
+
+
 		protected function mouseDown(event:MouseEvent):void {
+			_lastPosition = _knob.x;
+			changePosition(mouseX);
 			stage.addEventListener(MouseEvent.MOUSE_MOVE, mouseMove);
 			stage.addEventListener(MouseEvent.MOUSE_UP, mouseUp);
 		}
 		
 		
-		protected function mouseMove(event:MouseEvent):void {
-			_knob.x = mouseX;
+		protected function changePosition(value:Number):void {
+			_knob.x = value;
 			if (_knob.x < _radius)
 				_knob.x = _radius;
 			else if (_knob.x > _width - _radius)
 				_knob.x = _width - _radius;
 			_value = (_knob.x - _radius) / (_width - 2*_radius);
-			drawSlider();
+			drawComponent();
 			dispatchEvent(new Event(Event.CHANGE));
+		}
+		
+		
+		protected function mouseMove(event:MouseEvent):void {
+			changePosition(mouseX);
+		}
+		
+		
+		override public function touchCancel():void {
+			changePosition(_lastPosition);
+			stage.removeEventListener(MouseEvent.MOUSE_MOVE, mouseMove);
+			stage.removeEventListener(MouseEvent.MOUSE_UP, mouseUp);
 		}
 		
 		
@@ -117,8 +137,13 @@ package com.danielfreeman.madcomponents
 		}
 		
 		
-		protected function drawKnob():void {
+		protected function createKnob():void {
 			addChild(_knob=new Sprite());
+			drawKnob();
+		}
+		
+		
+		protected function drawKnob():void {
 			var matr:Matrix = new Matrix();
 			matr.createGradientBox(_radius*2, _radius*2, Math.PI/2, 0, -_radius);
 			_knob.graphics.beginFill(Colour.darken(_knobColour));
@@ -132,14 +157,17 @@ package com.danielfreeman.madcomponents
 		}
 		
 		
-		protected function drawSlider():void {
+		public function drawComponent():void {
 			var matr:Matrix = new Matrix();
 			matr.createGradientBox(_width, _sliderHeight, Math.PI/2, 0, _radius - _sliderHeight/2);
 			graphics.clear();
+			graphics.beginFill(0,0);
+			graphics.drawRect(-EXTRA, 0, _width + 2 * EXTRA, 2 * _radius);
 			graphics.beginGradientFill(GradientType.LINEAR, [Colour.darken(_sliderColour,-64),_sliderColour,Colour.lighten(_sliderColour,64),Colour.lighten(_sliderColour,64)], [1.0,1.0,1.0,1.0], [0x00,0x00,0x80,0xff], matr);
-			graphics.drawRoundRect(0, _radius - _sliderHeight/2, _width, _sliderHeight, _sliderHeight);
+			graphics.drawRoundRect(0, _radius - _sliderHeight/2, _width, _sliderHeight, _curve);
 			graphics.beginGradientFill(GradientType.LINEAR, [Colour.darken(_highlightColour,-64),_highlightColour,Colour.lighten(_highlightColour,64),Colour.lighten(_highlightColour,64)], [1.0,1.0,1.0,1.0], [0x00,0x00,0x80,0xff], matr);
-			graphics.drawRoundRect(0, _radius - _sliderHeight/2, _width * _value, _sliderHeight, _sliderHeight);
+		//	graphics.drawRoundRect(0, _radius - _sliderHeight/2, _width * _value, _sliderHeight, _sliderHeight);
+			graphics.drawRoundRect(0, _radius - _sliderHeight/2, _knob.x + _curve/2 , _sliderHeight, _curve);
 		}
 		
 /**
@@ -155,7 +183,7 @@ package com.danielfreeman.madcomponents
 		public function set value(valuu:Number):void {
 			_value = valuu;
 			_knob.x = _radius + valuu * (_width - 2*_radius);
-			drawSlider();
+			drawComponent();
 		}
 		
 /**
@@ -171,6 +199,11 @@ package com.danielfreeman.madcomponents
 		public function set fixwidth(valuu:Number):void {
 			_width = valuu;
 			value = _value;
+		}
+		
+		
+		override public function get width():Number {
+			return _width;
 		}
 		
 		

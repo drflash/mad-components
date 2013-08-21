@@ -62,13 +62,13 @@ package com.danielfreeman.madcomponents {
  *   alt = "true|false"
  *   prompt = "TEXT"
  *   promptColour = "#rrggbb"
+ *   password = "true|false"
  * /&gt;
  * </pre>
  */
 	public class UIInput extends Sprite {
 	
 		protected static const SHADOW_OFFSET:Number = 1.0;
-		protected static const FORMAT:TextFormat = new TextFormat("_sans", 16, 0x333333);
 		protected static const WIDTH:Number = 80.0;
 		protected static const CURVE:Number = 16.0;
 		protected static const SIZE_X:Number = 10.0;
@@ -77,6 +77,8 @@ package com.danielfreeman.madcomponents {
 		protected static const COLOUR:uint = 0x333339;
 		protected static const SHADOW_COLOUR:uint = 0xAAAAAC;
 		protected static const BACKGROUND:uint = 0xF0F0F0;
+		
+		protected const FORMAT:TextFormat = new TextFormat("_sans", 16, 0x333333);
 		
 		protected var _format:TextFormat = FORMAT;
 		protected var _label:*; //UIBlueText;
@@ -136,6 +138,7 @@ package com.danielfreeman.madcomponents {
 		protected function mouseDown(event:MouseEvent):void {
 			drawOutline(true);
 			stage.addEventListener(MouseEvent.MOUSE_UP, mouseUp);
+			event.stopPropagation();
 		}
 		
 		
@@ -148,6 +151,9 @@ package com.danielfreeman.madcomponents {
  *  Set text of input
  */
 		public function set text(value:String):void {
+			if (value == "") {
+				text = "x";
+			}
 			_label.text = value;
 			drawOutline();
 		}

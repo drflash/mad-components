@@ -82,6 +82,8 @@ package com.danielfreeman.madcomponents {
 		protected var _amfData:Object = null;
 		protected var _action:String="";
 		protected var _filter:String="";
+		protected var _request:URLRequest = null;
+		
 		
 		
 		public function Model(parent:Sprite,xml:XML,sendXml:XML = null) {
@@ -120,6 +122,13 @@ package com.danielfreeman.madcomponents {
 						sendURL("",sendXml.@action[0]);
 				}
 			}
+		}
+		
+/**
+ * An accessor for the Component associated with this model.  Useful for event handlers.
+ */
+		public function get page():Sprite {
+			return _parent;
 		}
 		
 /**
@@ -165,7 +174,9 @@ package com.danielfreeman.madcomponents {
 				_url = url;
 			addEventListener(Event.COMPLETE, isLoaded);
 			if (!request)
-				request = new URLRequest(url);
+				request = _request ? _request : new URLRequest(url);
+			else
+				_request = request;
 			try {
 				load(request);
 			} catch (error:Error) {
@@ -184,7 +195,9 @@ package com.danielfreeman.madcomponents {
 				_url = url;
 			addEventListener(Event.COMPLETE, jsonIsLoaded);
 			if (!request)
-				request = new URLRequest(url);
+				request = _request ? _request : new URLRequest(url);
+			else
+				_request = request;
 			try {
 				load(request);
 			} catch (error:Error) {
@@ -208,6 +221,12 @@ package com.danielfreeman.madcomponents {
 			else
 				netConnection.call(service!="" ? service : _service, new Responder(loadAMFList, errorFn));
 			_action="loadAMF";
+		}
+		
+		
+		protected function removeNetConnectionListeners(netConnection:NetConnection):void {
+			netConnection.removeEventListener(NetStatusEvent.NET_STATUS, errorFn);
+			netConnection.removeEventListener(SecurityErrorEvent.SECURITY_ERROR, errorFn);
 		}
 
 /**
@@ -314,14 +333,17 @@ package com.danielfreeman.madcomponents {
 				dispatchEvent(event);
 			else
 				dispatchEvent(new Event(ERROR));
+			removeNetConnectionListeners(event.target);
 		}
 		
 /**
  * XML data loaded handler
  */	
 		protected function isLoaded(event:Event):void {
-			dataXML = XML(htmlDecode(data));
+			var stringData:String = String(data).replace(/xmlns=[^\"]*\"[^\"]*\"/g, "");
+			dataXML = XML(htmlDecode(stringData));
 			dispatchEvent(new Event(LOADED));
+			removeEventListener(Event.COMPLETE, isLoaded);
 		}
 		
 /**
@@ -330,6 +352,7 @@ package com.danielfreeman.madcomponents {
 		protected function jsonIsLoaded(event:Event):void {
 			dataAMF = com.danielfreeman.madcomponents.TinyJSON.parse(data);
 			dispatchEvent(new Event(LOADED));
+			removeEventListener(Event.COMPLETE, jsonIsLoaded);
 		}
 		
 /**
@@ -338,9 +361,9 @@ package com.danielfreeman.madcomponents {
 		public function set dataXML(xml:XML):void {
 			var schema:XML = _schema;
 				xml=xmlPath(xml,_path);
-				if (_path!="" && _schema!=null)
+				if (_path!="" && _schema!=null) {
 					schema = _schema.parent();
-
+				}
 			if (_parent is UIList) {
 				var arrayCollectionList:Array = listData(xml,schema);
 				UIList(_parent).data = arrayCollectionList;
@@ -413,8 +436,13 @@ package com.danielfreeman.madcomponents {
  * Convert XML branch to an array of objects
  */	
 		protected function listObject(item:XML, childSchema:XMLList, result:Object = null):Object {
+			
 			if (!result) {
 				result = new Object();
+				if (item.hasSimpleContent() && childSchema.length() == 1 && childSchema.nodeKind() == "text") {
+					result[childSchema.toString()] = item.toString();
+					return result;
+				}
 			}
 			
 			for each (var child:XML in childSchema) if (child.nodeKind() != "text") { //?
@@ -439,8 +467,13 @@ package com.danielfreeman.madcomponents {
 		protected function xmlToObject(xml:XML):Object {
 			var result:Object = {};
 			var children:XMLList = xml.children();
-			for each (var child:XML in children) if (child.nodeKind() != "text") {
-				result[child.localName().toString()] = child.hasSimpleContent() ? child.toString() : xmlToObject(child);
+			if (children.length()==1 && children.nodeKind() == "text") {
+				result[xml.localName().toString()] = children.toString();
+			}
+			else {
+				for each (var child:XML in children) if (child.nodeKind() != "text") {
+					result[child.localName().toString()] = child.hasSimpleContent() ? child.toString() : xmlToObject(child);
+				}
 			}
 			return result;
 		}
@@ -472,7 +505,7 @@ package com.danielfreeman.madcomponents {
 		protected function substitute(data:XML):void {
 			for each(var item:XML in data.children()) {
 				if (item.hasSimpleContent()) {
-					var obj:*=UIForm(_parent).findViewById(item.toString());
+					var obj:Object=UIForm(_parent).findViewById(item.toString());
 					if (obj) {
 						if (_sendBy=="xml")
 							item.replace(0,obj.text);

@@ -38,6 +38,7 @@ package com.danielfreeman.madcomponents {
 		function get pages():Array;
 		function get attributes():Attributes;
 		function get xml():XML;
+		function drawComponent():void;
 		function destructor():void;
 	}
 }

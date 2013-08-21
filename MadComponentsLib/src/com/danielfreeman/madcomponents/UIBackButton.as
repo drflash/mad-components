@@ -34,12 +34,16 @@ package com.danielfreeman.madcomponents {
 /**
  * Arrow button, as used in the navigation bar (for both forward and back buttons)
  */	
-	public class UIBackButton extends Sprite {
+	public class UIBackButton extends MadSprite {
 		
 		protected static const FORMAT:TextFormat = new TextFormat("Arial",14,0xFFFFFF);
-		protected static const HEIGHT:Number = 32.0;
+		protected static const HEIGHT:Number = 33.0;
 		protected static const ARROW:Number = 10.0;
 		protected static const CURVE:Number = 5.0;
+		protected static const X:Number = 12.0;
+		protected static const Y:Number = 6;
+		
+		public static const ADJUSTMENT:Number = 0.0;
 		
 		protected var _label:UILabel;
 		protected var _colour:uint;
@@ -50,7 +54,7 @@ package com.danielfreeman.madcomponents {
 			screen.addChild(this);
 			_forward = forward;
 			_colour = colour;
-			_label = new UILabel(this, 12, 6, "", FORMAT);
+			_label = new UILabel(this, X, Y, "", FORMAT);
 			x=xx;y=yy;
 			this.text = text;
 			buttonMode = useHandCursor = true;
@@ -91,15 +95,17 @@ package com.danielfreeman.madcomponents {
 		protected function synthButton(width:int):void {
 			graphics.clear();
 			var matr:Matrix=new Matrix();
+			var buttonWidth:Number = Math.round(width/8)*8+2;
 			matr.createGradientBox(width, HEIGHT, Math.PI/2, 0, 0);
-			graphics.beginGradientFill(GradientType.LINEAR, [Colour.darken(_colour,-100),Colour.lighten(_colour)], [1.0,1.0], [0x00,0xff], matr);
-			
-			buttonShape(0,0,Math.floor(width/10)*10,_height);
+		//	graphics.beginGradientFill(GradientType.LINEAR, [Colour.darken(_colour,-32),Colour.lighten(_colour, 0)], [1.0,1.0], [0x00,0xff], matr);
+			graphics.beginFill(Colour.darken(_colour));
+			var x:Number = _forward ? 0.0 : 2.0;
+			buttonShape(x, 0.0, buttonWidth, _height);
 
 			var gradient:Array = [Colour.lighten(_colour),Colour.darken(_colour),Colour.darken(_colour)];
-			
 			graphics.beginGradientFill(GradientType.LINEAR, gradient, [1.0,1.0,1.0], [0x00,0x80,0xff], matr);
-			buttonShape(0.0,1.0,Math.floor(width/10)*10-1,_height-1.5);
+			buttonShape(x, 1.0, buttonWidth-1, _height-1.5);
+			_label.x = ( buttonWidth - _label.width ) / 2 + ( _forward ? -3 : 4 );
 		}
 		
 /**
@@ -108,19 +114,15 @@ package com.danielfreeman.madcomponents {
 		protected function buttonShape(x:Number,y:Number,buttonWidth:Number,height:Number):void {
 			var quotient:Number = (ARROW-CURVE)/ARROW;
 			var s:Number = _forward ? -1.0 : 1.0;
-			if (_forward) {
+			var adjustment:Number = _forward ? 0.0 : ADJUSTMENT;
+			if (_forward)
 				x+= buttonWidth;
-				_label.x = 7.0;// + (buttonWidth-width)/2;
-			}
-			else {
-				_label.x = 12.0;// + (buttonWidth-width)/2;
-			}
 			graphics.moveTo(x,_height/2);
 			graphics.lineTo(x+s*quotient*ARROW,y+(1-quotient)*_height/2);
 			graphics.curveTo(x+s*ARROW,y,x+s*(ARROW+CURVE),y);
 			graphics.lineTo(x+s*(buttonWidth-CURVE),y);
 			graphics.curveTo(x+s*buttonWidth,y,x+s*buttonWidth,y+CURVE);
-			graphics.lineTo(x+s*buttonWidth,y+height-CURVE);
+			graphics.lineTo(x+s*buttonWidth+adjustment,y+height-CURVE);
 			graphics.curveTo(x+s*buttonWidth,y+height,x+s*(buttonWidth-CURVE),y+height);
 			graphics.lineTo(x+s*(ARROW+CURVE),y+height);
 			graphics.curveTo(x+s*ARROW,y+height,x+s*quotient*ARROW,y+height-(1-quotient)*_height/2);

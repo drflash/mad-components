@@ -54,7 +54,7 @@ package com.danielfreeman.madcomponents {
 		public static var PADDING:Number = 10.0;
 		public static var ModelClass:Class = Model;
 		public static var FormClass:Class = UIForm;
-		public static var SIMULATION_RESIZE:Boolean = false;
+		public static var SIMULATION_RESIZE:Boolean = true;
 		
 		protected static const DPI:uint = 160;
 		protected static const DIM_ALPHA:Number = 0.4;
@@ -64,6 +64,8 @@ package com.danielfreeman.madcomponents {
 		
 		protected static const TOKENS:Array = ["scrollVertical","viewFlipper","list","groupedList","dividedList","pages","tabPages","navigation","navigationPages","longList"];
 		protected static const CLASSES:Array = [UIScrollVertical,UIViewFlipper,UIList,UIGroupedList,UIDividedList,UIPages,UITabPages,UINavigation,UINavigationPages,UILongList];
+
+		protected static const DEBUG_SCALE:Number = -1.0;
 
 		protected static var _tokens:Array = TOKENS;
 		protected static var _classes:Array = CLASSES;
@@ -81,7 +83,10 @@ package com.danielfreeman.madcomponents {
 		protected static var _maskIt:Boolean = true;
 		protected static var _stageColours:Vector.<uint> = null;
 		protected static var _dpi:uint = DPI;
+		protected static var _width:Number;		
+		protected static var _height:Number;	
 		
+
 /**
  * Create the user interface
  */	
@@ -91,7 +96,6 @@ package com.danielfreeman.madcomponents {
 			
 			screen.stage.stageFocusRect = false;
 			_simulated = width<0 && (Capabilities.playerType == "PlugIn" || Capabilities.playerType == "ActiveX" || Capabilities.playerType == "External");
-			
 			if (xml.@clickColour.length()>0)
 				UIList.HIGHLIGHT = toColourValue(xml.@clickColour[0].toString());
 			
@@ -116,14 +120,10 @@ package com.danielfreeman.madcomponents {
 			_xml = xml;
 			_screen = screen;
 			
-			if (SIMULATION_RESIZE || xml.@autoResize!="false" && !_simulated)
-				screen.stage.addEventListener(Event.RESIZE, resize);
-			
-			screen.addChild(_windowLayer = new Sprite());
-			_windowLayer.scaleX = _windowLayer.scaleY = _scale;
-			
-			_activityIndicator = new UIActivity(screen, width/2, height/2);
-	
+			if (SIMULATION_RESIZE || xml.@autoResize!="false" && !_simulated) {
+				screen.stage.addEventListener(Event.RESIZE, resize, false, 0, true);
+			}
+				
 			_root = Sprite(containers(screen,xml,_attributes));
 			if (!_root && (xml.@border.length()==0 || xml.@border[0]=="true")) {
 				_attributes.x=PADDING;
@@ -147,13 +147,19 @@ package com.danielfreeman.madcomponents {
 			if (!SIMULATION_RESIZE && _maskIt && _simulated) {
 				var mask:Sprite = new Sprite();
 				mask.graphics.beginFill(0);
-				mask.graphics.drawRect(0,0,WIDTH,HEIGHT);
+				mask.graphics.drawRect(0, 0, WIDTH, HEIGHT);
 				_root.mask = mask;
 				_root.addChild(mask);
 			}
+
+			screen.addChild(_windowLayer = new Sprite());
+			_windowLayer.scaleX = _windowLayer.scaleY = _scale;
 			
-			screen.setChildIndex(_windowLayer, screen.numChildren-1);
-			
+			_activityIndicator = new UIActivity(screen, width/2, height/2);
+			if (_simulated) {
+				resize(new Event("dummy"));
+			}
+
 			return _root;
 		}
 		
@@ -168,7 +174,7 @@ package com.danielfreeman.madcomponents {
 /**
  * Filter an XML String, removing odd unprintable characters.  (Unprintable characters often result from copy and paste of XML data)
  */
-		public static function clean(xml:String):XML {
+		public static function clean(xml:XML):XML {
 			return XML(xml.replace(/[^\x{20}-\x{7E}]/g,""));
 		}
 		
@@ -176,6 +182,7 @@ package com.danielfreeman.madcomponents {
  * Convert #rrggbb string to uint
  */
 		public static function toColourValue(value:String):uint {
+			value.replace(/ /gi,"");
 			if (value.substr(0,1)=="#")
 				return parseInt(value.substr(1,6),16);
 			else if (value.substr(0,1)>="0" && value.substr(0,1)<="9")
@@ -188,6 +195,7 @@ package com.danielfreeman.madcomponents {
  * Convert a comma seperated list of #rrggbb string colour values to a uint vector
  */
 		public static function toColourVector(value:String):Vector.<uint> {
+			value.replace(/ /gi,"");
 			var splitValues:Array = value.split(",");
 			var result:Vector.<uint> = new Vector.<uint>;
 			for each (var colour:String in splitValues) {
@@ -265,6 +273,11 @@ package com.danielfreeman.madcomponents {
 		public static function redraw():Sprite {
 			return create(_screen, FormClass(_root).xml);
 		}
+		
+		
+		public static function get attributes():Attributes {
+			return _attributes;
+		}
 
 /**
  * Handler for orientation change
@@ -278,6 +291,7 @@ package com.danielfreeman.madcomponents {
  * Rearrange the UI for a new screen size
  */	
 		public static function layout(width:Number = -1, height:Number = -1):void {
+			_width = width; _height = height;
 			_attributes = newAttributes(width, height);
 			_attributes.parse(_xml);
 			var container:Boolean = isContainer(_xml.localName());
@@ -285,26 +299,35 @@ package com.danielfreeman.madcomponents {
 				IContainerUI(_root).layout(_attributes);
 			}
 			if (!container && (_xml.@border.length()==0 || _xml.@border[0]=="true")) {
-					_attributes.x=PADDING;
-					_attributes.y=PADDING;
-					_attributes.width-=2*PADDING;
-					_attributes.height-=2*PADDING;
-					_attributes.hasBorder = true;
+				_attributes.x=PADDING;
+				_attributes.y=PADDING;
+				_attributes.width-=2*PADDING;
+				_attributes.height-=2*PADDING;
+				_attributes.hasBorder = true;
 			}
 			if (!container) {
 				FormClass(_root).layout(_attributes);
 			}
-			if (_popUps > 0) {
+			if (!_root.mouseEnabled) {
 				dimUI();
 			}
-			if (_stageColours)
-				drawBackgroundColour(_stageColours,width,height);
+			drawStageBackground();
 			centrePopUps();
+		}
+		
+		
+		public static function drawStageBackground():void {
+			drawBackgroundColour(_attributes.backgroundColours, _width, _height);
 		}
 		
 
 		protected static function newAttributes(width:Number, height:Number):Attributes {
-			if (_autoScale && Capabilities.screenDPI > _dpi) {
+			if (DEBUG_SCALE > 1.0) {
+				_scale = DEBUG_SCALE;
+				width/=_scale;
+				height/=_scale;
+			}
+			else if (_autoScale && Capabilities.screenDPI > _dpi) {
 				_scale = Math.round(4 *Capabilities.screenDPI / _dpi) / 4;
 				width/=_scale;
 				height/=_scale;
@@ -325,11 +348,18 @@ package com.danielfreeman.madcomponents {
 /**
  * Create a pop-up dialogue window
  */	
-		public static function createPopUp(xml:XML, width:Number = -1, height:Number = -1, curve:Number = -1):UIWindow {
-			var window:UIWindow = new UIWindow(_windowLayer, xml, new Attributes(0, 0, width, height), curve);
+		public static function createPopUp(xml:XML, width:Number = -1, height:Number = -1, curve:Number = 10.0, centre:Boolean = true):UIWindow {
+			if (width<0) {
+				width = 0.8 * _attributes.width;
+			}
+			if (height<0) {
+				height = 0.8 * _attributes.height;
+			}
+			var window:UIWindow = new UIWindow(_windowLayer, xml, new Attributes(0, 0, width, height), curve, centre);
 			window.x = _root.x + _attributes.x + (_attributes.width - width) / 2;
 			window.y = _root.y + _attributes.y + (_attributes.height - height) / 2;
-			showPopUp(window);
+			_popUps++;
+			dimUI();
 			return window;
 		}
 		
@@ -337,9 +367,11 @@ package com.danielfreeman.madcomponents {
  * Remove and dispose of the pop-up dialogue window
  */	
 		public static function removePopUp(window:UIWindow):void {
-			hidePopUp(window);
-			window.destructor();
-			_windowLayer.removeChild(window);
+			if (_windowLayer.contains(window)) {
+				hidePopUp(window);
+				window.destructor();
+				_windowLayer.removeChild(window);
+			}
 		}
 		
 /**
@@ -369,6 +401,7 @@ package com.danielfreeman.madcomponents {
  */	
 		public static function showActivityIndicator():void {
 			_activityIndicator.visible = true;
+		//	_screen.setChildIndex(_activityIndicator, _screen.numChildren-1);
 		}
 		
 /**
@@ -384,15 +417,24 @@ package com.danielfreeman.madcomponents {
 		public static function get windowLayer():Sprite {
 			return _windowLayer;
 		}
-		
+	
+/**
+ * This is the layer in which the UI is created
+ */	
+		public static function get uiLayer():Sprite {
+			return _root;
+		}
+			
 /**
  * Reposition all pop-ups to the centre of the screen
  */	
 		public static function centrePopUps():void {
 			for (var i:int = 0; i<_windowLayer.numChildren;i++) {
-				var window:UIWindow = UIWindow(_windowLayer.getChildAt(i));
-				window.x = _attributes.x + (_attributes.width - window.width) / 2 + UIWindow.CURVE;
-				window.y = _attributes.y + (_attributes.height - window.height) / 2  + UIWindow.CURVE;
+				var window:DisplayObject = _windowLayer.getChildAt(i);
+				if (window is UIWindow && UIWindow(window).centred) {
+					window.x = _attributes.x + (_attributes.width - UIWindow(window).attributes.width) / 2;
+					window.y = _attributes.y + (_attributes.height - UIWindow(window).attributes.height) / 2;
+				}
 			}
 			_activityIndicator.x = _scale*(_attributes.x + _attributes.width/2);
 			_activityIndicator.y = _scale*(_attributes.y + _attributes.height/2);
@@ -404,7 +446,7 @@ package com.danielfreeman.madcomponents {
 		public static function dimUI():void {
 			_root.mouseEnabled = _root.mouseChildren = false;
 			_windowLayer.graphics.clear();
-			_windowLayer.graphics.beginFill(0x000000,DIM_ALPHA);
+			_windowLayer.graphics.beginFill(0x000000, DIM_ALPHA);
 			_windowLayer.graphics.drawRect(0, 0, _screen.stage.stageWidth, _screen.stage.stageHeight);
 		}
 		
@@ -421,11 +463,15 @@ package com.danielfreeman.madcomponents {
  */	
 		public static function clear(item:Sprite = null):void {
 			if (!item) item = _root;
-			for (var i:int = 0; i<item.numChildren;i++) {
+			for (var i:int = item.numChildren-1; i>=0; i--) {
 				var child:DisplayObject = DisplayObject(item.getChildAt(i));
-				if (child is IContainerUI)
-					IContainerUI(child).destructor();
-				item.removeChild(child);
+				if (child.hasOwnProperty("destructor")) {
+					Object(child).destructor();
+				}
+				item.removeChildAt(i);
+			}
+			if (item==_root && _root) {
+				_screen.removeChild(_root);
 			}
 		}
 	}

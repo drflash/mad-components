@@ -69,11 +69,13 @@ package com.danielfreeman.madcomponents {
 		protected static const OFF_COLOUR:uint = 0x333333;
 		protected static const CURVE:Number = 8.0;
 		protected static const ALT_CURVE:Number = 32.0;
-		protected static const FORMAT_ON:TextFormat = new TextFormat("Tahoma",15, 0xFFFFFF);
-		protected static const FORMAT_OFF:TextFormat = new TextFormat("Tahoma",15, 0xFFFFFF);
-		protected static const THRESHOLD:Number = 4.0;
+		protected static const THRESHOLD:Number = 10.0;
 		protected static const EXTRA:Number = 30.0;
 		
+		protected const FORMAT_ON:TextFormat = new TextFormat("Tahoma",15, 0xFFFFFF);
+		protected const FORMAT_OFF:TextFormat = new TextFormat("Tahoma",15, 0xFFFFFF);
+		
+		protected var _layer:Sprite;
 		protected var _button:Sprite;
 		protected var _over:Shape;
 		protected var _colour:uint;
@@ -91,6 +93,7 @@ package com.danielfreeman.madcomponents {
 		protected var _outlineColour:uint = OUTLINE;
 		protected var _curve:Number;
 		protected var _extra:Number = 0;
+		protected var _lastPosition:Number;
 		
 	
 		public function UISwitch(screen:Sprite, xx:Number, yy:Number, colour:uint = 0xCC6600, onText:String = "ON", offText:String = "OFF", colours:Vector.<uint> = null, alt:Boolean = false) {
@@ -122,7 +125,7 @@ package com.danielfreeman.madcomponents {
 			var mask:Sprite = new Sprite();
 			mask.graphics.beginFill(0);
 			mask.graphics.drawRoundRect(0, 0, WIDTH, HEIGHT, _curve);
-			addChild(this.mask=mask);
+			_layer.addChild(_layer.mask=mask);
 			buttonMode = useHandCursor = true;
 		}
 		
@@ -159,9 +162,13 @@ package com.danielfreeman.madcomponents {
  *  Create the switch
  */	
 		protected function initialiseButton(onText:String, offText:String):void {
-			addChild(_button=new Sprite());
-			addChild(_over=new Shape());
+			addChild(_layer = new Sprite());
+			_layer.addChild(_button = new Sprite());
+			addChild(_over = new Shape());
 			_over.graphics.clear();
+			_over.graphics.beginFill(0,0);
+			_over.graphics.drawRect(-EXTRA, 0, WIDTH + 2 * EXTRA, HEIGHT);
+			_over.graphics.endFill();
 			_over.graphics.lineStyle(2,OUTLINE);
 			_over.graphics.drawRoundRect(0, 0, WIDTH, HEIGHT, _curve);
 			drawButton();
@@ -170,13 +177,14 @@ package com.danielfreeman.madcomponents {
 			_onLabel.x = (WIDTH-BUTTON_WIDTH - _onLabel.width) / 2 -WIDTH+BUTTON_WIDTH;
 			_button.addChild(_offLabel=new UILabel(this, WIDTH-BUTTON_WIDTH, 1, offText, _formatOff));
 			_offLabel.x = BUTTON_WIDTH + (WIDTH-BUTTON_WIDTH - _offLabel.width) / 2 -_extra;
-			_onLabel.y = _offLabel.y = ( HEIGHT - _onLabel.height) / 2 - 1;
+			_onLabel.y = _offLabel.y = ( HEIGHT - _onLabel.height) / 2;// - 1;
 		}
 		
 /**
  *  Draw the sliding part of the switch
  */	
 		protected function drawButton(state:Boolean = false):void {
+
 
 			_button.graphics.clear();
 			var matr:Matrix=new Matrix();
@@ -198,16 +206,26 @@ package com.danielfreeman.madcomponents {
 			_button.graphics.beginGradientFill(GradientType.LINEAR, buttonGradient, [1.0,1.0,1.0], [0x00,0x80,0xff], matr);
 			_button.graphics.drawRoundRect(1, 1, BUTTON_WIDTH - 2 -_curve/4 +2, HEIGHT - 2, _curve);
 			
-			_button.cacheAsBitmap = true;
+		//	_button.cacheAsBitmap = true;
 		}
 		
 		
 		protected function mouseDown(event:MouseEvent):void {
+			_lastPosition = _button.x;
 			stage.addEventListener(MouseEvent.MOUSE_MOVE, mouseMove);
 			stage.addEventListener(MouseEvent.MOUSE_UP, mouseUp);
 			_start = mouseX - _button.x;
 			_delta = 0;
 			drawButton(true);
+		//	event.stopPropagation();
+		}
+		
+		
+		override public function touchCancel():void {
+			_button.x = _lastPosition;
+			drawButton(false);
+			stage.removeEventListener(MouseEvent.MOUSE_MOVE, mouseMove);
+			stage.removeEventListener(MouseEvent.MOUSE_UP, mouseUp);
 		}
 		
 		
@@ -230,7 +248,7 @@ package com.danielfreeman.madcomponents {
 				_move = _state ? -MOVE_X : MOVE_X;
 			else
 				_move = (_button.x < (WIDTH-BUTTON_WIDTH+_extra) / 2) ? -MOVE_X : MOVE_X;
-			if (event.target==_button || event.target==this ||_delta>0) {
+			if (mouseX > 0 && mouseX < WIDTH && mouseY > 0 && mouseY < HEIGHT || _delta>0) {
 				_timer.reset();
 				_timer.start();
 			}
@@ -264,6 +282,14 @@ package com.danielfreeman.madcomponents {
 		protected function stop():void {
 			_timer.stop();
 			dispatchEvent(new Event(Event.CHANGE));
+		}
+		
+		
+		public function destructor():void {
+			removeEventListener(MouseEvent.MOUSE_DOWN, mouseDown);
+			stage.removeEventListener(MouseEvent.MOUSE_MOVE, mouseMove);
+			stage.removeEventListener(MouseEvent.MOUSE_UP, mouseUp);
+			_timer.removeEventListener(TimerEvent.TIMER, slide);
 		}
 	}
 }

@@ -90,5 +90,10 @@ package com.danielfreeman.madcomponents {
 			rotate = value;
 			super.visible = value;
 		}
+		
+		
+		public function destructor():void {
+			timer.removeEventListener(TimerEvent.TIMER,rotateHandler);
+		}
 	}
 }
