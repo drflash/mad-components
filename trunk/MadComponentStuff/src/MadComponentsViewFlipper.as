@@ -60,7 +60,7 @@ package
 				</group>
 				<columns widths="50%,256,50%">
 					<image/>															
-					<viewFlipper scrollBarColour="#FFFFFF">
+					<viewFlipper scrollBarColour={Attributes.TRANSPARENT}>
 						<image>256,192,{getQualifiedClassName(BUDDHA)}</image>
 						<image>256,192,{getQualifiedClassName(DRAGON)}</image>
 						<image>256,192,{getQualifiedClassName(FACES)}</image>

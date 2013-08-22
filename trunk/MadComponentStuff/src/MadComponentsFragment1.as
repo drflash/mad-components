@@ -74,7 +74,7 @@ package {
 		protected static const NAVIGATOR:XML =
 
 			<pages mask="true">
-				<navigation id="nav" title="lists" background="#FFFFFF" colour="#666677" autoTitle="label">
+				<navigation id="nav" autoResize="false" title="lists" background="#FFFFFF" colour="#666677" autoTitle="label">
 					{LIST1}
 					{LIST2}
 				</navigation>

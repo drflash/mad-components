@@ -90,8 +90,9 @@ package
 		
 		protected function navigationChange(event:Event):void {
 			var index:int = _uiNavigation.index;
-			if (index >= DETAIL_ARRAY.length)
+			if (index >= DETAIL_ARRAY.length) {
 				index = DETAIL_ARRAY.length - 1;
+			}
 			_detailPage.data = DETAIL_ARRAY[index];
 		}
 	}

@@ -23,6 +23,10 @@
  * <p>Redistributions of files must retain the above copyright notice.</p>
  */
 
+//
+//  NOTE THAT TWITTER HAVE CHANGED THEIR API.  THIS EXAMPLE DOESN'T WORK - BUT THE APPROACH IS STILL VALID FOR JSON DATA.
+//
+
 package
 {
 	import com.danielfreeman.madcomponents.*;
@@ -40,7 +44,7 @@ package
 		protected static const TRENDS_VIEW:XML =
 			
 			<list id="trendsView" pullDownRefresh="true" pullDownColour="#666666">
-				<model url="http://api.twitter.com/1/trends/daily.json" parse="trends.." action="loadJSON">
+				<model url="http://api.twitter.com/1/trends.json" parse="trends.." action="loadJSON">
 					<name>label</name>
 					<query/>
 				</model>
