@@ -74,6 +74,10 @@ package renderer
 		}
 		
 		
+		public function drawComponent():void {
+		}
+		
+		
 		public function get pages():Array {
 			return [this];
 		}
