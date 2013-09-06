@@ -315,8 +315,8 @@ package com.danielfreeman.madcomponents
 					_pressedCell = oldPressedCell;
 				}
 		}
-		
-		
+
+
 		override protected function mouseUp(event:MouseEvent):void {
 			super.mouseUp(event);
 			if (_jogable && !_classic && _distance < THRESHOLD) {

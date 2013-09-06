@@ -119,7 +119,7 @@ package com.danielfreeman.madcomponents {
 			if (_colours.length>4) {
 				_colours = new <uint>[];
 			}
-			_darkFormat.color = Colour.darken(_colour,-128);
+			_darkFormat.color = (Colour.power(_colour) > 0.5) ? Colour.darken(_colour) : Colour.darken(_colour,-128);
 			_format.align = _darkFormat.align = TextFormatAlign.CENTER;
 			_shadowLabel = new UILabel(this, _gap-SHADOW_OFFSET, _sizeY-SHADOW_OFFSET -1, " ", _darkFormat);
 			_label = new UILabel(this, _gap, _sizeY-1, " ", _format);
@@ -204,7 +204,8 @@ package com.danielfreeman.madcomponents {
 			if (XML('<t>' + value + '</t>').hasComplexContent()) {
 			//	var xmlString:String = XML(value).toXMLString();
 				_label.htmlText = value;
-				_shadowLabel.text = "";
+				_shadowLabel.htmlText = value;
+				_shadowLabel.setTextFormat(new TextFormat(null, null, _darkFormat.color));
 			} else {
 				_label.text = value;
 				_shadowLabel.text = value;
@@ -225,6 +226,7 @@ package com.danielfreeman.madcomponents {
  */	
 		public function set colour(value:uint):void {
 			_colour = value;
+			_darkFormat.color = (Colour.power(_colour) > 0.5) ? Colour.darken(_colour) : Colour.darken(_colour,-128);
 			drawButton();
 		}
 		

@@ -82,10 +82,10 @@ package com.danielfreeman.madcomponents {
 		public function parse(xml:XML):void {
 			var value:* = xml.@gapV;
 			if (value)
-				_paddingV = (isNaN(value) || value==undefined) ? GAP : value;
+				_paddingV = (isNaN(value) || value==undefined) ? GAP : parseFloat(value);
 			value = xml.@gapH;
 			if (value)
-				_paddingH = (isNaN(value) || value==undefined) ? GAP : value;
+				_paddingH = (isNaN(value) || value==undefined) ? GAP : parseFloat(value);
 			
 			if ((value = xml.@width).length() > 0) {
 				_width = parseInt(value);
