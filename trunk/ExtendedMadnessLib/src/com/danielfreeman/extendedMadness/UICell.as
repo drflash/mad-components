@@ -13,8 +13,11 @@ package com.danielfreeman.extendedMadness {
 	
 	public class UICell extends UILabel {
 		
+		protected const FORMAT:TextFormat = new TextFormat('Arial', 13, 0x000066, true);
+		
 		public function UICell(screen:Sprite, xx:int, yy:int, txt:String = "", wdth:Number = 0, format:TextFormat=null, multiLine:Boolean = false, borderColour:uint = 0x666666) {
 			super(screen, xx, yy, txt, format);
+			format = format ? format : FORMAT;
 			border = true;
 			borderColor = borderColour;
 			multiline = wordWrap = multiLine;

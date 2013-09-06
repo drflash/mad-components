@@ -44,14 +44,22 @@ package com.danielfreeman.extendedMadness
 		protected var _arrowPosition:Number;
 
 		public function UIDropWindow(screen:Sprite, xml:XML, attributes:Attributes=null) {
-			_arrowPosition = xml.@arrowPosition.length()>0 ? parseFloat(xml.@arrowPosition) : 0;
+			_arrowPosition = (xml.@arrowPosition.length() > 0) ? parseFloat(xml.@arrowPosition) : 0;
 			super(screen, xml, attributes, (xml.@curve.length() > 0) ? parseFloat(xml.@curve) : -1, false);
+			mask = null;
 		}
 		
 		
 		override public function layout(attributes:Attributes):void {
 			super.layout(attributes);
 			drawBackground(attributes.backgroundColours);
+		}
+		
+		
+		public function set arrowPosition(value:Number):void {
+			value = (-value > _attributes.width - _curve) ? _curve - _attributes.width : value;
+			_arrowPosition = value;
+			drawBackground(_attributes.backgroundColours);
 		}
 		
 		
@@ -92,21 +100,28 @@ package com.danielfreeman.extendedMadness
 			
 			graphics.moveTo(_attributes.x - _curve, _attributes.y);
 			
-			if (_arrowPosition==0) {
+			if (_arrowPosition == 0) {
 				graphics.lineTo(_attributes.x - _curve + ARROW, _attributes.y - _curve - ARROW);
 				graphics.lineTo(_attributes.x - _curve + 2 * ARROW, _attributes.y - _curve);
 			}
 			else {
 				graphics.curveTo(_attributes.x - _curve, _attributes.y - _curve, _attributes.x, _attributes.y - _curve);
-				graphics.lineTo(_arrowPosition + _attributes.x - _curve - ARROW, _attributes.y - _curve);
-				graphics.lineTo(_arrowPosition + _attributes.x - _curve, _attributes.y - _curve - ARROW);
-				graphics.lineTo(_arrowPosition + _attributes.x - _curve + ARROW, _attributes.y - _curve);
+				if (_arrowPosition > 0) {
+					graphics.lineTo(_arrowPosition + _attributes.x - _curve - ARROW, _attributes.y - _curve);
+					graphics.lineTo(_arrowPosition + _attributes.x - _curve, _attributes.y - _curve - ARROW);
+					graphics.lineTo(_arrowPosition + _attributes.x - _curve + ARROW, _attributes.y - _curve);
+				}
 			}
 			
 			graphics.lineTo(_attributes.x + _attributes.width, _attributes.y - _curve);
 			graphics.curveTo(_attributes.x + _attributes.width + _curve, _attributes.y - _curve, _attributes.x + _attributes.width + _curve, _attributes.y);
 			graphics.lineTo(_attributes.x + _attributes.width + _curve, _attributes.y + _attributes.height);
 			graphics.curveTo(_attributes.x + _attributes.width + _curve, _attributes.y + _attributes.height + _curve, _attributes.x + _attributes.width, _attributes.y + _attributes.height + _curve);
+			if (_arrowPosition < 0) {
+				graphics.lineTo(-_arrowPosition + _attributes.x - _curve + ARROW, _attributes.y + _attributes.height + _curve);
+				graphics.lineTo(-_arrowPosition + _attributes.x - _curve, _attributes.y + _attributes.height + _curve + ARROW);
+				graphics.lineTo(-_arrowPosition + _attributes.x - _curve - ARROW, _attributes.y + _attributes.height + _curve);
+			}
 			graphics.lineTo(_attributes.x, _attributes.y + _attributes.height + _curve);
 			graphics.curveTo(_attributes.x - _curve, _attributes.y + _attributes.height + _curve, _attributes.x - _curve, _attributes.y + _attributes.height);
 			graphics.lineTo(_attributes.x - _curve, _attributes.y);

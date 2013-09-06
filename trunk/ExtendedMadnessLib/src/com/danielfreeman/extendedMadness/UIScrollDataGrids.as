@@ -465,6 +465,8 @@ package com.danielfreeman.extendedMadness {
 		
 		
 		override public function doLayout():void {
+			_delta = 0;
+			_deltaX = 0;
 			var y:Number = sliderY;
 			sliceAllTables();
 			layout(_attributes);
