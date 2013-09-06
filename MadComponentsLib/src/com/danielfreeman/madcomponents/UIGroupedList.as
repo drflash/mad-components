@@ -153,6 +153,7 @@ package com.danielfreeman.madcomponents {
  */
 		override public function set data(value:Object):void {
 			_saveGroup = _group;
+			_saveIndex = -1;
 			_filteredData = noHeadings(_data = value as Array);
 			initDrawGroups();
 			clearCellGroups();

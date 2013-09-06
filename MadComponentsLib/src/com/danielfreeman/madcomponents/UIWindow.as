@@ -25,11 +25,34 @@
 
 package com.danielfreeman.madcomponents {
 	
+	import flash.display.Shape;
+	import flash.display.DisplayObject;
 	import flash.display.GradientType;
 	import flash.display.Sprite;
 	import flash.geom.Matrix;
 
-	
+/**
+ * UIWindow for popup windows
+ * <pre>
+ * &lt;
+ *    colour = "#rrggbb"
+ *    background = "#rrggbb, #rrggbb, ..."
+ *    gapV = "NUMBER"
+ *    gapH = "NUMBER"
+ *    alignH = "left|right|centre|fill"
+ *    alignV = "top|bottom|centre|fill"
+ *    visible = "true|false"
+ *    lines = "true|false"
+ *    widths = "i(%),j(%),k(%)…"
+ *    heights = "i(%),j(%),k(%)…"
+ *    pickerHeight = "NUMBER"
+ *    border = "true|false"
+ *    autoLayout = "true|false"
+ *    lazyRender = "true|false"
+ *	  alt = "true|false"
+ * /&gt;
+ * </pre>
+ * */	
 	public class UIWindow extends UIForm {
 		
 		public static const CURVE:Number = 32.0;
@@ -39,9 +62,12 @@ package com.danielfreeman.madcomponents {
 		protected static const SHADOW_OFFSET:Number = 4.0;
 		protected static const SHADOW_COLOUR:uint = 0x000000;
 		protected static const SHADOW_ALPHA:Number = 0.2;
+		protected static const OVERLAP:Number = 24.0;
 		
 		protected var _curve:Number = CURVE;
 		protected var _centred:Boolean = false;
+		protected var _iMask:Shape = null;
+		protected var _colour:uint;
 
 /**
  *  A MadComponents pop-up window
@@ -52,6 +78,9 @@ package com.danielfreeman.madcomponents {
 			if (curve>=0) {
 				_curve = curve;
 			}
+			if (_xml.@alt != "true") {
+				addChild(mask = _iMask = new Shape());
+			}
 			drawBackground();
 		}
 		
@@ -60,8 +89,9 @@ package com.danielfreeman.madcomponents {
  */
 		override public function drawBackground(colours:Vector.<uint> = null):void {
 			graphics.clear();
-			if (!colours)
+			if (!colours) {
 				colours = _attributes.backgroundColours;
+			}
 			
 			if (colours.length>3) {
 				graphics.beginFill(colours[3], SHADOW_ALPHA);
@@ -73,25 +103,41 @@ package com.danielfreeman.madcomponents {
 
 			
 			if (colours.length==1) {
-				graphics.beginFill(colours[0]);
+				graphics.beginFill(_colour = colours[0]);
 			}
 			else if (colours.length>1) {
 				var matr:Matrix=new Matrix();
 				matr.createGradientBox(width,height, Math.PI/2, 0, 0);
-				graphics.beginGradientFill(GradientType.LINEAR, [colours[0],colours[1]], [1.0,1.0], [0x00,0xff], matr);
+				graphics.beginGradientFill(GradientType.LINEAR, [_colour = colours[0],colours[1]], [1.0,1.0], [0x00,0xff], matr);
 			}
 			else {
-				graphics.beginFill(FILL_COLOUR);
+				graphics.beginFill(_colour = FILL_COLOUR);
+			}
+
+			graphics.drawRoundRect(_attributes.x-_curve, _attributes.y-_curve, _attributes.width + 2 * _curve, _attributes.height + 2 * _curve, _curve);
+			graphics.endFill();
+			
+			if (_iMask) {
+				
+				_iMask.graphics.beginFill(0);
+				_iMask.graphics.drawRoundRect(_attributes.x-_curve, _attributes.y-_curve, _attributes.width + 2 * _curve, _attributes.height + 2 * _curve, _curve);
+				_iMask.graphics.endFill();
+			
+				var matr0:Matrix=new Matrix();
+				matr0.createGradientBox(2 * _attributes.width, _attributes.width / 2 + OVERLAP, 0, -_attributes.width / 2, - _attributes.width / 2 + OVERLAP);
+				graphics.beginGradientFill(GradientType.RADIAL, [Colour.lighten(_colour, 64), _colour], [1,1], [0,255], matr0);
+				graphics.drawEllipse(-_attributes.width / 2, - _attributes.width / 2 + OVERLAP, 2 * _attributes.width, _attributes.width / 2);
+				graphics.endFill();
 			}
 			
 			if (colours.length>2) {
-				graphics.lineStyle(OUTLINE,colours[2], 1.0, true);
+				graphics.lineStyle(OUTLINE + (_iMask ? OUTLINE : 0), colours[2], 1.0, true);
 			}
 			else {
-				graphics.lineStyle(OUTLINE,LINE_COLOUR, 1.0, true);
+				graphics.lineStyle(OUTLINE + (_iMask ? OUTLINE : 0), LINE_COLOUR, 1.0, true);
 			}
-			
 			graphics.drawRoundRect(_attributes.x-_curve, _attributes.y-_curve, _attributes.width + 2 * _curve, _attributes.height + 2 * _curve, _curve);
+			
 		}
 		
 		

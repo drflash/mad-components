@@ -208,10 +208,12 @@ package com.danielfreeman.madcomponents {
  * Convert a comma seperated list of #rrggbb string colour values to a uint vector
  */
 		public static function drawBackgroundColour(colours:Vector.<uint>, width:Number, height:Number, screen:Sprite = null, padding:Number = 0):void {
-			if (!screen)
+			if (!screen) {
 				screen = _root;
-			if (screen==_root && _stageColours && _stageColours.length>0)
+			}
+			if (screen==_root && _stageColours && _stageColours.length>0) {
 				colours = _stageColours;
+			}
 			screen.graphics.clear();
 			if (colours.length == 1) {
 				screen.graphics.beginFill(colours[0]);

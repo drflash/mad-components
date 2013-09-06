@@ -151,9 +151,9 @@ package com.danielfreeman.madcomponents {
  *  Set text of input
  */
 		public function set text(value:String):void {
-			if (value == "") {
-				text = "x";
-			}
+		//	if (value == "") {
+		//		text = " ";
+		//	}
 			_label.text = value;
 			drawOutline();
 		}
