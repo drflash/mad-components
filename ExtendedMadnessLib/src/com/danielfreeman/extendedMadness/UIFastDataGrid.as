@@ -67,7 +67,7 @@ package com.danielfreeman.extendedMadness {
 		protected static const DEFAULT_HEADER_COLOUR:uint=0x9999AA; //0x4481c1; 
 		protected static const DEFAULT_COLOURS:Vector.<uint>=new <uint>[0xe8edf5,0xcfd8e9]; 
 		protected static const TABLE_WIDTH:Number=300.0;
-		protected static const TEXT_SIZE:Number=12.0;
+		protected static const TEXT_SIZE:Number=13.0;
 		protected static const THRESHOLD:Number = 100.0;
 		
 		protected const HEADER_STYLE:TextFormat = new TextFormat('Arial', TEXT_SIZE, 0xFFFFFF);
@@ -157,7 +157,7 @@ package com.danielfreeman.extendedMadness {
 			if (xml.title.length() > 0) {
 			//	var label:String = xml.title.toString();
 				_title = new UICell(this, 0, 0, " ", 0, _titleStyle, false, _titleBarColour);
-				_title.xml = xml.title[0];
+				_title.xmlText = xml.title[0];
 			//	_title.selectable = _title.mouseEnabled = false;
 				
 			//	title = xml.title.toString();
@@ -193,7 +193,7 @@ package com.danielfreeman.extendedMadness {
  *  Grid row colours
  */
 		public function set colours(value:Vector.<uint>):void {
-			_colours = value ? value : DEFAULT_COLOURS;
+			_colours = value && value.length > 0 ? value : DEFAULT_COLOURS;
 			drawBackground();
 		}
 		
@@ -215,7 +215,7 @@ package com.danielfreeman.extendedMadness {
 				_title.htmlText = value;
 			}
 			else {
-				_title.text = value;
+				_title.xmlText = value;
 				_title.setTextFormat(_titleStyle);
 				_title.border = true;
 				_title.borderColor = _borderColour;
@@ -636,7 +636,7 @@ package com.danielfreeman.extendedMadness {
 					}
 					else {
 						var item:String = _data[i-start][j];
-						row[j].text = (item != null) ? item : "";
+						row[j].xmlText = (item != null) ? item : "";
 					}
 				}
 			}

@@ -32,6 +32,7 @@ package com.danielfreeman.extendedMadness
  *    &lt;data&gt;LABELS&lt;/data&gt;
  *    &lt;font&gt;FORMAT&lt;/font&gt;
  *    &lt;activeFont&gt;FORMAT&lt;/activeFont&gt;
+ *    &lt;disableFont&gt;FORMAT&lt;/disableFont&gt;
  * /&gt;
  * </pre>
  */	
@@ -39,10 +40,11 @@ package com.danielfreeman.extendedMadness
 
 		protected static const COLOUR_OFFSET:Number = 0.5;
 		protected static const COLOUR_FACTOR:Number = 0.5;
+		protected static const DISABLED_COLOUR:uint = 0x333366;
 		
 		protected const LABEL_FORMAT:TextFormat = new TextFormat("Arial", 10, 0xCCCCCC);
 		protected const LABEL_HIGHLIGHT:TextFormat = new TextFormat("Arial", 10, 0xFFFFFF);
-		
+		protected const LABEL_DISABLE:TextFormat = new TextFormat("Arial", 10, DISABLED_COLOUR);
 		
 		protected var _icons:Vector.<DisplayObject>;
 		protected var _timer:Timer = new Timer(50,1);
@@ -51,11 +53,14 @@ package com.danielfreeman.extendedMadness
 		protected var _iconColour:uint = uint.MAX_VALUE;
 		protected var _activeColour:uint = uint.MAX_VALUE;
 		protected var _highlightColour:uint = UIList.HIGHLIGHT;
+		protected var _disableColour:uint = DISABLED_COLOUR;
 		protected var _leftMargin:Number = 0;
 		protected var _data:Vector.<String> = null;
 		protected var _labels:Vector.<UILabel> = null;
 		protected var _labelFormat:TextFormat = LABEL_FORMAT;
 		protected var _labelHighlight:TextFormat = LABEL_HIGHLIGHT;
+		protected var _labelDisable:TextFormat = LABEL_DISABLE;
+		protected var _enabled:Vector.<Boolean> = null;
 		
 		
 		public function UIIcons(screen:Sprite, xml:XML, attributes:Attributes) {
@@ -68,6 +73,9 @@ package com.danielfreeman.extendedMadness
 			}
 			if (xml.@activeColour.length() > 0) {
 				_activeColour = UI.toColourValue(xml.@activeColour);
+			}
+			if (xml.@disableColour.length() > 0) {
+				_disableColour = UI.toColourValue(xml.@disableColour);
 			}
 			if (xml.@leftMargin.length() > 0) {
 				_leftMargin = parseFloat(xml.@leftMargin);
@@ -91,6 +99,10 @@ package com.danielfreeman.extendedMadness
 				_labelHighlight = UIe.toTextFormat(xml.activeFont[0] ,LABEL_HIGHLIGHT);
 				delete xml.activeFont;
 			}
+			if (xml.disableFont.length() > 0) {
+				_labelDisable = UIe.toTextFormat(xml.disableFont[0] ,LABEL_DISABLE);
+				delete xml.disableFont;
+			}
 			text = xml.toString().replace(/[\s\r\n\t]/g,"");
 			unHighlight();
 		}
@@ -101,13 +113,24 @@ package com.danielfreeman.extendedMadness
 		}
 		
 		
+		public function enable(index:int, state:Boolean):void {
+		//	var colour:ColorTransform = new ColorTransform();
+		//	colour.color = state ? _iconColour : _disableColour;
+		//	DisplayObject(_icons[index]).transform.colorTransform = colour;
+			_enabled[index] = state;
+			unHighlight();
+		}
+		
+		
 		protected function mouseDown(event:MouseEvent):void {
 			_pressIndex = -1;
 			for (var i:int = 0; i < _icons.length; i++) {
 				var icon:DisplayObject = _icons[i];
 				if (mouseX < icon.x + icon.width + _attributes.paddingH/2) {
-					_pressIndex = i;
-					highlight();
+					if (_enabled[i]) {
+						_pressIndex = i;
+						highlight();
+					}
 					break;
 				}
 			}
@@ -117,8 +140,9 @@ package com.danielfreeman.extendedMadness
 		
 		
 		public function clearHighlight():void {
+			var index:int = 0;
 			for each(var label:UILabel in _labels) {
-				label.setTextFormat(_labelFormat);
+				label.setTextFormat(_enabled[index++] ? _labelFormat : _labelDisable);
 			}
 		}
 		
@@ -143,11 +167,13 @@ package com.danielfreeman.extendedMadness
 			for (var i:int = 0; i < _icons.length; i++) {
 				var icon:DisplayObject = _icons[i];
 				if (mouseX < icon.x + icon.width + _attributes.paddingH/2) {
-					index = i;
+					if (_enabled[i]) {
+						index = i;
+					}
 					break;
 				}
 			}
-			if (_pressIndex == index) {
+			if (index >=0 && _pressIndex == index) {
 				_index = _pressIndex;
 				dispatchEvent(new Event(Event.CHANGE));
 				labelHighlight();
@@ -181,11 +207,14 @@ package com.danielfreeman.extendedMadness
 		
 		
 		protected function unHighlight(event:TimerEvent = null):void {
+			var disableColourTransform:ColorTransform = new ColorTransform();
+			disableColourTransform.color = _disableColour;
+			var index:int = 0;
 			for each (var icon:DisplayObject in _icons) {
-				icon.transform.colorTransform = newColourTransform(_iconColour);
+				icon.transform.colorTransform = _enabled[index++] ? newColourTransform( _iconColour) : disableColourTransform;
 			}
 			if (_index >= 0 && _activeColour < uint.MAX_VALUE) {
-				_icons[_index].transform.colorTransform = newColourTransform(_activeColour);
+				_icons[_index].transform.colorTransform = _enabled[_index] ? newColourTransform(_activeColour) : disableColourTransform;
 			}
 		}
 		
@@ -218,9 +247,11 @@ package com.danielfreeman.extendedMadness
 				clear();
 			}
 			_icons = new <DisplayObject>[];
+			_enabled = new <Boolean>[];
 			for (var i:int = 0; i < dimensions.length; i++) {
 				var icon:DisplayObject = DisplayObject(new (getDefinitionByName(dimensions[i]) as Class));
 				_icons.push(icon);
+				_enabled.push(true);
 				if (icon is Bitmap) {
 					Bitmap(icon).smoothing = true;
 				}

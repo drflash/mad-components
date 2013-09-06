@@ -339,9 +339,12 @@ package com.danielfreeman.extendedMadness {
 		}
 		
 /**
- * Set number of fixed columns (It is advisable to do this at the start, or after a clear() )
+ * Set number of fixed columns
  */
 		public function set fixedColumns(value:int):void {
+			if (value != _fixedColumns) {
+				clear();
+			}
 			_fixedColumns = value;
 		}
 		

@@ -126,6 +126,7 @@ package com.danielfreeman.extendedMadness {
 		
 		
 		public function destructor():void {
+			removeEventListener(MouseEvent.MOUSE_DOWN, mouseDown);
 			stage.removeEventListener(MouseEvent.MOUSE_MOVE, mouseMove);
 			stage.removeEventListener(MouseEvent.MOUSE_UP, mouseUp);
 		}

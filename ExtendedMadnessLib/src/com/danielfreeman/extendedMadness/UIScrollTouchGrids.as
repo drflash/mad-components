@@ -527,7 +527,7 @@ package com.danielfreeman.extendedMadness {
 		
 		public function set selectIndex(value:int):void {
 			temporaryRowClear();
-			_highlightedRowIndex = value;
+			_clickedRowIndex = _highlightedRowIndex = value;
 			temporaryRowHighlightDraw(_highlightedDataGrid, _highlightedRowIndex);
 		}
 		

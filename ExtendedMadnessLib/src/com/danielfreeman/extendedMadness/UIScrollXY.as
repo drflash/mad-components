@@ -51,12 +51,15 @@ package com.danielfreeman.extendedMadness
  *    tapToScale = "NUMBER"
  *    auto = "true|false"
  *    lockSides = "true|false"
+ *    alt = "true|false"
  * /&gt;
  * </pre>
  */
 	public class UIScrollXY extends UIScrollVertical
 	{
 		protected static const STEPS:int = 5;
+		protected static const ALT_FACTOR:Number = 4.0;
+		protected static const ALT_THRESHOLD:Number = 10.0;
 		
 		protected var _maximumSlideX:Number;
 		protected var _deltaX:Number = 0;
@@ -77,6 +80,7 @@ package com.danielfreeman.extendedMadness
 		protected var _swipeDurationX:Number;
 		protected var _oldDeltaX:Number;
 		protected var _scrollEnabledX:Boolean = true;
+		protected var _manhattan:Boolean;
 		
 /**
  *  XY scrolling container
@@ -102,6 +106,7 @@ package com.danielfreeman.extendedMadness
 			super(screen, xml, attributes);
 			_auto = xml.@auto == "true";
 			_lockSides = xml.@lockSides == "true";
+			_manhattan = xml.@manhattan == "true";
 			if (xml.@tapToScale.length()>0) {
 				_tapToScale = parseFloat(xml.@tapToScale[0]);
 				_slider.doubleClickEnabled = true;
@@ -238,6 +243,11 @@ package com.danielfreeman.extendedMadness
 					_delta = SWIPE_FACTOR * _swipeTotalY / _swipeDurationY;					
 
 				}
+				
+				if (_manhattan) {
+					justMoveVerticallyOrHorizontally();
+				}
+				
 				_distance += Math.abs(mouseX - _lastMouse.x) + Math.abs(mouseY - _lastMouse.y);
 			}
 			_lastMouse.x = mouseX;
@@ -249,6 +259,16 @@ package com.danielfreeman.extendedMadness
 				pressButton();
 			}
 		//	super.mouseMove(event);
+		}
+		
+		
+		protected function justMoveVerticallyOrHorizontally():void {
+			if (Math.abs(_delta) > ALT_FACTOR * Math.abs(_deltaX) && Math.abs(_delta) > ALT_THRESHOLD) {
+				_deltaX = 0;
+			}
+			else if (Math.abs(_deltaX) > ALT_FACTOR * Math.abs(_delta) && Math.abs(_deltaX) > ALT_THRESHOLD) {
+				_delta = 0;
+			}
 		}
 				
 		
@@ -291,6 +311,7 @@ package com.danielfreeman.extendedMadness
  */
 		override protected function stopMovement():void {
 			_stopY = true;
+		//	hideScrollBar();
 		}
 		
 /**
