@@ -77,7 +77,7 @@ package com.danielfreeman.extendedMadness {
 /**
  *  Create a list row
  */	
-		override protected function drawCell(position:Number, count:int):void {
+		override protected function drawCell(position:Number, count:int, record:*):void {
 			var tick:UITick = UITick(_slider.getChildByName("tick_"+count.toString()));
 			if (tick) {
 				tick.x = _width-_attributes.paddingH-UITick.SIZE;
@@ -87,7 +87,7 @@ package com.danielfreeman.extendedMadness {
 				tick.name = "tick_"+count.toString();
 				tick.visible = false;
 			}
-			super.drawCell(position, count);
+			super.drawCell(position, count, record);
 		}
 		
 		

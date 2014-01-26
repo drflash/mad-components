@@ -44,32 +44,41 @@ package com.danielfreeman.extendedMadness
  *    alignV = "top|bottom|centre|fill"
  *    visible = "true|false"
  * 	  alt = "true|false"
+ * 	  pressedColour = "#rrggbb"
  * /&gt;
  * </pre>
  * */
 	public class UISegmentedControl extends UICutCopyPaste implements IContainerUI
 	{
 		protected static const BUTTON_COLOUR:uint = 0xE6E6E6;
+		protected static const BUTTON_COLOUR7:uint = 0xFFFFFF;
 		protected static const TEXT_COLOUR:uint = 0x666666;
+		protected static const TEXT_COLOUR7:uint = PRESSED_COLOUR;
 		protected static const CONTROL_CURVE:Number = 12.0;
 		
 		protected var _attributes:Attributes;
 		protected var _xml:XML;
+		protected var _textColour:uint;
 		
 		
 		public function UISegmentedControl(screen:Sprite, xml:XML, attributes:Attributes)
 		{
 			_xml = xml;
 			_attributes = attributes;
-			if (xml.font.length()>0)
+			_textColour = attributes.style7 ? TEXT_COLOUR7 : TEXT_COLOUR;
+			if (xml.@pressedColour.length() > 0) {
+				_textColour = UI.toColourValue(xml.@pressedColour);
+			}
+			if (xml.font.length()>0) {
 				_font = xml.font[0];
-			var colour:uint = attributes.backgroundColours.length>0 ? attributes.backgroundColours[0] : BUTTON_COLOUR;
-			super(screen, 0, 0, 0, colour, xml.@alt == "true");
+			}
+			var colour:uint = attributes.backgroundColours.length>0 ? attributes.backgroundColours[0] : (attributes.style7 ? BUTTON_COLOUR7 : BUTTON_COLOUR);
+			super(screen, 0, 0, 0, colour, _attributes.style7 != (xml.@alt == "true"), null, attributes.style7);
 			colourButtons();
-			if (attributes.fillH)
+			if (attributes.fillH) {
 				fixwidth = attributes.widthH;
+			}
 			index=0;
-		//	addEventListener(MouseEvent.MOUSE_DOWN, mouseDown); // JSS fix
 		}
 		
 /**
@@ -92,27 +101,69 @@ package com.danielfreeman.extendedMadness
 		
 		public function layout(attributes:Attributes):void {
 			_attributes = attributes;
-			if (attributes.fillH)
+			if (attributes.fillH) {
 				fixwidth = attributes.widthH;
+			}
+			if (attributes.fillV) {
+				_height = attributes.heightV;
+			}
+			
 		}
 		
 		
 		override protected function initialise(words:Vector.<String>):void {
-			_curve = _attributes.backgroundColours.length>2 ? _attributes.backgroundColours[2] : CONTROL_CURVE;
+			_lineColour = _attributes.style7 ? TEXT_COLOUR7 : Colour.darken(_colour,-32);
+			if (_xml.@lineColour.length() > 0) {
+				_lineColour = UI.toColourValue(_xml.@lineColour);
+			}
+			_curve = _attributes.style7 ? CURVE7 : (_attributes.backgroundColours.length>2 ? _attributes.backgroundColours[2] : CONTROL_CURVE);
 			_pressedColour = _attributes.backgroundColours.length>1 ? _attributes.backgroundColours[1] : PRESSED_COLOUR;
+			if (_attributes.fillV) {
+				_height = _attributes.heightV;
+			}
 			if (_xml.data.length()==1) {
 				drawButtons(extractData(_xml.data[0]));
 			}
 		}
 		
 		
+		public function set vectorData(value:Vector.<String>):void {
+			clear();
+			drawButtons(value);
+			colourButtons();
+			index = _index;
+		}
+		
+		
+		public function set data(value:Array):void {
+			var vector:Vector.<String> = new <String>[];
+			for each (var item:* in value) {
+				if (item is String) {
+					vector.push(item);
+				}
+				else {
+					vector.push(item.label);
+				}
+			}
+			vectorData = vector;
+
+		}
+		
+		
+		public function set xmlData(value:XML):void {
+			vectorData = extractData(value);
+		}
+		
+		
 		protected function extractData(xml:XML):Vector.<String> {
 			var result:Vector.<String> = new Vector.<String>();
 			for each (var item:XML in xml.children()) {
-				if (item.@label.length()>0)
+				if (item.@label.length()>0) {
 					result.push(item.@label.toString());
-				else
+				}
+				else {
 					result.push(item.localName());
+				}
 			}
 			return result;
 		}
@@ -121,8 +172,9 @@ package com.danielfreeman.extendedMadness
 		override protected function mouseUp(event:MouseEvent):void {
 			stage.removeEventListener(MouseEvent.MOUSE_UP, mouseUp);
 			if (_ready && event.target == this) {
-				if (_index>=0 && !_font)
-					_labels[_index].textColor = TEXT_COLOUR;
+				if (_index>=0 && !_font) {
+					_labels[_index].textColor = _textColour;
+				}
 				updateIndex();
 				dispatchEvent(new Event(Event.CHANGE));
 				showPressed();
@@ -135,8 +187,9 @@ package com.danielfreeman.extendedMadness
  * Set index of active segment
  */	
 		override public function set index(value:int):void {
-			if (_index>=0 && !_font)
-				_labels[_index].textColor = TEXT_COLOUR;
+			if (_index>=0 && !_font) {
+				_labels[_index].textColor = _textColour;
+			}
 			_index = value;
 			showPressed();
 		}
@@ -145,12 +198,12 @@ package com.danielfreeman.extendedMadness
 		protected function colourButtons():void {
 			if (!_font)
 				for each (var label:UILabel in _labels) {
-					label.textColor = TEXT_COLOUR;
+					label.textColor = _textColour;
+					label.y = (_height - label.height) / 2;
 				}
 		}
-		
-		
-		
+
+
 		public function get attributes():Attributes {
 			return _attributes;
 		}

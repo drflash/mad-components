@@ -42,14 +42,14 @@ package com.danielfreeman.extendedMadness {
 /**
  * ScrollTouchGrids component
  * <pre>
- * &lt;dataGrid
+ * &lt;scrollTouchGrids
  *    id = "IDENTIFIER"
  *    colour = "#rrggbb"
  *    background = "#rrggbb, #rrggbb, ..."
  *    visible = "true|false"
  *    widths = "p,q,r..."
- *    alignH = "left|right|centre|fill"
- *    alignV = "top|bottom|centre|fill"
+ *    scrollH = "true|false|auto"
+ *    scrollV = "true|false"
  *    editable = "true|false"
  *    widths = "i(%),j(%),k(%)…"
  *    multiline = "true|false"
@@ -85,6 +85,8 @@ package com.danielfreeman.extendedMadness {
 		public static const ROW_SELECTED:String = "rowSelected";
 		public static const HEADER_DOWN:String = "headerDown";
 		public static const HEADER_CLICKED:String = "headerClicked";
+		public static const PAGE_UP:String = "pageUp";
+		public static const PAGE_DOWN:String = "pageDown";
 		
 		protected static const ROW_SELECT_COLOUR:uint = 0xAAAAFF;
 		protected static const EDIT_BUTTON_COLOUR:uint = 0xCC9966;
@@ -100,6 +102,13 @@ package com.danielfreeman.extendedMadness {
 		protected static const DELTAY_THRESHOLD:Number = 128.0;
 		protected static const SMALL_Y_THRESHOLD:Number = 16.0;
 		protected static const BUTTON_MOVE_THRESHOLD:Number = 20.0;
+		protected static const ARROW_COLOUR:uint = 0x333333;
+		protected static const ARROW_HIGHLIGHT_COLOUR:uint = 0xFFFFFF;
+		protected static const PAGE_BUTTON_ALPHA:Number = 0.2;
+		protected static const ARROW_SIZE:Number = 20.0;
+		protected static const BUTTON_COLOUR:uint = 0x333333;
+		protected static const PAGE_BUTTON_SENSOR_RADIUS:Number = 40.0;
+		protected static const PAGE_BUTTON_RADIUS:Number = 30.0;
 		
 		protected var _clickDelay:Timer = new Timer(150, 1);
 		protected var _slideTimer:Timer = new Timer(50, STEPS);
@@ -125,6 +134,11 @@ package com.danielfreeman.extendedMadness {
 		protected var _headerClicked:Boolean;
 		protected var _timer:Timer = new Timer(400, 1);
 		protected var _longClickDispatched:Boolean = false;
+		protected var _upButton:Sprite = null;
+		protected var _downButton:Sprite = null;
+		protected var _upButtonArrow:Sprite = null;
+		protected var _downButtonArrow:Sprite = null;
+		protected var _pageButtonTarget:Object = null;
 
 		
 		public function UIScrollTouchGrids(screen : Sprite, xml : XML, attributes : Attributes) {
@@ -149,6 +163,59 @@ package com.danielfreeman.extendedMadness {
 			if (xml.@longClickEnabled == "true") {
 				_timer.addEventListener(TimerEvent.TIMER_COMPLETE, longClick);
 			}
+			if (xml.@pageButtons == "true") {
+				_upButtonArrow = pageButton(null, true, true);
+				_downButtonArrow = pageButton(null, false, true);
+				_upButton = pageButton(null, true);
+				_downButton = pageButton(null, false);
+				positionPageButtons();
+			}
+
+		}
+		
+		
+		public function set pageUpVisible(value:Boolean):void {
+			_upButton.visible = _upButtonArrow.visible = value;
+		}
+				
+		
+		public function set pageDownVisible(value:Boolean):void {
+			_downButton.visible = _downButtonArrow.visible = value;
+		}
+
+
+		protected function pageButton(result:Sprite, up:Boolean, justArrow:Boolean = false, highlight:Boolean = false):Sprite {
+			if (!result) {
+				result = new Sprite();
+				addChild(result);
+			}
+			result.graphics.clear();
+			if (!justArrow) {
+				result.graphics.beginFill(BUTTON_COLOUR); //, PAGE_BUTTON_ALPHA);
+				if (highlight) {
+					result.graphics.drawCircle(0, 0, PAGE_BUTTON_SENSOR_RADIUS);
+					result.graphics.drawCircle(0, 0, PAGE_BUTTON_SENSOR_RADIUS - 6);
+				}
+				result.graphics.drawCircle(0, 0, PAGE_BUTTON_RADIUS);
+			}
+			else {
+				result.graphics.beginFill(ARROW_COLOUR);
+			}
+			var arrow:Number = up ? -ARROW_SIZE : ARROW_SIZE;
+			 //, PAGE_BUTTON_ALPHA);
+			result.graphics.moveTo(0, 0.7 * arrow);
+			result.graphics.lineTo( 0.9*ARROW_SIZE, -arrow/2);
+			result.graphics.lineTo( -0.9*ARROW_SIZE, -arrow/2);
+			result.graphics.lineTo(0, 0.7 * arrow);
+			result.blendMode = justArrow ? BlendMode.ADD : BlendMode.SUBTRACT;
+			return result;
+		}
+		
+		
+		protected function resetPageButtons():void {
+			pageButton(_upButton, true);
+			pageButton(_downButton, false);
+			_pageButtonTarget = null;
 		}
 		
 /**
@@ -165,8 +232,8 @@ package com.danielfreeman.extendedMadness {
  * Switch edit button on or off
  */
 		public function set editButton(value:Boolean):void {
-			if (!value && _editButton && _titleSlider.contains(_editButton)) {
-				_titleSlider.removeChild(_editButton);
+			if (!value && _editButton && _editButtonLayer.contains(_editButton)) {
+				_editButtonLayer.removeChild(_editButton);
 				_editButton.removeEventListener(MouseEvent.MOUSE_DOWN, editButtonMouseDown);
 				_editButton = null;
 			}
@@ -367,7 +434,8 @@ package com.danielfreeman.extendedMadness {
 			temporaryRowClear();
 		}		
 		
-		protected function setHighlightRow(slidein:Boolean = false):void {
+		
+		public function setHighlightRow(slidein:Boolean = false):void {
 			if (_highlightedDataGrid && _highlightedRowIndex >= 0 && _highlightedRowIndex < _highlightedDataGrid.tableCells.length) {
 				if (_editButton && (!_highlightedDataGrid.hasHeader || _highlightedRowIndex > 0)) {
 					var firstCell:UICell = _highlightedDataGrid.tableCells[_highlightedRowIndex][0];
@@ -399,6 +467,10 @@ package com.danielfreeman.extendedMadness {
 			
 			if (_mouseDistance > BUTTON_MOVE_THRESHOLD) {
 				_headerClicked = false;
+				if (_pageButtonTarget) {
+					resetPageButtons();
+				}
+				
 			}
 
 			super.mouseMove(event);
@@ -425,6 +497,9 @@ package com.danielfreeman.extendedMadness {
 		protected function rowSelectHandler():Boolean {
 			var highlightedDataGrid:UIFastDataGrid = yToDataGrid(_slider.mouseY);
 			var highlightedRowIndex:int = highlightedDataGrid ? highlightedDataGrid.yToRow(highlightedDataGrid.mouseY) : -1;
+			if (!_headerClicked && highlightedDataGrid && highlightedRowIndex < 0) {
+				highlightedRowIndex = (highlightedDataGrid.hasHeader ? 1 : 0);
+			}
 			if (highlightedRowIndex >= 0 && (highlightedDataGrid != _highlightedDataGrid || highlightedRowIndex != _highlightedRowIndex)) {
 				temporaryRowHighlightDraw(highlightedDataGrid, highlightedRowIndex);
 				_highlightedDataGrid = highlightedDataGrid;
@@ -440,7 +515,20 @@ package com.danielfreeman.extendedMadness {
  * Mouse down handler
  */
 		override protected function mouseDown(event:MouseEvent):void {
-			if (event.target.name == HEADER_NAME) {
+			_pageButtonTarget = null;
+			if (event.target == _upButton || event.target == _upButtonArrow) {
+				_pageButtonTarget = event.target;
+				_rowSelect = false;
+				pageButton(_upButton, true, false, true);
+				super.mouseDown(event);
+			}
+			else if (event.target == _downButton || event.target == _downButtonArrow) {
+				_pageButtonTarget = event.target;
+				_rowSelect = false;
+				pageButton(_downButton, false, false, true);
+				super.mouseDown(event);
+			}
+			else if (event.target.name == HEADER_NAME) {
 				_headerClicked = true;
 				_rowSelect = false;
 				super.mouseDown(event);
@@ -474,7 +562,12 @@ package com.danielfreeman.extendedMadness {
 		
 		
 		override protected function mouseUp(event:MouseEvent):void {
-			if (_headerClicked && event.target.name == HEADER_NAME) {
+			if (_pageButtonTarget) {
+				dispatchEvent(new Event((_pageButtonTarget == _upButton || _pageButtonTarget == _upButtonArrow) ? PAGE_UP : PAGE_DOWN));
+				resetPageButtons();
+				super.mouseUp(event);
+			}
+			else if (_headerClicked && event.target.name == HEADER_NAME) {
 				dispatchEvent(new Event(HEADER_CLICKED));
 				super.mouseUp(event);
 			}
@@ -503,7 +596,7 @@ package com.danielfreeman.extendedMadness {
 					refreshHighlight();
 				}
 				_mouseDistance = 999999.9;
-				if (_alt && _editButton) {
+				if (_alt && _editButton && !_headerClicked) {
 					setHighlightRow();
 					slideEditButton();
 				}
@@ -535,9 +628,18 @@ package com.danielfreeman.extendedMadness {
  * The index of the datagrid that is selected.  First datagrid is 0, second = 1, etc...
  */
 		public function get selectDataGrid():int {
-			if (_dataGrid) {
+			//DEPRECIATED
+		//	if (_dataGrid) {
+		//		for (var index:String in _dataGrids) {
+		//			if (_dataGrid == _dataGrids[index]) {
+		//				trace("*depreciated code would have returned:", parseInt(index));
+		//			}
+		//		}
+		//	}
+			//
+			if (_highlightedDataGrid) {
 				for (var index:String in _dataGrids) {
-					if (_dataGrid == _dataGrids[index]) {
+					if (_highlightedDataGrid == _dataGrids[index]) {
 						return parseInt(index);
 					}
 				}
@@ -560,9 +662,22 @@ package com.danielfreeman.extendedMadness {
 		}
 		
 		
+		protected function positionPageButtons():void {
+			if (_upButton) {
+				_upButtonArrow.x = _upButton.x = attributes.width / 2;
+				_upButtonArrow.y = _upButton.y = attributes.height / 2 - PAGE_BUTTON_SENSOR_RADIUS;
+			}
+			if (_downButton) {
+				_downButtonArrow.x = _downButton.x = attributes.width / 2;
+				_downButtonArrow.y = _downButton.y = attributes.height / 2 + PAGE_BUTTON_SENSOR_RADIUS;
+			}
+		}
+		
+		
 		override public function layout(attributes:Attributes):void {
 			super.layout(attributes);
 			refreshHighlight();
+			positionPageButtons();
 		}
 		
 		

@@ -58,6 +58,7 @@ package com.danielfreeman.extendedMadness
 		
 		public function UIProgressBar(screen:Sprite, xml:XML, attributes:Attributes) {
 			_xml = xml;
+			_attributes = attributes;
 			super(screen, 0, 0, attributes.backgroundColours, xml.@alt == "true");
 			if (attributes.fillH) {
 				fixwidth = attributes.widthH;
@@ -70,7 +71,7 @@ package com.danielfreeman.extendedMadness
 		
 		override protected function createKnob():void {
 			_knob=new Sprite();
-			_sliderHeight = _radius;
+			_sliderHeight = _attributes.style7 ? SLIDER_HEIGHT7 : _radius;
 			_curve = (_xml.@curve.length() > 0) ? parseFloat(_xml.@curve) : _sliderHeight;
 		}
 		
@@ -105,6 +106,16 @@ package com.danielfreeman.extendedMadness
 		
 		public function get pages():Array {
 			return [];
+		}
+
+
+/**
+ *  Set value of slider, a number between 0 and 1
+ */
+		override public function set value(valuu:Number):void {
+			_value = valuu;
+			_knob.x = valuu * _width - _curve/2;
+			drawComponent();
 		}
 
 	}

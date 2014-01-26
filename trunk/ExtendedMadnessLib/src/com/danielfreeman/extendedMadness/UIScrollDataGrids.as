@@ -48,8 +48,8 @@ package com.danielfreeman.extendedMadness {
  *    background = "#rrggbb, #rrggbb, ..."
  *    visible = "true|false"
  *    widths = "p,q,r..."
- *    alignH = "left|right|centre|fill"
- *    alignV = "top|bottom|centre|fill"
+ *    alignH = "scroll|no scroll"
+ *    alignV = "scroll|no scroll"
  *    editable = "true|false"
  *    widths = "i(%),j(%),k(%)…"
  *    multiline = "true|false"
@@ -90,6 +90,7 @@ package com.danielfreeman.extendedMadness {
 
 		public function UIScrollDataGrids(screen : Sprite, xml : XML, attributes : Attributes) {
 			_screen = screen;
+			xml = xml.copy();
 			_alignGridWidths = xml.@alignGridWidths == "true";
 			initialiseLayers(xml);
 			if (xml.statusFont.length() > 0) {
@@ -140,6 +141,13 @@ package com.danielfreeman.extendedMadness {
 		}
 		
 		
+		override public function set xml(value:XML):void {
+			_dataGridXML = value;
+			clear();
+			createSlider(value, _attributes);
+		}
+		
+		
 		override protected function sliceTable(dataGrid:UIFastDataGrid):void {
 		}
 		
@@ -167,12 +175,12 @@ package com.danielfreeman.extendedMadness {
 					var tableRow:Vector.<UICell> = dataGrid.tableCells[i];
 					for (var j:int = 0; j < _fixedColumns; j++) {
 						var cell:UICell = tableRow[j];
-						if (i < start) {
-							cell.defaultColour = dataGrid.headerColour;
-						}
-						else if (_fixedColumnColours) {
-							cell.defaultColour = _fixedColumnColours[(rowIndex - start) % _fixedColumnColours.length];
-						}
+					//	if (i < start) {
+					//		cell.defaultColour = dataGrid.headerColour;
+					//	}
+					//	else if (_fixedColumnColours) {
+					//		cell.defaultColour = _fixedColumnColours[(rowIndex - start) % _fixedColumnColours.length];
+					//	}
 						fixedColumnLayer.addChild(cell);
 					}
 					rowIndex++;
@@ -272,8 +280,8 @@ package com.danielfreeman.extendedMadness {
  */
 		protected function swapCellHeaders():void {
 			var index:int = -1;
-			if (_slider.y < 0) {
-				while (index + 1 < _fixedColumnLayers.length && _dataGrids[index + 1].includeInLayout && -_slider.y + (_currentHeading >=0 ? _headerSlider.getBounds(this).bottom / 2 : 0) > _fixedColumnLayers[index + 1].y) {
+			if (_slider.y < 0 && _dataGrids.length > 0) {
+				while (index + 1 < _fixedColumnLayers.length && index + 1 < _dataGrids.length && _dataGrids[index + 1].includeInLayout && -_slider.y + (_currentHeading >=0 ? _headerSlider.getBounds(this).bottom / 2 : 0) > _fixedColumnLayers[index + 1].y) {
 					index++;
 				}
 			}
@@ -326,6 +334,7 @@ package com.danielfreeman.extendedMadness {
 			_slider = new UI.FormClass(this, _dataGridXML, sliderAttributes(attributes));
 			_slider.name = "-";
 			adjustMaximumSlide();
+			_dataGrids = new <UIFastDataGrid>[];
 			for (var i:int = 0; i < _slider.numChildren; i++) {
 				var child:DisplayObject = _slider.getChildAt(i);
 				if (child is UIFastDataGrid && UIFastDataGrid(child).includeInLayout) {
@@ -337,12 +346,13 @@ package com.danielfreeman.extendedMadness {
 		
 		
 		protected function headerFixedColumnLine(index:int):void {
-			if (_currentHeading >= 0) {
+			if (_dataGrids.length > index && _currentHeading >= 0) {
 				var dataGrid:UIFastDataGrid = _dataGrids[index];
 				if (dataGrid.includeInLayout && dataGrid.tableCells.length > 0) {
 					_headerFixedColumnSlider.graphics.clear();
 					_headerFixedColumnSlider.graphics.beginFill(dataGrid.attributes.colour);
 					_headerFixedColumnSlider.graphics.drawRect(dataGrid.tableCells[0][_fixedColumns].x, _headerFixedColumnSlider.getBounds(this).top, 2.0, _headerFixedColumnSlider.height);
+					_headerFixedColumnSlider.graphics.endFill();
 				}
 			}
 		}
@@ -379,12 +389,21 @@ package com.danielfreeman.extendedMadness {
 		
 		
 		protected function relayout(adjust:Boolean = false):void {
-			var index:int = 0;
+			var gridIndex:int = 0;
 			for each(var fixedColumnLayer:Sprite in _fixedColumnLayers) {
+				var dataGrid:UIFastDataGrid = _dataGrids[gridIndex++];
+				var colour:uint = dataGrid.hasHeader ? dataGrid.headerColour : Colour.darken(dataGrid.colours[0], DARKEN);
+				var index:int = dataGrid.hasHeader ? 0 : 1;
 				fixedColumnLayer.graphics.clear();
-				fixedColumnLayer.graphics.beginFill(_dataGrids[index].attributes.colour);
+				for each(var row:Vector.<UICell> in dataGrid.tableCells) {
+					fixedColumnLayer.graphics.beginFill(colour);
+					fixedColumnLayer.graphics.drawRect(0, row[0].y, fixedColumnLayer.width, row[0].height);
+					fixedColumnLayer.graphics.endFill();
+					colour = Colour.darken(dataGrid.colours[index++ % dataGrid.colours.length], DARKEN);
+				}
+				fixedColumnLayer.graphics.beginFill(dataGrid.attributes.colour);
 				fixedColumnLayer.graphics.drawRect(fixedColumnLayer.width, fixedColumnLayer.getBounds(fixedColumnLayer).top, 2.0, fixedColumnLayer.height);
-				index++;
+				fixedColumnLayer.graphics.endFill();
 			}
 			if (_alignGridWidths) {
 				doAlignGridWidths();
@@ -398,14 +417,28 @@ package com.danielfreeman.extendedMadness {
 			preExtractHeadersCells();
 		}
 		
+		
+		override protected function autoScrollEnabled():void {
+			if (_autoScrollEnabledX) {
+				_scrollEnabledX = false;
+				for each (var dataGrid:UIFastDataGrid in _dataGrids) {
+					_scrollEnabledX = _scrollEnabledX || (!dataGrid.fits && dataGrid.visible);
+				}
+			}
+		}
+		
 /**
  *  Rearrange the layout to new screen dimensions
  */	
 		override public function layout(attributes:Attributes):void {
 			_attributes = attributes;
-			IContainerUI(_slider).layout(sliderAttributes(attributes));
-			relayout(true);
+			if (!_fastLayout) {  //fastLayout is yet implemented in this release
+				IContainerUI(_slider).layout(sliderAttributes(attributes));
+				relayout(true);
+			//	_fastLayout = _xml.@fastLayout == "true";
+			}
 			_status.x = attributes.width - _status.width;
+			autoScrollEnabled();
 		}
 		
 		
@@ -469,10 +502,13 @@ package com.danielfreeman.extendedMadness {
 			_deltaX = 0;
 			var y:Number = sliderY;
 			sliceAllTables();
-			layout(_attributes);
+			IContainerUI(_slider).layout(sliderAttributes(attributes));
+			relayout(true);
+		//	_status.x = attributes.width - _status.width;
 			realignColumnLayers();
 			adjustMaximumSlide();
 			sliderY = y;
+			autoScrollEnabled();
 		}
 		
 /**

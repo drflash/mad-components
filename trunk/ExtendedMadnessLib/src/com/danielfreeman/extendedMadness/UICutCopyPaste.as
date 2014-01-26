@@ -46,6 +46,7 @@ package com.danielfreeman.extendedMadness
 		protected static const ALT_HEIGHT:Number = 22.0;
 		protected static const GAP:Number = 10.0;
 		protected static const CURVE:Number = 16.0;
+		protected static const CURVE7:Number = 4.0;
 		protected static const COLOUR:uint = 0x555555;
 		protected static const PRESSED_COLOUR:uint = 0x6666CC;
 		protected static const PRESSED_TEXT_COLOUR:uint = 0xFFFFFF;
@@ -57,7 +58,7 @@ package com.danielfreeman.extendedMadness
 		protected var _index:int = -1;
 		protected var _colour:uint = COLOUR;
 		protected var _gap:Number = GAP;
-		protected var _curve:Number = CURVE;
+		protected var _curve:Number;
 		protected var _height:Number = HEIGHT;
 		protected var _alt:Boolean;
 		protected var _font:XML = null;
@@ -65,14 +66,18 @@ package com.danielfreeman.extendedMadness
 		protected var _pressedColour:uint = UIList.HIGHLIGHT;
 		protected var _timer:Timer;
 		protected var _ready:Boolean = false;
+		protected var _style7:Boolean;
+		protected var _lineColour:uint;
 		
 /**
  * Cut / Copy / Paste style buttons
  */
-		public function UICutCopyPaste(screen:Sprite, xx:Number, yy:Number, arrowPosition:Number = 0, colour:uint = 0x666666, alt:Boolean = false, words:Vector.<String> = null) {
+		public function UICutCopyPaste(screen:Sprite, xx:Number, yy:Number, arrowPosition:Number = 0, colour:uint = 0x666666, alt:Boolean = false, words:Vector.<String> = null, style7:Boolean = false) {
 			screen.addChild(this);
 			x=xx;y=yy;
 			_colour = colour;
+			_style7 = style7;
+			_curve = style7 ? CURVE7 : CURVE;
 			_height = alt ? ALT_HEIGHT : HEIGHT;
 			_arrowPosition = arrowPosition;
 			addChild(_pressedLayer = new Sprite());
@@ -88,6 +93,7 @@ package com.danielfreeman.extendedMadness
 		
 		
 		protected function initialise(words:Vector.<String>):void {
+			_lineColour = Colour.darken(_colour,-32);
 			drawButtons(words ? words : new <String>["Cut","Copy","Paste"], _arrowPosition);
 			_timer = new Timer(50, 1);
 			_timer.addEventListener(TimerEvent.TIMER_COMPLETE, resetHighlight);
@@ -180,10 +186,15 @@ package com.danielfreeman.extendedMadness
 		protected function buttonChrome(left:Number, arrowPosition:Number = 0):void {
 			var matr:Matrix = new Matrix();
 			var gradient:Array = [Colour.lighten(_colour,128),_colour,_colour];
+			
 			matr.createGradientBox(left, _height, Math.PI/2, 0, 0);
 			graphics.clear();
-			graphics.beginGradientFill(GradientType.LINEAR, gradient, [1.0,1.0,1.0], [0x00,0x80,0xff], matr);
-			graphics.lineStyle(1, Colour.darken(_colour,-32), 1.0, true);
+			if (_style7) {
+				graphics.beginFill(gradient[1]);
+			} else {
+				graphics.beginGradientFill(GradientType.LINEAR, gradient, [1.0,1.0,1.0], [0x00,0x80,0xff], matr);
+			}
+			graphics.lineStyle(1, _lineColour, 1.0, true);
 			graphics.moveTo(0,_curve);
 			graphics.curveTo(0, 0, _curve, 0);
 			if (arrowPosition<0) {
@@ -207,10 +218,16 @@ package com.danielfreeman.extendedMadness
 			graphics.lineStyle(0,0,0);
 			for (var i:int = 1; i < _labels.length; i++) {
 				var position:Number = _labels[i].x;
-				graphics.beginGradientFill(GradientType.LINEAR, [Colour.lighten(_colour,126), _colour], [1.0,1.0], [0x00,0xff], matr);
-				graphics.drawRect(position - _gap, 1, 1, _height-1);
-				graphics.beginGradientFill(GradientType.LINEAR, [Colour.darken(_colour), _colour], [1.0,1.0], [0x00,0xff], matr);
-				graphics.drawRect(position - _gap + 1, 1, 1, _height-1);
+				if (_style7) {
+					graphics.beginFill(_lineColour);
+					graphics.drawRect(position - _gap + 1, 1, 1, _height-1);
+				}
+				else {
+					graphics.beginGradientFill(GradientType.LINEAR, [Colour.lighten(_colour,126), _colour], [1.0,1.0], [0x00,0xff], matr);
+					graphics.drawRect(position - _gap, 1, 1, _height-1);
+					graphics.beginGradientFill(GradientType.LINEAR, [Colour.darken(_colour), _colour], [1.0,1.0], [0x00,0xff], matr);
+					graphics.drawRect(position - _gap + 1, 1, 1, _height-1);
+				}
 			}
 		}
 		
@@ -219,7 +236,11 @@ package com.danielfreeman.extendedMadness
 			var matr:Matrix = new Matrix();
 			_pressedLayer.graphics.clear();
 			matr.createGradientBox(width, _height, Math.PI/2, 0, 0);
-			_pressedLayer.graphics.beginGradientFill(GradientType.LINEAR, [Colour.darken(_pressedColour,-32),_pressedColour,Colour.lighten(_pressedColour,48),Colour.lighten(_pressedColour,48)], [1.0,1.0,1.0,1.0], [0x00,0x20,0x80,0xff], matr);
+			if (_style7) {
+				_pressedLayer.graphics.beginFill(_pressedColour);
+			} else {
+				_pressedLayer.graphics.beginGradientFill(GradientType.LINEAR, [Colour.darken(_pressedColour,-32),_pressedColour,Colour.lighten(_pressedColour,48),Colour.lighten(_pressedColour,48)], [1.0,1.0,1.0,1.0], [0x00,0x20,0x80,0xff], matr);
+			}
 			if (_index<0 || _labels.length<=0) {
 				return;
 			}

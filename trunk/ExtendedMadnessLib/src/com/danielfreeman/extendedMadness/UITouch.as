@@ -20,6 +20,11 @@ package com.danielfreeman.extendedMadness
 		}
 		
 		
+		override public function touchCancel():void {
+			mouseUp();
+		}
+		
+		
 		override public function layout(attributes:Attributes):void {
 			var childAttributes:Attributes = attributes.copy(_xml);
 			_up.layout(childAttributes);
@@ -34,7 +39,7 @@ package com.danielfreeman.extendedMadness
 		}
 		
 		
-		protected function mouseUp(event:MouseEvent):void {
+		protected function mouseUp(event:MouseEvent = null):void {
 			stage.removeEventListener(MouseEvent.MOUSE_UP, mouseUp);
 			_up.visible = true;
 			_down.visible = false;

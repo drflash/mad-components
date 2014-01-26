@@ -117,6 +117,12 @@ package com.danielfreeman.extendedMadness
 		}
 		
 		
+		override public function set imageClass(value:Class):void {
+			_images = new <Bitmap>[Bitmap(new value())];
+			scaleImage();
+		}
+		
+		
 		public function layout(attributes:Attributes):void {
 			_attributes = attributes;
 			_attributesWidth = attributes.widthH;

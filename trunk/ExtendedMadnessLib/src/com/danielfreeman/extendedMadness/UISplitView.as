@@ -106,11 +106,11 @@ package com.danielfreeman.extendedMadness
 			_right = new UIPages(this, _rightXML, slice(attributes.width - (_landscape ? LEFT : 0) - LINE, _attributes.height - UINavigationBar.HEIGHT));
 			_right.x = LEFT + LINE;
 			_right.y = UINavigationBar.HEIGHT;
-			_top = new UINavigationBar(this, attributes);
+			_top = new UINavigationBar(this, xml, attributes);
 			_top.backButton.visible = false;
 			if (xml.@topColour.length()>0)
 				_top.colour = UI.toColourValue(xml.@topColour[0]);
-			_button = new UIButton(_top, 8, 5, '<font size="14">menu</font>', BUTTON_COLOUR, new <uint>[], true);
+			_button = new UIButton(_top, 8, 5, '<font size="14">menu</font>', BUTTON_COLOUR, new <uint>[], true, attributes.style7);
 			this.swapChildren(_menu, _list);
 			
 			_button.addEventListener(UIButton.CLICKED, showMenu);

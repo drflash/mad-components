@@ -48,12 +48,13 @@ package com.danielfreeman.extendedMadness {
  *    background = "#rrggbb, #rrggbb, ..."
  *    visible = "true|false"
  *    widths = "p,q,r..."
- *    alignH = "left|right|centre|fill"
- *    alignV = "top|bottom|centre|fill"
+ *    scrollH = "true|false|auto"
+ *    scrollV = "true|false|auto"
  *    editable = "true|false"
  *    widths = "i(%),j(%),k(%)…"
  *    multiline = "true|false"
  *    titleBarColour = "#rrggbb"
+ *    recycle = "true|false|shared"
  *    gapV = "NUMBER"
  *    gapH = "NUMBER"
  *    border = "true|false"
@@ -78,6 +79,7 @@ package com.danielfreeman.extendedMadness {
 		public static const SWIPE_RIGHT:String = "swipeRight";
 		protected static const STEPS:int = 4;
 		protected static const SWIPE_THRESHOLD:Number = 32.0;
+		protected static const DARKEN:int = -16;
 		
 		protected var _headerSlider:Sprite;
 		protected var _fixedColumnSlider:Sprite = null;
@@ -92,20 +94,25 @@ package com.danielfreeman.extendedMadness {
 		protected var _fixedColumnDelta:Number = 0;
 		protected var _trigger0:Boolean = false;
 		protected var _trigger1:Boolean = true;
+		protected var _fastLayout:Boolean = false;
+		protected var _autoScrollEnabledX:Boolean = false;
 
 		
 		public function UIScrollDataGrid(screen : Sprite, xml : XML, attributes : Attributes) {
 			xml.@border = "false";
 			_dataGridXML = xml;
+			_autoScrollEnabledX = xml.@scrollH != "scroll" || xml.@scrollH != "no scroll";
 			if (xml.@fixedColumnColours.length() > 0) {
 				_fixedColumnColours = UI.toColourVector(xml.@fixedColumnColours);
 			}
+	//		_fastLayout = xml.@fastLayout == "true";
 			super(screen, noChildren(xml), attributes);
 			super.layout(attributes);
 			if (xml.@slideFixedColumns == "true") {
 				_slideFixedColumns = true;
 				_columnSlideTimer.addEventListener(TimerEvent.TIMER, columnSlideMovement);
 			}
+			autoScrollEnabled();
 		}
 		
 /**
@@ -165,22 +172,25 @@ package com.danielfreeman.extendedMadness {
 		protected function colourFixedColumns(dataGrid:UIFastDataGrid, flag:Boolean = false):void {
 			if (_fixedColumns > 0 && dataGrid.tableCells.length > 0) {
 				
-				var rowIndex:int = 0;
+			//	var rowIndex:int = 0;
 				var start:int = dataGrid.hasHeader  ? 1 : 0;
-				for (var i:int = 0; i < dataGrid.tableCells.length; i++) {
-					var tableRow:Vector.<UICell> = dataGrid.tableCells[i];
-					for (var j:int = 0; j < _fixedColumns; j++) {
-						var cell:UICell = tableRow[j];
-						if (i >= start) {
-							cell.defaultColour = _fixedColumnColours ? _fixedColumnColours[(rowIndex - start) % _fixedColumnColours.length]
-							: Colour.darken(dataGrid.colours[(rowIndex - start) % dataGrid.colours.length], -16);
+				if (flag) {
+					for (var i:int = 0; i < dataGrid.tableCells.length; i++) {
+						var tableRow:Vector.<UICell> = dataGrid.tableCells[i];
+						for (var j:int = 0; j < _fixedColumns; j++) {
+							var cell:UICell = tableRow[j];
+						//	if (i >= start) {
+						//		cell.defaultColour = _fixedColumnColours ? _fixedColumnColours[(rowIndex - start) % _fixedColumnColours.length]
+						//		: Colour.darken(dataGrid.colours[(rowIndex - start) % dataGrid.colours.length], -16);
+						//	}
+						//	if (flag) {
+								_fixedColumnSlider.addChild(cell);
+						//	}
 						}
-						if (flag) {
-							_fixedColumnSlider.addChild(cell);
-						}
+					//	rowIndex++;
 					}
-					rowIndex++;
 				}
+				
 			}
 		}
 		
@@ -208,12 +218,12 @@ package com.danielfreeman.extendedMadness {
 				var cell:UICell;
 				for (var k:int = _fixedColumns; k < headerRow.length; k++) {
 					_headerSlider.addChild(cell = headerRow[k]);
-					cell.defaultColour = _dataGrid.headerColour;
+				//	cell.defaultColour = _dataGrid.headerColour;
 				}
 				if (_fixedColumns > 0) {
 					for (var l:int = 0; l < _fixedColumns; l++) {
 						_headerFixedColumnSlider.addChild(cell = headerRow[l]);
-						cell.defaultColour = _dataGrid.headerColour;
+					//	cell.defaultColour = _dataGrid.headerColour;
 					}
 				}
 			}
@@ -384,20 +394,61 @@ package com.danielfreeman.extendedMadness {
 			sliceTable(_dataGrid);
 		}
 		
+		
+		protected function fixedHeaderLine(dataGrid:UIFastDataGrid):void {
+			var colour:uint = dataGrid.hasHeader ? dataGrid.headerColour : Colour.darken(dataGrid.colours[0], DARKEN);
+			var index:int = dataGrid.hasHeader ? 0 : 1;
+			_headerSlider.graphics.clear();
+			_headerSlider.graphics.beginFill(colour);
+			_headerSlider.graphics.drawRect(_headerSlider.getBounds(this).left, _headerSlider.getBounds(this).top, _headerSlider.width, _headerSlider.height);
+			_headerSlider.graphics.endFill();
+			if (_headerFixedColumnSlider) {
+				_headerFixedColumnSlider.graphics.clear();
+				_headerFixedColumnSlider.graphics.beginFill(colour);
+				_headerFixedColumnSlider.graphics.drawRect(0, _headerFixedColumnSlider.getBounds(this).top, _fixedColumnSlider.width, _headerFixedColumnSlider.height);
+				_headerFixedColumnSlider.graphics.endFill();
+				_headerFixedColumnSlider.graphics.beginFill(_dataGrid.attributes.colour);
+				_headerFixedColumnSlider.graphics.drawRect(_fixedColumnSlider.width, _headerFixedColumnSlider.getBounds(this).top, 2.0, _headerFixedColumnSlider.height);
+				_headerFixedColumnSlider.graphics.endFill();
+			}
+			if (_fixedColumnSlider) {
+				_fixedColumnSlider.graphics.clear();
+				for each(var row:Vector.<UICell> in dataGrid.tableCells) {
+					_fixedColumnSlider.graphics.beginFill(colour);
+					_fixedColumnSlider.graphics.drawRect(0, row[0].y, _fixedColumnSlider.width, row[0].height);
+					_fixedColumnSlider.graphics.endFill();
+					colour = Colour.darken(dataGrid.colours[index++ % dataGrid.colours.length], DARKEN);
+				}
+				_fixedColumnSlider.graphics.beginFill(_dataGrid.attributes.colour);
+				_fixedColumnSlider.graphics.drawRect(_fixedColumnSlider.width, _fixedColumnSlider.getBounds(this).top, 2.0, _fixedColumnSlider.height);
+				_fixedColumnSlider.graphics.endFill();
+			}
+
+			
+		}
+		
+		
+		protected function autoScrollEnabled():void {
+			if (_autoScrollEnabledX) {
+				_scrollEnabledX = !_dataGrid.fits;
+			}
+		}
+		
 /**
  *  Rearrange the layout to new screen dimensions
  */	
 		override public function layout(attributes:Attributes):void {
-			_dataGrid.layout(attributes);
-			super.layout(attributes);
-			if (_fixedColumnSlider) {
-				_fixedColumnSlider.graphics.beginFill(_dataGrid.attributes.colour);
-				_fixedColumnSlider.graphics.drawRect(_fixedColumnSlider.width, _fixedColumnSlider.getBounds(this).top, 2.0, _fixedColumnSlider.height);
+			if (_fastLayout) {  //fastLayout is yet implemented in this release
+				adjustMaximumSlide();
+				refreshMasking();
 			}
-			if (_headerFixedColumnSlider) {
-				_headerFixedColumnSlider.graphics.beginFill(_dataGrid.attributes.colour);
-				_headerFixedColumnSlider.graphics.drawRect(_headerFixedColumnSlider.width, _headerFixedColumnSlider.getBounds(this).top, 2.0, _headerFixedColumnSlider.height);
+			else {
+				_dataGrid.layout(attributes);
+				super.layout(attributes);
+				fixedHeaderLine(dataGrid);
+			//	_fastLayout = _xml.@fastLayout == "true";
 			}
+			autoScrollEnabled();
 		}
 		
 /**

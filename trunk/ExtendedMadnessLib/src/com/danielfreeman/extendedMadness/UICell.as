@@ -15,10 +15,13 @@ package com.danielfreeman.extendedMadness {
 		
 		protected const FORMAT:TextFormat = new TextFormat('Arial', 13, 0x000066, true);
 		
-		public function UICell(screen:Sprite, xx:int, yy:int, txt:String = "", wdth:Number = 0, format:TextFormat=null, multiLine:Boolean = false, borderColour:uint = 0x666666) {
+		public function UICell(screen:Sprite, xx:int, yy:int, txt:String = "", wdth:Number = 0, format:TextFormat=null, multiLine:Boolean = false, borderColour:uint = 0x666666, border:Boolean = true) {
+			if (!format) {
+				format = FORMAT;
+				format.leftMargin = 4.0;
+			}
 			super(screen, xx, yy, txt, format);
-			format = format ? format : FORMAT;
-			border = true;
+			this.border = border;
 			borderColor = borderColour;
 			multiline = wordWrap = multiLine;
 			setTextFormat(format);
