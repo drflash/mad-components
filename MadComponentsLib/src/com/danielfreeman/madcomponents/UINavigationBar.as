@@ -38,14 +38,16 @@ package com.danielfreeman.madcomponents {
 	
 		public static const HEIGHT:Number = 46.0;
 		protected static const COLOUR:uint = 0x9999BB;
+		protected static const COLOUR7:uint = 0xF6F6F6;
 		protected static const LEFTCOLOUR:uint = 0x7777AA;
 		protected static const DONECOLOUR:uint = 0xAA7777;
 		protected static const SIDES:Number = 100.0;
-		protected static const Y:Number = 5;
+		protected static const Y:Number = 6;
 		
 		protected const FORMAT:TextFormat = new TextFormat("Tahoma",20,0xFFFFFF);
+		protected const FORMAT7:TextFormat = new TextFormat("Tahoma",18,0x000000);
 		protected const DARK_FORMAT:TextFormat = new TextFormat("Tahoma", 20, 0x333366);
-
+		protected const DARK_FORMAT7:TextFormat = new TextFormat("Tahoma", 18, 0xFFFFFF );
 		
 		protected var _label:UILabel;
 		protected var _shadowLabel:UILabel;
@@ -56,28 +58,82 @@ package com.danielfreeman.madcomponents {
 		protected var _rightArrow:UIBackButton;
 		protected var _colour:uint;
 		protected var _centrePanel:Sprite;
+		protected var _xml:XML;
 		
 	
-		public function UINavigationBar(screen:Sprite, attributes:Attributes) {
+		public function UINavigationBar(screen:Sprite, xml:XML, attributes:Attributes) {
 			screen.addChildAt(this,0);
+			_xml = xml;
 			_attributes = attributes;
-			_colour = attributes.colour;
+			
+			_colour = (xml.@barColour.length() > 0) ? UI.toColourValue(xml.@barColour) : attributes.colour;
+
 			drawBar();
-			_shadowLabel = new UILabel(this, 0, Y+1, "", DARK_FORMAT);
-			_label = new UILabel(this, 0, Y+2, "", FORMAT);
-			_leftButton = new UIButton(this, 8, Y, '<font size="14">left</font>', LEFTCOLOUR, new <uint>[], true);		// JSS
-			_leftButton.visible = false;
-			_backButton = new UIBackButton(this, 4, Y, "back", COLOUR);
-			_rightArrow = new UIBackButton(this, 200, Y, "next", COLOUR, true);
-			_rightButton = new UIButton(this, 200, Y, '<font size="14">done</font>', DONECOLOUR, new <uint>[], true);
+			var default7:Boolean = _attributes.style7 && _colour == Attributes.COLOUR7;
+			var format:TextFormat = default7 ? FORMAT7 : FORMAT;
+			var shadowFormat:TextFormat = default7 ? DARK_FORMAT7 : DARK_FORMAT;
+			_shadowLabel = new UILabel(this, 0, Y+1, "", shadowFormat);
+			_label = new UILabel(this, 0, Y+2, "", format);
+			_leftButton = new UIButton(this, 8, Y - 1, '<font size="14">left</font>', LEFTCOLOUR, new <uint>[], true, attributes.style7);		// JSS
+			_backButton = new UIBackButton(this, 4, 0, "Back", COLOUR, false, !_attributes.style7, xml.@leftLink.length() == 0);
+			_rightArrow = new UIBackButton(this, 200, 0, "Next", COLOUR, true, !_attributes.style7, xml.@rightArrow.length() > 0);
+			_rightButton = new UIButton(this, 200, Y - 1, '<font size="14">done</font>', DONECOLOUR, new <uint>[], true, attributes.style7);
+			_backButton.visible = _leftButton.visible = _rightButton.visible = _rightArrow.visible = false;
 			addChild(_centrePanel = new Sprite());
+			initialiseClassicButtons();
+		//	if (_attributes.style7) {
+		//		initialiseIos7Buttons();
+			//	_colour = (_attributes.style7 && xml.@colour.length == 0) ? COLOUR7 : _colour;
+		//	}
+		//	else {
+		//		
+		//	}
+			
 			adjustButtons();
-			_rightButton.visible = _rightArrow.visible = false;
 		}
 		
 		
+		protected function initialiseClassicButtons():void {
+			if (_xml.@leftButton.length()>0) {
+				leftButtonText = _xml.@leftButton;
+				leftButton.visible = true;
+			}
+			if (_xml.@rightButton.length()>0) {
+				rightButtonText = _xml.@rightButton;
+				rightButton.visible = true;
+			}
+			if (_xml.@rightArrow.length()>0) {
+				rightButtonText = _xml.@rightArrow;
+				rightButton.visible = false;
+				rightArrow.visible = true;
+			}
+			if (_xml.@leftArrow.length()>0) {
+				backButton.text = _xml.@leftArrow;
+			}
+		}
+		
+		
+	/*	protected function initialiseIos7Buttons():void {
+			if (_xml.@leftLink.length()>0) {
+				leftButtonText = _xml.@leftLink;	
+			}
+		//	if (_xml.@leftArrow.length()>0) {
+		//		leftButtonText = _xml.@leftArrow;
+		//	}
+			if (_xml.@rightLink.length()>0) {
+				rightButtonText = _xml.@rightLink;
+			}
+		//	if (_xml.@rightArrow.length()>0) {
+		//		rightButtonText = _xml.@rightArrow;
+		//	}
+		//	leftButton.visible = rightButton.visible = false;
+			_backButton.visible = _xml.@leftLink.length() > 0 || _xml.@leftArrow.length() > 0;
+			_rightArrow.visible = _xml.@rightLink.length() > 0 || _xml.@rightArrow.length() > 0;
+		}*/
+		
+		
 		protected function adjustButtons():void {
-			_rightArrow.x = _attributes.width - _rightArrow.width - 6;
+			_rightArrow.x = _attributes.width - _rightArrow.width  - (_attributes.style7 ? 6 : 0);
 			_rightButton.x = _attributes.width - _rightButton.width - 8;
 			_centrePanel.x = _attributes.width / 2;
 		}
@@ -105,7 +161,18 @@ package com.danielfreeman.madcomponents {
  */
 		public function set leftButtonText(value:String):void {
 			_leftButton.text = '<font size="14">'+value+'</font>';
+			_backButton.text = value;
 		}
+
+/**
+ *  Right button/arrow text
+ */
+		public function set rightButtonText(value:String):void {
+			_rightButton.text = '<font size="14">'+value+'</font>';
+			_rightArrow.text = value;
+			adjustButtons();
+		}
+
 		
 /**
  *  Back button
@@ -143,14 +210,6 @@ package com.danielfreeman.madcomponents {
 			return _colour;
 		}
 		
-/**
- *  Right button/arrow text
- */
-		public function set rightButtonText(value:String):void {
-			_rightButton.text = '<font size="14">'+value+'</font>';
-			_rightArrow.text = value;
-			adjustButtons();
-		}
 		
 /**
  *  Width of navigation bar
@@ -182,14 +241,32 @@ package com.danielfreeman.madcomponents {
 			var matr:Matrix=new Matrix();
 			matr.createGradientBox(_attributes.width, HEIGHT, Math.PI/2, 0, 0);
 			graphics.clear();
-			graphics.beginGradientFill(GradientType.LINEAR, [Colour.lighten(_colour,64),Colour.darken(_colour)], [1.0,1.0], [0x00,0xff], matr);
+			if (_attributes.style7) {
+				graphics.beginFill(_colour);
+			}
+			else {
+				graphics.beginGradientFill(GradientType.LINEAR, [Colour.lighten(_colour,64),Colour.darken(_colour)], [1.0,1.0], [0x00,0xff], matr);
+			}
 			graphics.drawRect(0, 0, _attributes.width, HEIGHT);
+			graphics.endFill();
+			if (_attributes.style7) {
+				graphics.beginFill(Colour.darken(_colour));
+				graphics.drawRect(0, HEIGHT - 1, _attributes.width, 1);
+				graphics.endFill();
+			}
+		}
+		
+		
+		override public function get height():Number {
+			return HEIGHT;
 		}
 		
 		
 		public function destructor():void {
 			_leftButton.destructor();
 			_rightButton.destructor();
+			_backButton.destructor();
+			_rightArrow.destructor();
 		}
 	}
 }

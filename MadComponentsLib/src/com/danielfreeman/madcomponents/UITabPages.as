@@ -46,6 +46,8 @@ package com.danielfreeman.madcomponents {
  *    border = "true|false"
  *    mask = "true|false"
  *    alt = "true|false"
+ *    pixelSnapping = "true|false"
+ *    iconOffset = "NUMBER"
  * /&gt;
  * </pre>
  */
@@ -60,11 +62,16 @@ package com.danielfreeman.madcomponents {
 		protected var _colour:uint;
 		protected var _alt:Boolean;
 		protected var _pagesAttributes:Attributes;
+		protected var _pixelSnapping:Boolean;
+		protected var _iconOffset:Number = 0;
 		
 
 		public function UITabPages(screen:Sprite, xml:XML, attributes:Attributes) {
+			_attributes = attributes;
 			_colour = attributes.colour;
 			_alt = xml.@alt == "true";
+			_pixelSnapping = xml.@pixelSnapping == "true";
+			_iconOffset = xml.@iconOffset.length() > 0 ? parseFloat(xml.@iconOffset) : 0;
 			initialiseButtonBar(xml,attributes);
 			super(screen, xml, attributes);
 			_buttonBar.addEventListener(MouseEvent.MOUSE_DOWN, mouseDown);			
@@ -102,8 +109,12 @@ package com.danielfreeman.madcomponents {
 		public function setTab(index:int, label:String, imageClass:Class = null):void {
 			var button:UITabButton = UITabButton(_buttons[index]);
 			button.text = label;
-			if (imageClass)
+			if (imageClass) {
 				button.imageClass = imageClass;
+				if (_pixelSnapping) {
+					button.pixelSnapImage(_iconOffset);
+				}
+			}
 		}
 		
 		
@@ -142,8 +153,8 @@ package com.danielfreeman.madcomponents {
 			makeTabButtons(_attributes, pages.length, alt);
 			_buttonBar.y = attributes.height + (alt ? 1 : TWEAK);
 		}
-		
-		
+
+
 		override public function set pageNumber(value:int):void {
 			for (var i:int=0; i<_buttonBar.numChildren; i++) {
 				var button:UITabButton = UITabButton(_buttonBar.getChildAt(i));
@@ -160,7 +171,7 @@ package com.danielfreeman.madcomponents {
 			if (numberOfPages > 0) {
 				var buttonWidth:Number = attributes.width / numberOfPages;
 				for (var i:int = 0; i < numberOfPages; i++) {
-					var _tab:UITabButton = new UITabButton(_buttonBar, i * buttonWidth - 0.5, 0, i.toString(), _colour, alt);
+					var _tab:UITabButton = new UITabButton(_buttonBar, i * buttonWidth - 0.5, 0, i.toString(), _colour, alt, _attributes.style7);
 					_buttons.push(_tab);
 					_tab.name = i.toString();
 					_tab.fixwidth = buttonWidth + 1;

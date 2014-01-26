@@ -59,6 +59,7 @@ package com.danielfreeman.madcomponents {
 		protected static const RADIUS:int = 9;
 		protected static const LINE:int = 6;
 		protected static const RIGHT_GAP:int = 45;
+		protected static const CURVE7:Number = 10.0;
 		
 
 		protected var _attributes:Attributes;
@@ -84,30 +85,39 @@ package com.danielfreeman.madcomponents {
 		override protected function drawOutline(pressed:Boolean = false):void {
 			var matr:Matrix=new Matrix();
 			var colour:uint = _colours.length>0 ? _colours[0] : _attributes.colour;
+			var curve:Number = _attributes.style7 ? CURVE7 : WINDOW_HEIGHT;
 			matr.createGradientBox(_attributes.width, HEIGHT, Math.PI/2, 0, 0);
 			_over.graphics.clear();
 			if (!_alt) {
-				_over.graphics.beginGradientFill(GradientType.LINEAR, [Colour.lighten(colour,64),Colour.darken(colour)], [1.0,1.0], [0x00,0xff], matr);
+				if (_attributes.style7) {
+					_over.graphics.beginFill(colour);
+				}
+				else {
+					_over.graphics.beginGradientFill(GradientType.LINEAR, [Colour.lighten(colour,64),Colour.darken(colour)], [1.0,1.0], [0x00,0xff], matr);					
+				}
 				_over.graphics.drawRect(0, 0, _attributes.width, HEIGHT);
-				_over.graphics.drawRoundRect(GAP, (HEIGHT-WINDOW_HEIGHT)/2, _attributes.width-2*GAP, WINDOW_HEIGHT, WINDOW_HEIGHT);
+				_over.graphics.drawRoundRect(GAP, (HEIGHT-WINDOW_HEIGHT)/2, _attributes.width-2*GAP, WINDOW_HEIGHT, curve);
 				_over.graphics.beginFill(Colour.lighten(colour,64));
-				_over.graphics.drawRect(0,0, _attributes.width, 1);
-				_over.graphics.beginFill(Colour.darken(colour,-64));
-				_over.graphics.drawRect(0,HEIGHT, _attributes.width, 2);
+				if (!_attributes.style7) {
+					_over.graphics.drawRect(0, 0, _attributes.width, 1);
+					_over.graphics.beginFill(Colour.darken(colour,-64));
+					_over.graphics.drawRect(0, HEIGHT, _attributes.width, 2);
+				}
 			}
-			_over.graphics.beginFill(0,0);
-			_over.graphics.lineStyle(2,_iconColour);
+			_over.graphics.beginFill(0, 0);
+			_over.graphics.lineStyle(2, _iconColour);
 			_over.graphics.drawCircle(GAP+WINDOW_HEIGHT/2,HEIGHT/2-1,6);
 			_over.graphics.moveTo(GAP+WINDOW_HEIGHT/2+5,HEIGHT/2+4);
 			_over.graphics.lineTo(GAP+WINDOW_HEIGHT/2+8,HEIGHT/2+7);
 			
+			var fieldColour:uint = _colours.length>1 ? _colours[1] : 0xFFFFFF;
 			graphics.clear();
-			graphics.beginFill(Colour.darken(colour,-64));
+			graphics.beginFill(_attributes.style7 ? fieldColour : Colour.darken(colour,-64));
 			graphics.drawRect(0,0, _attributes.width, HEIGHT);
-			graphics.beginFill(_colours.length>1 ? _colours[1] : 0xFFFFFF);
-			graphics.drawRoundRect(GAP+1, (HEIGHT-WINDOW_HEIGHT)/2+1, _attributes.width-2*GAP, WINDOW_HEIGHT, WINDOW_HEIGHT);
+			graphics.beginFill(fieldColour);
+			graphics.drawRoundRect(GAP+1, (HEIGHT-WINDOW_HEIGHT)/2+1, _attributes.width-2*GAP, WINDOW_HEIGHT, curve);
 			
-			_label.x = GAP+WINDOW_HEIGHT;
+			_label.x = GAP + WINDOW_HEIGHT;
 			_label.fixwidth = _attributes.width-RIGHT_GAP - (_alt ? GAP : 0);
 			_label.y = (HEIGHT-WINDOW_HEIGHT)/2 + 1.0;
 		}

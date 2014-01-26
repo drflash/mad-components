@@ -25,6 +25,8 @@
 
 package com.danielfreeman.madcomponents {
 	
+	import flash.display.PixelSnapping;
+	import flash.display.Bitmap;
 	import flash.display.Sprite;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
@@ -45,14 +47,16 @@ package com.danielfreeman.madcomponents {
 		protected var _screen:Sprite;
 		protected var _icon:Sprite;
 		protected var _tiny:Boolean;
+		protected var _iconBitmap:Bitmap;
+		
 		
 		protected const SMALL_FORMAT:TextFormat = new TextFormat("Tahoma", 12, 0xFFFFFF);
 		
 		
-		public function UITabButton(screen:Sprite, xx:Number, yy:Number, text:String, colour:uint, tiny:Boolean = false) {
+		public function UITabButton(screen:Sprite, xx:Number, yy:Number, text:String, colour:uint, tiny:Boolean = false, style7:Boolean = false) {
 			addChild(_icon = new Sprite());
-			_tiny = tiny
-			super(_screen = screen, xx, yy, text, colour, new <uint>[0,0,0,0,0], tiny);
+			_tiny = tiny;
+			super(_screen = screen, xx, yy, text, colour, new <uint>[0,0,0,0,0], tiny, style7);
 			_icon.mouseEnabled = _icon.mouseChildren = false;
 			filters = null;
 			screen.addEventListener(CLEAR, clearState);
@@ -90,6 +94,17 @@ package com.danielfreeman.madcomponents {
  */
 		override protected function drawButton(pressed:Boolean = false):void {
 			super.drawButton(pressed);
+			var height:Number = _skinHeight>0 ? _skinHeight : _label.height + sizeY();
+			if (_style7) {
+				var width:Number = Math.max(_fixwidth,_label.width + 2 * _gap);
+				if (_buttonSkin && _alt) {
+					_buttonSkin.scaleX = 1.0;
+					width = _buttonSkin.width;
+				}
+				graphics.clear();
+				graphics.beginFill(_colour);
+				graphics.drawRect(0, 0, width, height);
+			}
 			var myColor:ColorTransform = new ColorTransform();
 			_icon.visible = true;
 			if (pressed)
@@ -117,11 +132,19 @@ package com.danielfreeman.madcomponents {
 			if (_icon.numChildren>0)
 				_icon.removeChildAt(0);
 			if (value) {
-				_icon.addChild(new value());
+				_iconBitmap = new value();
+				_icon.addChild(_iconBitmap);
 				_icon.x = ( _fixwidth - _icon.width ) / 2;
 				_icon.y = ICON_Y;
 			}
 			drawButton(_state);
+		}
+		
+		
+		public function pixelSnapImage(offset:Number):void {
+			_iconBitmap.scaleX = _iconBitmap.scaleY = 1 / UI.scale;
+			_icon.y = (TAB_HEIGHT - _icon.height) / 2 + 2 + offset;
+			_iconBitmap.pixelSnapping = PixelSnapping.ALWAYS;
 		}
 		
 		

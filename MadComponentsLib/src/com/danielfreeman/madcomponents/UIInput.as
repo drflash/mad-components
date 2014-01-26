@@ -71,12 +71,14 @@ package com.danielfreeman.madcomponents {
 		protected static const SHADOW_OFFSET:Number = 1.0;
 		protected static const WIDTH:Number = 80.0;
 		protected static const CURVE:Number = 16.0;
+		protected static const CURVE7:Number = 6.0;
 		protected static const SIZE_X:Number = 10.0;
 		protected static const SIZE_Y:Number = 7.0;
 		protected static const SIZE_ALT:Number = 4.0;
 		protected static const COLOUR:uint = 0x333339;
 		protected static const SHADOW_COLOUR:uint = 0xAAAAAC;
 		protected static const BACKGROUND:uint = 0xF0F0F0;
+		protected static const BACKGROUND7:uint = 0xFFFFFF;
 		
 		protected const FORMAT:TextFormat = new TextFormat("_sans", 16, 0x333333);
 		
@@ -85,21 +87,31 @@ package com.danielfreeman.madcomponents {
 		protected var _colours:Vector.<uint>;
 		protected var _fixwidth:Number = WIDTH;
 		protected var _alt:Boolean;
+		protected var _style7:Boolean;
+		
 	
-		public function UIInput(screen:Sprite, xx:Number, yy:Number, text:String, colours:Vector.<uint> = null, alt:Boolean = false, prompt:String="", promptColour:uint = 0x999999) {
+		public function UIInput(screen:Sprite, xx:Number, yy:Number, text:String, colours:Vector.<uint> = null, alt:Boolean = false, prompt:String="", promptColour:uint = 0x999999, style7:Boolean = false) {
 			screen.addChild(this);
 			x=xx;y=yy;
 			_alt = alt;
+			_style7 = style7;
 			_colours = colours ? colours : new <uint>[];
 			inputField = new UIBlueText(this, alt ? SIZE_ALT : SIZE_X, (alt ? SIZE_ALT : SIZE_Y) + 1, prompt, -1, _format, prompt!="", promptColour);
-			if (XML(text).hasSimpleContent())
+			if (XML(text).hasSimpleContent()) {
 				_label.text = text;
-			else
+			}
+			else {
 				_label.htmlText = XML(text).children()[0].toXMLString();
+			}
 			if (_colours.length>4 && _label.hasOwnProperty("highlightColour")) {
 				_label.highlightColour = _colours[4];
 			}
+			if (text != "") {
+				UIBlueText(_label).txtchange();
+				UIBlueText(_label).focusout();
+			}
 			addEventListener(MouseEvent.MOUSE_DOWN, mouseDown);
+			drawOutline();
 		}
 		
 /**
@@ -145,6 +157,9 @@ package com.danielfreeman.madcomponents {
 		protected function mouseUp(event:MouseEvent):void {
 			drawOutline();
 			stage.removeEventListener(MouseEvent.MOUSE_UP, mouseUp);
+			if (stage.focus is UIBlueText && UIBlueText(stage.focus).selectionBeginIndex<=0) {
+				UIBlueText(stage.focus).setSelection(UIBlueText(stage.focus).text.length, UIBlueText(stage.focus).text.length);
+			}
 		}
 		
 /**
@@ -195,12 +210,19 @@ package com.danielfreeman.madcomponents {
 				graphics.beginFill(_colours[3]);
 				graphics.drawRect(0, 0, _fixwidth, height+1);
 			}
+			var curve:Number = _style7 ? CURVE7 : CURVE;
 			graphics.beginFill(_colours.length > 0 ? _colours[0] : COLOUR);
-			graphics.drawRoundRect(0, 0, _fixwidth, height, CURVE);
-			graphics.beginFill(_colours.length > 2 ? _colours[2] : SHADOW_COLOUR);
-			graphics.drawRoundRect(1, 1, _fixwidth-2, height-2, CURVE-1);
-			graphics.beginFill(_colours.length > 1 ? _colours[1] : BACKGROUND);
-			graphics.drawRoundRect(2.5, 3, _fixwidth-3.5, height-4, CURVE-2);
+			graphics.drawRoundRect(0, 0, _fixwidth, height, curve);
+			if (_style7) {
+				graphics.beginFill(_colours.length > 1 ? _colours[1] : BACKGROUND7);
+				graphics.drawRoundRect(1, 1, _fixwidth-2, height-2, curve-1);
+			}
+			else {
+				graphics.beginFill(_colours.length > 2 ? _colours[2] : SHADOW_COLOUR);
+				graphics.drawRoundRect(1, 1, _fixwidth-2, height-2, curve-1);
+				graphics.beginFill(_colours.length > 1 ? _colours[1] : BACKGROUND);
+				graphics.drawRoundRect(2.5, 3, _fixwidth-3.5, height-4, curve-2);
+			}
 		}
 		
 		
