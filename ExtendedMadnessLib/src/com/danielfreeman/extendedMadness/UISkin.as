@@ -59,10 +59,10 @@ package com.danielfreeman.extendedMadness
 			super(screen, xml, attributes);
 			includeInLayout = false;
 			mouseEnabled = false;
-			var isRow:Boolean = parent.parent.parent is UIList;
-			if (isRow) {
+		//	var isRow:Boolean = parent.parent.parent is UIList;
+		//	if (isRow) {
 				drawSkin();
-			}
+		//	}
 		}
 
 		
@@ -73,8 +73,9 @@ package com.danielfreeman.extendedMadness
 		
 		
 		override public function set skinClass(value:Class):void {
-			if (_skin)
+			if (_skin) {
 				_skinContainer.removeChild(_skin);
+			}
 			_skinContainer.addChild(_skin = new value());
 		}
 		

@@ -43,8 +43,8 @@ package com.danielfreeman.extendedMadness
  *    background = "#rrggbb, #rrggbb, …"
  *    gapV = "NUMBER"
  *    gapH = "NUMBER"
- *    alignH = "left|right|centre|fill"
- *    alignV = "top|bottom|centre|fill"
+ *    scrollH = "true|false"
+ *    scrollV = "true|false"
  *    visible = "true|false"
  *    border = "true|false"
  *    autoLayout = "true|false"
@@ -75,6 +75,7 @@ package com.danielfreeman.extendedMadness
 		protected var _auto:Boolean;
 		protected var _scrollBarThreshold:Number = ABORT_THRESHOLD;
 		protected var _lockSides:Boolean;
+		protected var _lockTopBottom:Boolean;
 		
 		protected var _swipeTotalX:Number;
 		protected var _swipeDurationX:Number;
@@ -96,6 +97,7 @@ package com.danielfreeman.extendedMadness
  *    visible = "true|false"
  *    border = "true|false"
  *    autoLayout = "true|false"
+ *    auto = "true|false"
  *    alignV = "scroll|no scroll"
  *    tapToScale = "NUMBER"
  * /&gt;
@@ -106,7 +108,9 @@ package com.danielfreeman.extendedMadness
 			super(screen, xml, attributes);
 			_auto = xml.@auto == "true";
 			_lockSides = xml.@lockSides == "true";
+			_lockTopBottom = xml.@lockTopBottom == "true";
 			_manhattan = xml.@manhattan == "true";
+			_scrollEnabledX = xml.@scrollH != "no scroll";
 			if (xml.@tapToScale.length()>0) {
 				_tapToScale = parseFloat(xml.@tapToScale[0]);
 				_slider.doubleClickEnabled = true;
@@ -229,7 +233,11 @@ package com.danielfreeman.extendedMadness
 					//	_delta += sliderY;
 					
 					var delta:Number = -sliderY;
-					sliderY += (outsideSlideRange ? _dampen : 1.0) * (mouseY - _lastMouse.y);
+					var ySlider:Number = sliderY + (outsideSlideRange ? _dampen : 1.0) * (mouseY - _lastMouse.y);
+					if (_lockTopBottom) {
+						ySlider = Math.max(Math.min(0, ySlider), -_maximumSlide);
+					}
+					sliderY = ySlider;
 					delta += sliderY;
 					
 					if (delta * _swipeTotalY < 0 || Math.abs(delta) < DELTA_THRESHOLD && Math.abs(_oldDeltaY) < DELTA_THRESHOLD) {

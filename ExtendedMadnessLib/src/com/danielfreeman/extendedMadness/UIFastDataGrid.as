@@ -47,8 +47,7 @@ package com.danielfreeman.extendedMadness {
  *    widths = "i(%),j(%),k(%)…"
  *    multiline = "true|false"
  *    titleBarColour = "#rrggbb"
- *    footerColour = "#rrggbb"
- *    recycle = "true|false"
+ *    recycle = "true|false|shared"
  *    <title>
  *    <font>
  *    <headerFont>
@@ -63,22 +62,23 @@ package com.danielfreeman.extendedMadness {
  * </pre>
  */
 	public class UIFastDataGrid extends MadSprite implements IContainerUI { 
-		
+
 		protected static const DEFAULT_HEADER_COLOUR:uint=0x9999AA; //0x4481c1; 
 		protected static const DEFAULT_COLOURS:Vector.<uint>=new <uint>[0xe8edf5,0xcfd8e9]; 
 		protected static const TABLE_WIDTH:Number=300.0;
 		protected static const TEXT_SIZE:Number=13.0;
-		protected static const THRESHOLD:Number = 100.0;
-		
+		protected static const THRESHOLD:Number = 40.0;
+
 		protected const HEADER_STYLE:TextFormat = new TextFormat('Arial', TEXT_SIZE, 0xFFFFFF);
 		protected const TITLE_STYLE:TextFormat = new TextFormat('Arial', 14, 0xFFFFFF, true);
 		protected const DATA_STYLE:TextFormat = new TextFormat('Arial', TEXT_SIZE, 0x333333);
-		
-		
+
+
 		protected var _table:Vector.<Vector.<UICell>>=new Vector.<Vector.<UICell>>(); 
 		protected var _last:Number=0; 
 		protected var _lastWidth:Number; 
-		protected var _cellWidths:Array = null; 
+		protected var _cellWidths:Array = null;
+		protected var _theWidths:Array = null;
 		protected var _leftMargin:Number;
 		protected var _tableWidth:Number;
 		protected var _data:Array = [];
@@ -97,22 +97,26 @@ package com.danielfreeman.extendedMadness {
 		protected var _titleStyle:TextFormat = TITLE_STYLE;
 		protected var _titleBarColour:uint = DEFAULT_HEADER_COLOUR;
 		protected var _title:UICell = null;
-		protected var _footerColour:uint = uint.MAX_VALUE;
+	//	protected var _footerColour:uint = uint.MAX_VALUE;
 		protected var _headerText:Array;
 		protected var _headerColour:uint;
 		protected var _recycle:Vector.<UICell> = null;
-		protected var _recycleHeader:Vector.<UICell> = null;
+		protected static var _sharedRecycle:Vector.<UICell> = new <UICell>[];
+	//	protected var _recycleHeader:Vector.<UICell> = null;
 		protected var _fastLayout:Boolean = false;
-		
-		
-		public function UIFastDataGrid(screen:Sprite, xml:XML, attributes:Attributes) {							   
+		protected var _border:Boolean;
+		protected var _fits:Boolean = false;
 
+
+		public function UIFastDataGrid(screen:Sprite, xml:XML, attributes:Attributes) {							   
+	
 			screen.addChild(this); 
 			x=attributes.x;
 			y=attributes.y;
 			_xml = xml;
 			_attributes = attributes;
-			_fastLayout = xml.@fastLayout == "true";
+			_border = xml.@lines.length() == 0 || xml.@lines == "true";
+		//	_fastLayout = xml.@fastLayout == "true";
 			
 			_tableWidth=attributes.width;
 			_leftMargin=4.0;
@@ -121,6 +125,9 @@ package com.danielfreeman.extendedMadness {
 			
 			if (xml.widths.length() > 0) { // Depreciated
 				_cellWidths = xml.widths.split(",");
+			}
+			if (_xml.@widths.length() > 0) {
+				_theWidths = xml.@widths.split(",");
 			}
 			if (xml.model.length() > 0) {
 				_model = new DGModel(this,xml.model[0]);
@@ -134,12 +141,14 @@ package com.danielfreeman.extendedMadness {
 			if (xml.titleFont.length() > 0) {
 				_titleStyle = UIe.toTextFormat(xml.titleFont[0], TITLE_STYLE);
 			}
-			if (xml.@footerColour.length() > 0) {
-				_footerColour = UI.toColourValue(xml.@footerColour);
+		//	if (xml.@footerColour.length() > 0) {
+		//		_footerColour = UI.toColourValue(xml.@footerColour);
+		//	}
+			if (xml.@recycle=="shared" && !_recycle) {
+				_recycle = _sharedRecycle;
 			}
 			if (xml.@recycle=="true" && !_recycle) {
 				_recycle = new Vector.<UICell>();
-				_recycleHeader = new Vector.<UICell>();
 			}
 
 			customWidths();
@@ -183,12 +192,32 @@ package com.danielfreeman.extendedMadness {
 			if (xml.data.length()>0) {
 				extractData(xml.data[0]);
 			}
-
+			_dataStyle.leftMargin = _leftMargin;
+			_headerStyle.leftMargin = 0;
 			makeTable(_data, null);
 			doLayout();
 			drawBackground();
 		}
 		
+		
+		public function get fits():Boolean {
+			return _fits;
+		}
+		
+		
+		public function set widths(value:String):void {
+			if (value == "") {
+				_theWidths = null;
+				_compactTable = true;
+				_columnWidths = null;
+			}
+			else {
+				_theWidths = value.split(",");
+				calculateCustomWidths();
+				_compactTable = false;
+			}
+		}
+
 /**
  *  Grid row colours
  */
@@ -255,22 +284,26 @@ package com.danielfreeman.extendedMadness {
 			return _headerColour;
 		}
 		
+		
+		protected function calculateCustomWidths():void {
+			var total:Number = 0;
+			for each (var item : String in _theWidths) {
+				if (item.lastIndexOf("%") < 0) {
+					total += parseInt(item);
+				}
+			}
+			_columnWidths = new Vector.<Number>();
+			for each (var width:String in _theWidths) {
+				_columnWidths.push((width.lastIndexOf("%") > 0) ? parseFloat(width)/100 * (_attributes.width - total) : parseFloat(width));			
+			}
+		}
+		
 /**
  *  Adjust column widths
  */
 		protected function customWidths():void {
-			if (_xml.@widths.length() > 0 && _table.length > 0) {
-				var total:Number = 0;
-				var widths:Array = _xml.@widths.toString().split(",");
-				for each (var item : String in widths) {
-					if (item.lastIndexOf("%") < 0) {
-						total += parseInt(item);
-					}
-				}
-				_columnWidths = new Vector.<Number>();
-				for each (var width:String in widths) {
-					_columnWidths.push((width.lastIndexOf("%") > 0) ? parseFloat(width)/100 * (_attributes.width - total) : parseFloat(width));			
-				}		
+			if (_theWidths && _table.length > 0) {
+				calculateCustomWidths();
 			}
 			rejig();
 		}
@@ -284,13 +317,16 @@ package com.danielfreeman.extendedMadness {
 			}
 			var lastRow:Vector.<UICell> = _table[_table.length - 1];
 			var cornerCell:UICell = lastRow[lastRow.length - 1];
-			var theWidth:Number = cornerCell.x + cornerCell.width + 1;
+		//	var theWidth:Number = Math.max(cornerCell.x + cornerCell.width + 1, _attributes.height, _attributes.width);
+			var theWidth:Number = Math.max(cornerCell.x + cornerCell.width + 1, _attributes.width);
 			var colour:uint = _hasHeader ? _headerColour : _colours[0];
 			var index:int = _hasHeader ? 0 : 1;
+			_title.fixwidth = theWidth;
 			graphics.clear();
 			for each(var row:Vector.<UICell> in _table) {
 				graphics.beginFill(colour);
 				graphics.drawRect(0, row[0].y, theWidth, row[0].height);
+				graphics.endFill();
 				colour = _colours[index++ % _colours.length];
 			}
 		}
@@ -307,14 +343,13 @@ package com.danielfreeman.extendedMadness {
 				var wdth0:Number=_tableWidth/dataRow.length; 
 				var lastX:Number=0; 
 				for (var j:int=0;j<dataRow.length;j++) { 
-					var wdth:Number=(_cellWidths) ? _tableWidth*_cellWidths[Math.min(_cellWidths.length-1,j)]/100 : wdth0;
-					var txt:UICell = new UICell(this, lastX, _last, dataRow[j], wdth, format);
-					row.push(txt); 
-					
+					var wdth:Number = (_cellWidths) ? _tableWidth*_cellWidths[Math.min(_cellWidths.length-1,j)]/100 : wdth0;
+					var txt:UICell = new UICell(this, lastX, _last, dataRow[j], wdth, format, _border);
+					row.push(txt);
 					txt.border = true;
 					txt.borderColor = _borderColour;
 					txt.multiline = txt.wordWrap = _multiLine;
-					txt.setTextFormat(format);
+				//	txt.setTextFormat(format);
 					txt.fixwidth = wdth;
 					lastX=txt.x+txt.width;
 				} 
@@ -360,7 +395,9 @@ package com.danielfreeman.extendedMadness {
 			var dataA:Array = _data[rowIndexA];
 			_data[rowIndexA] = _data[rowIndexB];
 			_data[rowIndexB] = dataA;
-			drawBackground();
+			if (_multiLine) {
+				drawBackground();
+			}
 		}
 		
 /**
@@ -389,15 +426,18 @@ package com.danielfreeman.extendedMadness {
 			var index:int = 0;
 			var newRow:Vector.<UICell> = new Vector.<UICell>();
 			for each (var topCell:UICell in row) {
-				newRow.push(cell = newCell(rowData[index]));
+				newRow.push(cell = newCell(_dataStyle));
 				cell.x = topCell.x;
 				cell.y = rowY;
+				cell.xmlText = rowData[index];
 				cell.fixwidth = topCell.width;
 				index++;
 			}
 			_table.splice(rowIndex, 0, newRow);
 			_data.splice(rowIndex, 0, rowData);
-			drawBackground();
+			if (_multiLine) {
+				drawBackground();
+			}
 		}
 		
 /**
@@ -411,8 +451,9 @@ package com.danielfreeman.extendedMadness {
 			for each (var cell:UICell in row) {
 				removeCell(cell);
 			}
-			drawBackground();
-			
+			if (_multiLine) {
+				drawBackground();
+			}
 		}
 
 /**
@@ -430,6 +471,7 @@ package com.danielfreeman.extendedMadness {
 				var wdth0:Number=_tableWidth/row.length;
 				var position:Number = 0;
 				var maxHeight:Number = 0;
+
 				for (var j:int = 0; j < row.length; j++) {
 					var wdth:Number= Math.ceil(_columnWidths ? _columnWidths[j] : (_cellWidths) ? _tableWidth*_cellWidths[Math.min(_cellWidths.length-1,j)]/100 : wdth0);
 					var cell:UICell = row[j];
@@ -465,7 +507,7 @@ package com.danielfreeman.extendedMadness {
 			if (_cellWidths) {
 				rejig();
 			}
-			else if (_xml.@widths.length()>0) {
+			else if (_theWidths) {
 				customWidths();
 			}
 			else if (_compactTable) {
@@ -479,14 +521,12 @@ package com.danielfreeman.extendedMadness {
 		
 		
 		public function layout(attributes:Attributes):void {
+			_attributes = attributes;
 			x=attributes.x;
 			y=attributes.y;
-			_attributes = attributes;
-			if (_fastLayout) {
-				drawBackground();
-			}
-			else {
+			if (!_fastLayout) {
 				doLayout();
+				_fastLayout = _xml.@fastLayout == "true";
 			}
 		}
 		
@@ -498,18 +538,9 @@ package com.danielfreeman.extendedMadness {
  * Clear the data grid
  */
 		public function clear():void {
-			var header:Boolean = _hasHeader;
 			for each (var row:Vector.<UICell> in _table) {
-				if (header) {
-					for each (var cell0:UICell in row) {
-						removeHeaderCell(cell0);
-					}
-					header = false;
-				}
-				else {
-					for each (var cell:UICell in row) {
-						removeCell(cell);
-					}
+				for each (var cell:UICell in row) {
+					removeCell(cell);
 				}
 			}
 			_table = new Vector.<Vector.<UICell>>();
@@ -576,14 +607,25 @@ package com.danielfreeman.extendedMadness {
 		}
 		
 		
+		protected function reformatTopRow(format:TextFormat):void {
+			if (_table.length > 0) {
+				for each (var cell:UICell in _table[0]) {
+					cell.setTextFormat(format);
+					cell.defaultTextFormat = format;
+				}
+			}
+		}
+		
+		
 		protected function addHeaderToTable():void {
-			//_table.unshift()
 			_hasHeader = true;
+			reformatTopRow(_headerStyle);
 		}
 		
 		
 		protected function removeHeaderFromTable():void {
 			_hasHeader = false;
+			reformatTopRow(_dataStyle);
 		}
 		
 				
@@ -600,7 +642,7 @@ package com.danielfreeman.extendedMadness {
 			else if (_hasHeader) {
 				removeHeaderFromTable();
 			}
-			newDimensions(value.length + (!includeHeader && _hasHeader ? 1 : 0), value[0].length);
+			newDimensions(value.length + (!includeHeader && _hasHeader ? 1 : 0), value.length > 0 ? value[0].length : 0);
 			invalidate(false, includeHeader);
 			doLayout();
 		}
@@ -608,6 +650,11 @@ package com.danielfreeman.extendedMadness {
 		
 		public function set data(value:Array):void {
 			setData(value);
+		}
+		
+		
+		public function get data():Array {
+			return _data;
 		}
 		
 		
@@ -668,6 +715,7 @@ package com.danielfreeman.extendedMadness {
  *  Attempt to make the datagrid width fit exactly the width of the screen
  */
 		public function compact(padding:Boolean = false):void {
+			_fits = false;
 			if (_table.length > 0) {
 				_columnWidths = new Vector.<Number>(_table[0].length);
 				for (var i:int = 0; i<_table.length; i++) {
@@ -687,6 +735,7 @@ package com.danielfreeman.extendedMadness {
 						sum += width;
 					}
 					if (sum < _tableWidth) {
+						_fits = true;
 						var padEachCellBy:Number = (_tableWidth - sum) / _columnWidths.length;
 						for (var k:int = 0; k < _columnWidths.length; k++) {
 							_columnWidths[k] += padEachCellBy;
@@ -701,8 +750,22 @@ package com.danielfreeman.extendedMadness {
 								maxValue = _columnWidths[l];
 							}
 						}
-						if (sum - _tableWidth + THRESHOLD < _columnWidths[maxColumn]) {
-							_columnWidths[maxColumn] -= sum - _tableWidth;
+						var indexes:Array = [];
+						var minValue:Number = maxValue;
+						for (var m:int = 0; m < _columnWidths.length; m++) {
+							var value:Number = _columnWidths[m];
+							if (value/maxValue > 0.7) {
+								indexes.push(m);
+								if (value < minValue) {
+									minValue = value;
+								}
+							}
+						}
+						var reduction:Number = (sum - _tableWidth) / indexes.length;
+						if (minValue - reduction > THRESHOLD) {
+							for each (var index:int in indexes) {
+								_columnWidths[index] -= reduction;
+							}
 						}
 					}
 				}
@@ -719,30 +782,33 @@ package com.danielfreeman.extendedMadness {
 		}
 		
 		
-		protected function removeHeaderCell(cell:UICell):void {
-			if (_recycleHeader) {
-				_recycleHeader.push(cell);
+	/*	protected function removeHeaderCell(cell:UICell):void {
+			if (_recycle) {
+				_recycle.push(cell);
 			}
 			if (cell.parent) {
 				cell.parent.removeChild(cell);
 			}
-		}
+		} */
 		
 		
-		protected function newCell(label:String = ""):UICell {
+		protected function newCell(format:TextFormat):UICell {
 			_dataStyle.leftMargin=_leftMargin; 
 			var result:UICell;
 			if (_recycle && _recycle.length > 0) {
 				addChild(result = _recycle.pop());
+				result.setTextFormat(format);
+				result.defaultTextFormat = format;
+				result.border = _border;
 			}
 			else {
-				result = new UICell(this, 0, 0, label, 0, _dataStyle);
+				result = new UICell(this, 0, 0, "", 0, format, _multiLine, _borderColour, _border);
 			}
 			return result;
 		}
 		
 		
-		protected function newHeaderCell():UICell {
+	/*	protected function newHeaderCell():UICell {
 			_headerStyle.leftMargin=_leftMargin; 
 			var result:UICell;
 			if (_recycleHeader && _recycleHeader.length > 0) {
@@ -752,7 +818,7 @@ package com.danielfreeman.extendedMadness {
 				result = new UICell(this, 0, 0, " ", 0, _headerStyle);
 			}
 			return result;
-		}
+		}*/
 		
 /**
  *  Add and remove rows and columns to resize the datagrid efficiently
@@ -774,7 +840,7 @@ package com.danielfreeman.extendedMadness {
 				for each (var row1:Vector.<UICell> in _table) {
 					if (header) {
 						for (var c0:int = columns; c0 < oldColumns; c0++) {
-							removeHeaderCell(row1[c0]);
+							removeCell(row1[c0]);
 						}
 						header = false;
 					}
@@ -790,7 +856,7 @@ package com.danielfreeman.extendedMadness {
 				for (var r1:int = oldRows; r1 < rows; r1++) {
 					var newRow:Vector.<UICell> = new Vector.<UICell>();
 					for (var c2:int = 0; c2 < Math.min(columns, oldColumns); c2++) {
-						newRow.push(newCell());
+						newRow.push(newCell(_dataStyle));
 					}
 					_table.push(newRow);
 				}
@@ -799,13 +865,13 @@ package com.danielfreeman.extendedMadness {
 				for each (var row:Vector.<UICell> in _table) {
 					if (header) {
 						for (var c3:int = oldColumns; c3 < columns; c3++) {
-							row.push(newHeaderCell());
+							row.push(newCell(_headerStyle));
 						}
 						header = false;
 					}
 					else {
 						for (var c4:int = oldColumns; c4 < columns; c4++) {
-							row.push(newCell());
+							row.push(newCell(_dataStyle));
 						}
 					}
 				}

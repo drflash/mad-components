@@ -1,5 +1,6 @@
 package com.danielfreeman.extendedMadness {
 
+	import flash.system.Capabilities;
 	import com.danielfreeman.madcomponents.*;
 
 	import flash.display.Sprite;
@@ -17,12 +18,16 @@ package com.danielfreeman.extendedMadness {
 		public static const SCREEN_CHANGED:String = "screenChanged";
 		
 		public function UIScreens(screen : Sprite, xml : XML, attributes : Attributes) {
+		//	attributes.parse(xml);
 			super(screen, xml, attributes);
 		}
 	
 	
 		protected function useThisOne(size:String):Boolean {
 			var result:Boolean = true;
+			if (size.substr(-3,3) == "DPI") {
+				return parseFloat(size.substr(0,-3)) >= Capabilities.screenDPI;
+			}
 			if (size.substr(-1,1) == "C") {
 				size = size.substr(0,-1);
 			}
@@ -79,6 +84,13 @@ package com.danielfreeman.extendedMadness {
 				}
 			}
 			return IContainerUI(_thisPage).findViewById(id, row, group);
+		}
+		
+		
+		override public function touchCancel():void {
+			if (_thisPage is Sprite && Sprite(_thisPage).getChildAt(0) is MadSprite) {
+				MadSprite(Sprite(_thisPage).getChildAt(0)).touchCancel();
+			}
 		}
 				
 /**

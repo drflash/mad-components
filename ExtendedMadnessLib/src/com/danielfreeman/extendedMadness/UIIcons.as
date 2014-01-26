@@ -1,5 +1,6 @@
 package com.danielfreeman.extendedMadness
 {
+	import flash.display.PixelSnapping;
 	import flash.text.TextField;
 	import com.danielfreeman.madcomponents.*;	
 	import flash.display.Bitmap;
@@ -29,6 +30,8 @@ package com.danielfreeman.extendedMadness
  *    visible = "true|false"
  *    border = "true|false"
  *    leftMargin = "NUMBER"
+ *    pixelSnapping = "true|false"
+ *    scaleHeight = "NUMBER"
  *    &lt;data&gt;LABELS&lt;/data&gt;
  *    &lt;font&gt;FORMAT&lt;/font&gt;
  *    &lt;activeFont&gt;FORMAT&lt;/activeFont&gt;
@@ -41,12 +44,13 @@ package com.danielfreeman.extendedMadness
 		protected static const COLOUR_OFFSET:Number = 0.5;
 		protected static const COLOUR_FACTOR:Number = 0.5;
 		protected static const DISABLED_COLOUR:uint = 0x333366;
+		protected static const CENTRE_OFFSET:Number = 5;
 		
 		protected const LABEL_FORMAT:TextFormat = new TextFormat("Arial", 10, 0xCCCCCC);
 		protected const LABEL_HIGHLIGHT:TextFormat = new TextFormat("Arial", 10, 0xFFFFFF);
 		protected const LABEL_DISABLE:TextFormat = new TextFormat("Arial", 10, DISABLED_COLOUR);
 		
-		protected var _icons:Vector.<DisplayObject>;
+		protected var _icons:Vector.<Bitmap>;
 		protected var _timer:Timer = new Timer(50,1);
 		protected var _index:int = -1;
 		protected var _pressIndex:int = -1;
@@ -61,10 +65,13 @@ package com.danielfreeman.extendedMadness
 		protected var _labelHighlight:TextFormat = LABEL_HIGHLIGHT;
 		protected var _labelDisable:TextFormat = LABEL_DISABLE;
 		protected var _enabled:Vector.<Boolean> = null;
+		protected var _pixelSnapping:Boolean;
+		protected var _scaleHeight:Number = 0;
 		
 		
 		public function UIIcons(screen:Sprite, xml:XML, attributes:Attributes) {
 			
+			xml = xml.copy();
 			if (xml.@highlightColour.length() > 0) {
 				_highlightColour = UI.toColourValue(xml.@highlightColour);
 			}
@@ -80,6 +87,10 @@ package com.danielfreeman.extendedMadness
 			if (xml.@leftMargin.length() > 0) {
 				_leftMargin = parseFloat(xml.@leftMargin);
 			}
+			if (xml.@scaleHeight.length() > 0) {
+				_scaleHeight = parseFloat(xml.@scaleHeight);
+			}
+			_pixelSnapping = xml.@pixelSnapping == "true";
 			super(screen, xml, attributes);
 			addEventListener(MouseEvent.MOUSE_DOWN, mouseDown);
 			_timer.addEventListener(TimerEvent.TIMER, unHighlight);
@@ -119,6 +130,7 @@ package com.danielfreeman.extendedMadness
 		//	DisplayObject(_icons[index]).transform.colorTransform = colour;
 			_enabled[index] = state;
 			unHighlight();
+			labelHighlight();
 		}
 		
 		
@@ -155,8 +167,8 @@ package com.danielfreeman.extendedMadness
 		
 		protected function labelHighlight():void {
 			clearHighlight();
-			if (_labels && _index < _labels.length) {
-				_labels[_index].setTextFormat(_labelHighlight);
+			if (_labels && _index >= 0 && _index < _labels.length) {
+				_labels[_index].setTextFormat(_enabled[_index] ? _labelHighlight : _labelDisable);
 			}
 		}
 		
@@ -210,11 +222,23 @@ package com.danielfreeman.extendedMadness
 			var disableColourTransform:ColorTransform = new ColorTransform();
 			disableColourTransform.color = _disableColour;
 			var index:int = 0;
+			graphics.clear();
+			if (_attributes.backgroundColours.length > 0) {
+				graphics.beginFill(_attributes.backgroundColours[0])
+			}
+			else {
+				graphics.beginFill(0, 0);
+			}
 			for each (var icon:DisplayObject in _icons) {
+				graphics.drawRect(icon.x - _attributes.paddingH / 2, 0, icon.width + _attributes.paddingH, _attributes.heightV);
 				icon.transform.colorTransform = _enabled[index++] ? newColourTransform( _iconColour) : disableColourTransform;
 			}
 			if (_index >= 0 && _activeColour < uint.MAX_VALUE) {
 				_icons[_index].transform.colorTransform = _enabled[_index] ? newColourTransform(_activeColour) : disableColourTransform;
+				if (_attributes.backgroundColours.length > 1) {
+					graphics.beginFill(_attributes.backgroundColours[1]);
+					graphics.drawRect(_icons[_index].x - _attributes.paddingH / 2, 0, _icons[_index].width + _attributes.paddingH, _attributes.heightV);
+				}
 			}
 		}
 		
@@ -233,11 +257,11 @@ package com.danielfreeman.extendedMadness
 		}
 		
 		
-		override public function drawComponent():void {
-			graphics.clear();
-			graphics.beginFill(0, 0);
-			graphics.drawRect(0, 0, width + _attributes.paddingH, height);
-		}
+	//	override public function drawComponent():void {
+	//		graphics.clear();
+	//		graphics.beginFill(0, 0);
+	//		graphics.drawRect(0, 0, width + _attributes.paddingH, height);
+	//	}
 		
 		
 		public function set text(source:String):void {
@@ -246,19 +270,34 @@ package com.danielfreeman.extendedMadness
 			if (_icons) {
 				clear();
 			}
-			_icons = new <DisplayObject>[];
+			_icons = new <Bitmap>[];
 			_enabled = new <Boolean>[];
 			for (var i:int = 0; i < dimensions.length; i++) {
-				var icon:DisplayObject = DisplayObject(new (getDefinitionByName(dimensions[i]) as Class));
+				var icon:Bitmap = Bitmap(new (getDefinitionByName(dimensions[i]) as Class));
 				_icons.push(icon);
 				_enabled.push(true);
-				if (icon is Bitmap) {
-					Bitmap(icon).smoothing = true;
+			/*	if (icon is Bitmap) {
+					Bitmap(icon).smoothing = !_pixelSnapping;
+					if (_pixelSnapping) {
+						icon.scaleX = icon.scaleY = 1 / UI.scale;
+					}
+					Bitmap(icon).pixelSnapping = _pixelSnapping ? PixelSnapping.ALWAYS : PixelSnapping.NEVER;;
+				}*/
+				icon.smoothing = !_pixelSnapping;
+				if (_scaleHeight > 0) {
+					icon.scaleX = icon.scaleY = icon.scaleY * _scaleHeight / icon.height;
+					icon.y = (_attributes.heightV - icon.height) / 2 - (_data ? CENTRE_OFFSET : 0);					
 				}
+				else if (_pixelSnapping) {
+					icon.scaleX = icon.scaleY = 1 / UI.scale;
+					icon.y = (_attributes.heightV - icon.height) / 2 - (_data ? CENTRE_OFFSET : 0);
+				}
+				icon.pixelSnapping = _pixelSnapping ? PixelSnapping.ALWAYS : PixelSnapping.NEVER;
+				
 				addChild(icon);
 				icon.x = position;
 				if (_data && i < _data.length) {
-					var label:UILabel = new UILabel(this, 0, icon.height - 2, _data[i], _labelFormat);
+					var label:UILabel = new UILabel(this, 0, icon.y + icon.height - 3, _data[i], _labelFormat);
 					label.x = position + icon.width / 2 - label.width / 2;
 					_labels.push(label);
 				}
@@ -277,11 +316,16 @@ package com.danielfreeman.extendedMadness
 		}
 		
 		
-		public function set icons(value:Vector.<DisplayObject>):void {
+		public function set icons(value:Vector.<Bitmap>):void {
 			if (_icons) {
 				clear();
 			}
 			_icons = value;
+		}
+		
+		
+		public function get icons():Vector.<Bitmap> {
+			return _icons;
 		}
 	
 	

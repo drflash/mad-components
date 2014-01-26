@@ -54,6 +54,7 @@ package com.danielfreeman.extendedMadness {
 			}
 			
 			var listAttributes:Attributes = new Attributes(0, 0, _listWidth - SHADOW_WIDTH / 2, attributes.height - UINavigationBar.HEIGHT);
+			listAttributes.style7 = attributes.style7;
 			var formAttributes:Attributes = attributes.copy(_detailXML);
 			if (_detailXML.@border!="false") {
 				addPadding(_detailXML.localName(), formAttributes);
@@ -62,7 +63,7 @@ package com.danielfreeman.extendedMadness {
 			_list = UIList(UI.containers(this, _listXML, listAttributes));
 			_form = new UI.FormClass(this, _detailXML, formAttributes);
 			
-			_navigationBar = new UINavigationBar(this, attributes);
+			_navigationBar = new UINavigationBar(this, xml, attributes);
 			if (xml.@title.length()>0) {
 				_navigationBar.text = xml.@title[0].toString();
 			}
