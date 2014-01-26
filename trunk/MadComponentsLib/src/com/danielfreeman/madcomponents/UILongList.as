@@ -80,7 +80,7 @@ package com.danielfreeman.madcomponents
 			for each (var record:Object in value) {
 				customCell(record, position);
 				position += _cell.height + _attributes.paddingV;
-				drawCell(position, _count);
+				drawCell(position, _count, record);
 				position += _attributes.paddingV;
 				_count++;
 				
@@ -91,7 +91,7 @@ package com.danielfreeman.madcomponents
 					if (_cellHeight<0)
 						_cellHeight = (_slider.height - _top - (_refresh ? TOP : 0)) / _count;
 					for (var i:uint = _count; i<value.length; i++) {
-						drawCell((i+1) * _cellHeight + _top, i);
+						drawCell((i+1) * _cellHeight + _top, i, record.hasOwnProperty("$colour") ? record.$colour : uint.MAX_VALUE);
 					}
 					_lazy = true;
 					return;
@@ -113,7 +113,7 @@ package com.danielfreeman.madcomponents
 			for each (var record:* in value) {
 				var label:UILabel = labelCell(record, position);
 				position += label.height + 2 * _attributes.paddingV;
-				drawCell(position, _count);
+				drawCell(position, _count, record);
 				position += 2 * _attributes.paddingV;
 			//	_cellHeight = 4 * _attributes.paddingV + label.height;
 				_count++;
@@ -125,7 +125,7 @@ package com.danielfreeman.madcomponents
 					if (_cellHeight<0)
 						_cellHeight = (_slider.height - _top - (_refresh ? TOP : 0)) / _count;
 					for (var i:uint = _count; i<value.length; i++) {
-						drawCell((i+1) * _cellHeight + _top, i);
+						drawCell((i+1) * _cellHeight + _top, i, record.hasOwnProperty("$colour") ? record.$colour : uint.MAX_VALUE);
 					}
 					_lazy = true;
 					return;
@@ -198,12 +198,12 @@ package com.danielfreeman.madcomponents
 /**
  *  Re-use a recyclable row, otherwise instanciate a new one
  */
-		override protected function newRow():UIForm {
+		override protected function newRow(rendererXML:XML):UIForm {
 			if (_lazy && _recycle && _recycleList.length > 0) {
 				return _recycleList.pop();
 			}
 			else {
-				return super.newRow();
+				return super.newRow(rendererXML);
 			}
 		}
 

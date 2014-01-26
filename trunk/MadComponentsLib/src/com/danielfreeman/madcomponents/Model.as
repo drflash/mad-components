@@ -152,6 +152,16 @@ package com.danielfreeman.madcomponents {
 			return value.replace(/&gt;/g, ">");
 		}
 		
+		
+/**
+ * htmlEncode a string
+ */
+		public static function addSlashes(value:String):String {
+			value = value.replace(/\"/g, '\\"');
+			value = value.replace(/\'/g, "\\'");
+			return value.replace(/[^\x{20}-\x{7E}\s\t\n\r]/g,"");
+		}
+		
 /**
  * Repeat the previous server query
  */	

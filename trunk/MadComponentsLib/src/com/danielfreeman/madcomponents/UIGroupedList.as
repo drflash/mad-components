@@ -74,9 +74,11 @@ package com.danielfreeman.madcomponents {
 		protected static const STRIPE_WIDTH:Number = 8.0;
 		protected static const PADDING:Number = 10.0;
 		protected static const CELL_COLOUR:uint = 0xFFFFFF;
-		protected static const CURVE:Number = 8.0;
+		protected static var CURVE:Number = 8.0;
+		protected static var CURVE7:Number = 4.0;
 		protected const BLACK:TextFormat = new TextFormat("Tahoma",17,0x555566);
 		protected const WHITE:TextFormat = new TextFormat("Tahoma",17,0xFCFCFC);
+		protected static const GROUP_SPACING:Number = 45;
 		
 		public static var HEADING:Class = null;
 		
@@ -94,6 +96,9 @@ package com.danielfreeman.madcomponents {
 		protected var _alwaysAutoLayout:Boolean = false;
 		protected var _cellLeft:Number = 0;
 		protected var _saveGroup:int = -1;
+		protected var _headingClicked:Boolean = false;
+		protected var _topGroupSpacing:Number = 0;
+		protected var _groupSpacing:Number = 0;
 		
 		
 		public function UIGroupedList(screen:Sprite, xml:XML, attributes:Attributes) {
@@ -104,14 +109,25 @@ package com.danielfreeman.madcomponents {
 			if (xml.@headingShadowColour.length() > 0) {
 				_shadowFormat.color = UI.toColourValue(xml.@headingShadowColour);
 			}
+			_groupSpacing = ((xml.@groupSpacing.length() > 0) ? parseFloat(xml.@groupSpacing) : GROUP_SPACING);// - (_autoLayoutGroup ? GROUP_SPACING : 0);
+			_topGroupSpacing = ((xml.@topGroupSpacing.length() > 0) ? parseFloat(xml.@topGroupSpacing) : _groupSpacing);
 			super(screen, xml, attributes);
 			_autoLayout = false;
 			_field = "";
 		}
 		
 		
+		override protected function mouseUp(event:MouseEvent):void {
+			super.mouseUp(event);
+			if (_headingClicked) {
+				headingClicked();
+			}
+		}
+		
+		
 		override protected function mouseDown(event:MouseEvent):void {
 			_saveGroup = _group;
+			_headingClicked = false;
 			super.mouseDown(event);
 		}
 		
@@ -119,18 +135,29 @@ package com.danielfreeman.madcomponents {
 		override protected function doCancel():void {
 			_pressedCell = _saveIndex;
 			_group = _saveGroup;
+			_headingClicked = false;
 			dispatchEvent(new Event(CLICK_CANCEL, true));
 			if (_showPressed && _pressedCell >= _header && _group < _groupPositions.length) {
 				drawHighlight();
 			}
 		}
 		
+		
+		override public function touchCancel():void {
+			super.touchCancel();
+			_headingClicked = false;
+		}
+		
 /**
  *  Draw background
  */
 		override public function drawComponent():void {
+			var hasBackground:Boolean = _colours && _colours.length>0;
 			graphics.clear();
-			if (_colours && _colours.length>0) {
+			if (_attributes.style7) {
+				graphics.beginFill(hasBackground ? _colours[0] : _attributes.colour);
+			}
+			else if (hasBackground) {
 				var matr:Matrix=new Matrix();
 				matr.createGradientBox(STRIPE_WIDTH,_attributes.height, 0, 0, 0);
 				var colour:uint = _colours[0];
@@ -158,7 +185,9 @@ package com.danielfreeman.madcomponents {
 			initDrawGroups();
 			clearCellGroups();
 			setCellSize();
-			_cellTop =  _top + 4 * _attributes.paddingV; //_attributes.y +	
+			_cellTop =  _top + _topGroupSpacing;// -1.5*_attributes.paddingV + (_autoLayoutGroup ? 2*_attributes.paddingV : 0);
+//;// + (_autoLayoutGroup ? 4 * _attributes.paddingV : 0); //4 * _attributes.paddingV; //_attributes.y +	
+			
 			_groupPositions = [];
 			_group = 0;
 			for each(var group:* in value) {
@@ -170,20 +199,28 @@ package com.danielfreeman.madcomponents {
 					_length = group.length;
 					_groupDetails = {top:_cellTop, length:_length, bottom:0, cellHeight:0, visible:true};
 					if (!_heading) {
-						_heading = " ";
+						_heading = "";
 					}
+				//	var cellTop:Number = _cellTop;
 					super.data0 = group;
+					
 					_groupDetails.cellHeight = (_cellTop - _groupDetails.top) / _length;
 					_groupDetails.bottom = _cellTop;
 					_groupPositions.push(_groupDetails);
-					_cellTop += 4 * _attributes.paddingV;
+					_cellTop += _groupSpacing; //4 * _attributes.paddingV;
 					_group++;
 				}
+		//		doLayout();
 			}
 	//		if (_autoLayoutGroup) {
 				doLayout();
 	//		}
 			_group = _saveGroup;
+		}
+		
+		
+		public function refresh():void {
+			data = _data;
 		}
 		
 		
@@ -229,26 +266,30 @@ package com.danielfreeman.madcomponents {
 			setCellSize();
 			var saveGroup:int = _group;
 			_group = 0;
-			var last:Number = _top-1.5*_attributes.paddingV ;// + _gapBetweenGroups;
+			var last:Number = _topGroupSpacing+ _top;//-1.5*_attributes.paddingV + (_autoLayoutGroup ? 2*_attributes.paddingV : 0);
 			for each(var groupDetails:Object in _groupPositions) {
 				_length = groupDetails.length;
 				if (autoLayout) {
 					groupDetails.top = last;
 					var heading:DisplayObject = _slider.getChildByName("heading_"+_group.toString());
 					if (heading) {
-						heading.y = last + 2*_attributes.paddingV + 1;
+						heading.y = last + _attributes.paddingV + 2;
 						last = groupDetails.top = Math.max(heading.y + heading.height, last + 3*_attributes.paddingV) + _attributes.paddingV;
 						var shadow:DisplayObject = _slider.getChildByName("shadow_"+_group.toString());
 						if (shadow) {
 							shadow.y = heading.y + 1;
 						}
 					}
+				//	else {
+				//	last = groupDetails.top = last + _groupSpacing;// + 4 * _attributes.paddingV;
+				//	}
 				}
 				_cellTop = groupDetails.top;
 				headingChrome();
 				if (groupDetails.visible) {
+					var cellHeight:Number;
 					for (var i:int=0; i<_length; i++) {
-						var cellHeight:Number = groupDetails.cellHeight;
+						cellHeight = groupDetails.cellHeight;
 						if (autoLayout) {
 							var renderer:DisplayObject = byGroupAndRow(_group,i);
 							if (!_simple) {
@@ -256,19 +297,32 @@ package com.danielfreeman.madcomponents {
 							}
 							renderer.y = last + _attributes.paddingV * (_simple ? 2.0 : 1.0);
 							last += cellHeight;
+	
 						}
-						drawCell(_cellTop + cellHeight, i);
+						if (cellHeight > 0) {
+							var record:Object = _filteredData[_group][i];
+							drawCell(_cellTop + cellHeight, i, record);
+						}
 					}
+
+				}
+				else {
+					last += _groupSpacing;
 				}
 				_group++;
-				last += _attributes.paddingV;
+			//	last += (_xml.@groupSpacing.length() > 0) ? _groupSpacing - 2 * _gapBetweenGroups - groupDetails.cellHeight + 8 : _attributes.paddingV;
+			//	last += (_xml.@groupSpacing.length() > 0) ? _groupSpacing - 2 * _gapBetweenGroups + 8 : _attributes.paddingV;
+				last += _groupSpacing;
+				
 				if (!_simple && autoLayout && groupDetails.visible) {
-					last += 2 * _gapBetweenGroups;
-					groupDetails.bottom = last - (_alwaysAutoLayout ? _gapBetweenGroups : 0);
-				}
-				if (_alwaysAutoLayout && (_simple || !groupDetails.visible)) {
+				//	last += _groupSpacing; //2 * _gapBetweenGroups;// + 4 * _attributes.paddingV - 4;
+				//	groupDetails.bottom = last - (_alwaysAutoLayout ? _gapBetweenGroups : 0);
 					groupDetails.bottom = last;
-					last += 2.0*_gapBetweenGroups;
+				}
+				if (_alwaysAutoLayout) {
+					last = last - 15;
+					groupDetails.bottom = last + 5;
+				//	last += 2.0*_gapBetweenGroups;
 				}
 			}
 			_group = saveGroup;
@@ -279,11 +333,26 @@ package com.danielfreeman.madcomponents {
 		}
 		
 		
+		override public function clear():void {
+			data = [[]];
+		}
+		
+		
 		override protected function calculateMaximumSlide():void {
 			super.calculateMaximumSlide();
 			if (_maximumSlide > 0) {
 				_maximumSlide += (!_simple && _autoLayoutGroup) ? _attributes.paddingH : 3 * _attributes.paddingH;
 			}
+		}
+		
+		
+		protected function superCalculateMaximumSlide():void {
+			super.calculateMaximumSlide();
+		}
+		
+		
+		protected function positionHeading(top:Number, heading:DisplayObject):void {
+			heading.y = top - Math.min(_groupSpacing / 3, 10); // + heading.height; //(_groupSpacing + (_autoLayoutGroup ? GROUP_SPACING : 0) - heading.height) / 2;
 		}
 		
 /**
@@ -292,11 +361,13 @@ package com.danielfreeman.madcomponents {
 		override protected function initDraw():void {
 			if (_heading) {
 				var heading:DisplayObject;
+				var shadow:DisplayObject = null;
 				var top:Number = _cellTop - 4 * _attributes.paddingV;
 				if (_heading is String) {
-					var shadow:DisplayObject = new UILabel(_slider, _attributes.paddingH-1, top+_attributes.paddingV / 2+1, _heading, _shadowFormat);
-					shadow.name = "shadow_"+_group.toString();
+					shadow = new UILabel(_slider, _attributes.paddingH+1, top+_attributes.paddingV / 2+1, _heading, _shadowFormat);
+					shadow.name = "shadow_" + _group.toString();
 					heading = new UILabel(_slider, _attributes.paddingH, top+_attributes.paddingV / 2, _heading, _headingFormat);
+					heading.visible = shadow.visible = _heading != "";
 				}
 				else if (_heading is Class) {
 					_slider.addChild(heading = new _heading());
@@ -305,10 +376,18 @@ package com.danielfreeman.madcomponents {
 					_slider.addChild(heading = _heading);
 				}
 				heading.x = _attributes.paddingH;
-				heading.y = top + _attributes.paddingV / 2;
+			//	heading.y = top + _attributes.paddingV / 2;
+			//	heading.y = top + ( 4 * _attributes.paddingV - heading.height) / 2;
+			//	heading.y = _cellTop + _groupSpacing + heading.height;// ( _groupSpacing - heading.height) / 2;
+				positionHeading(_cellTop, heading);
+				if (shadow) {
+					shadow.y = heading.y + 1;
+				}
 				_heading = null;
-				_cellTop = heading.y+heading.height + _attributes.paddingV;
+			//	_cellTop = heading.y + heading.height + _attributes.paddingV;
+				_cellTop += heading.height;
 				_groupDetails.top = _cellTop;
+			//	_groupDetails.heading = heading;
 				heading.name = "heading_"+_group.toString();
 				_gapBetweenGroups = 2*_attributes.paddingV;
 			}
@@ -335,10 +414,10 @@ package com.danielfreeman.madcomponents {
 /**
  *  Rearrange the layout to new screen dimensions
  */	
-//		override public function layout(attributes:Attributes):void {
-//		//	initDrawGroups();
-//			super.layout(attributes);
-//		}
+		override public function layout(attributes:Attributes):void {
+			initDrawGroups();
+			super.layout(attributes);
+		}
 		
 		
 		protected function setColour(colour:uint, top:Number, width:Number, height:Number):void {
@@ -351,7 +430,7 @@ package com.danielfreeman.madcomponents {
 			else if (colours && colours.length>0) {
 				_slider.graphics.beginFill(colours[0]);
 			}
-			else if (_attributes.backgroundColours.length>0) {
+			else {
 				_slider.graphics.beginFill(colour);
 			}
 		}
@@ -359,34 +438,41 @@ package com.danielfreeman.madcomponents {
 /**
  *  Draw the background for a cell somewhere in the middle of a group
  */	
-		override protected function drawCell(position:Number, count:int):void {
-			_slider.graphics.beginFill(_colour);
-			var colour:uint = CELL_COLOUR;
-			if (_colours.length > 1)
+		override protected function drawCell(position:Number, count:int, record:*):void {
+			var colour:uint = (record.hasOwnProperty("$colour") && record.$colour) ? record.$colour : CELL_COLOUR;
+			if (_colours.length > 1 && !record.hasOwnProperty("$colour")) {
 				colour = _colours[Math.min(_colours.length - 1, count + 1)];
+			}
+			_slider.graphics.beginFill(_attributes.style7 ? colour : _colour);
 			if (_length==1) {	
 				_slider.graphics.drawRoundRect(_cellLeft, _cellTop, _cellWidth + 1, position - _cellTop, 1.5 * CURVE);
 				setColour(colour, _cellTop + 1, _cellWidth - 1, position - _cellTop - 2);
 				_slider.graphics.drawRoundRect(_cellLeft + 1, _cellTop + 1, _cellWidth - 1, position - _cellTop - 2, 1.5 * CURVE);
 			}
 			else if (count==0) {
-				curvedTop(_slider.graphics, _cellLeft, _cellTop, _cellLeft + _cellWidth + 1, position);
+				curvedTop(_slider.graphics, _cellLeft, _cellTop, _cellLeft + _cellWidth + 1, position, _attributes.style7);
 				setColour(colour, _cellTop + 1, _cellWidth - 1, position - _cellTop - 2);
-				curvedTop(_slider.graphics, _cellLeft + 1, _cellTop + 1, _cellLeft + _cellWidth, position);
+				curvedTop(_slider.graphics, _cellLeft + 1, _cellTop + 1, _cellLeft + _cellWidth, position, _attributes.style7);
 			}
 			else if (count==_length-1) {
-				curvedBottom(_slider.graphics, _cellLeft, _cellTop, _cellLeft + _cellWidth + 1, position);
+				curvedBottom(_slider.graphics, _cellLeft, _cellTop, _cellLeft + _cellWidth + 1, position, _attributes.style7);
 				setColour(colour, _cellTop + 1, _cellWidth - 1, position - _cellTop - 2);
-				curvedBottom(_slider.graphics, _cellLeft + 1, _cellTop + 1, _cellLeft + _cellWidth, position - 1);
+				curvedBottom(_slider.graphics, _cellLeft + 1, _cellTop + 1, _cellLeft + _cellWidth, position - 1, _attributes.style7);
 			}
 			else {
 				_slider.graphics.drawRect(_cellLeft, _cellTop, _cellWidth + 1, position - _cellTop);
 				setColour(colour, _cellTop + 1, _cellWidth - 1, position - _cellTop - 2);
 				_slider.graphics.drawRect(_cellLeft + 1, _cellTop + 1, _cellWidth - 1, position - _cellTop);
 			}
-			drawLines(position);
+			if (!(record is String) && hasLines(record)) {
+				drawLines(position);
+			}
 			if (_arrows && (_header > 0 ? count >= _header : count < _length + _header)) {
 				drawArrow(_cellLeft + _cellWidth - PADDING, (_cellTop + position) / 2);
+			}
+			if (_attributes.style7 && count < _length - 1) {
+				_slider.graphics.beginFill(_colour);
+				_slider.graphics.drawRect(_lineGap, position - 1, _cellWidth - _lineGap + _cellLeft + 1, 1);
 			}
 			_cellTop = position;
 		}
@@ -394,26 +480,28 @@ package com.danielfreeman.madcomponents {
 /**
  *  Draw the background of the top cell of a group
  */	
-		public static function curvedTop(shape:Graphics, left:Number, top:Number, right:Number, bottom:Number):void {
-			shape.moveTo(left + CURVE, top);
-			shape.lineTo(right - CURVE, top);
-			shape.curveTo(right, top, right, top + CURVE);
+		public static function curvedTop(shape:Graphics, left:Number, top:Number, right:Number, bottom:Number, style7:Boolean = true):void {
+			var curve:Number = style7 ? CURVE7 : CURVE;
+			shape.moveTo(left + curve, top);
+			shape.lineTo(right - curve, top);
+			shape.curveTo(right, top, right, top + curve);
 			shape.lineTo(right, bottom);
 			shape.lineTo(left, bottom);
-			shape.lineTo(left, top + CURVE);
-			shape.curveTo(left, top, left + CURVE, top);
+			shape.lineTo(left, top + curve);
+			shape.curveTo(left, top, left + curve, top);
 		}
 		
 /**
  *  Draw the background of the bottom cell of a group
  */
-		public static function curvedBottom(shape:Graphics, left:Number, top:Number, right:Number, bottom:Number):void {
+		public static function curvedBottom(shape:Graphics, left:Number, top:Number, right:Number, bottom:Number, style7:Boolean = true):void {
+			var curve:Number = style7 ? CURVE7 : CURVE;
 			shape.moveTo(left, top);
 			shape.lineTo(right, top);
-			shape.lineTo(right, bottom - CURVE);
-			shape.curveTo(right, bottom, right - CURVE, bottom);
-			shape.lineTo(left + CURVE, bottom);
-			shape.curveTo(left, bottom, left, bottom - CURVE);
+			shape.lineTo(right, bottom - curve);
+			shape.curveTo(right, bottom, right - curve, bottom);
+			shape.lineTo(left + curve, bottom);
+			shape.curveTo(left, bottom, left, bottom - curve);
 			shape.lineTo(left, top);		
 		}
 		
@@ -513,7 +601,8 @@ package com.danielfreeman.madcomponents {
 					activate();
 				}
 				else if (sliderMouseY > _top) {
-					headingClicked();
+					_headingClicked = true;
+				//	headingClicked();
 				}
 			}
 			return _pressButton;
@@ -550,8 +639,9 @@ package com.danielfreeman.madcomponents {
 				
 				if (group.@icon.length()>0)
 					result.push(getDefinitionByName(group.@icon.toString()) as Class);
-				else if (group.@label.length()>0)
+				else if (group.@label.length()>0) {
 					result.push(group.@label.toString());
+				}
 				
 				for each (var child:XML in group.children()) {
 					row.push(attributesToObject(child));
@@ -559,6 +649,37 @@ package com.danielfreeman.madcomponents {
 				result.push(row);
 			}
 			data = result;
+		}
+		
+		
+		override public function setData(value:Array, index:int = 0):Boolean {
+			var result:Boolean = false;
+		//	var savePosition:Number = sliderY;
+			_group = index;
+			for each(var row:* in value) {
+				if (row is String) {
+					var heading:DisplayObject = _slider.getChildByName("heading_"+_group.toString());
+					if (heading && heading is UILabel) {
+						UILabel(heading).xmlText = row;
+					}
+					var shadow:DisplayObject = _slider.getChildByName("shadow_"+_group.toString());
+					if (shadow && shadow is UILabel) {
+						UILabel(shadow).xmlText = row;
+					}
+				}
+				else if (row is Array) {
+					_suffix = "_"+_group.toString();
+					super.setData(row);
+					_group++;
+				}
+			}
+		//	sliderY = savePosition;
+			if (_autoLayoutGroup) {
+				doLayout();
+				calculateMaximumSlide();
+			}
+			
+			return result;
 		}
 		
 /**
@@ -569,6 +690,9 @@ package com.danielfreeman.madcomponents {
 				_highlightIsOn = true;
 				var autoLayout:Boolean = _autoLayoutGroup && !_simple;
 				var groupDetails:Object = _groupPositions[_group];
+				if (!groupDetails) {
+					return;
+				}
 				var length:int = groupDetails.length;
 				var top:Number = autoLayout ? _row.y - _attributes.paddingV +1 : groupDetails.top + _pressedCell * groupDetails.cellHeight;
 				var bottom:Number = top + (autoLayout ? _row.height + 2*_attributes.paddingV -1 : groupDetails.cellHeight);

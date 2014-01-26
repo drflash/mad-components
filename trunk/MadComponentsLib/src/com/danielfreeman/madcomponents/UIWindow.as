@@ -57,17 +57,22 @@ package com.danielfreeman.madcomponents {
 		
 		public static const CURVE:Number = 32.0;
 		protected static const OUTLINE:Number = 2.0;
-		protected static const LINE_COLOUR:uint = 0xEEEEEE;
+		protected static const LINE_COLOUR:uint = 0xBABABA;
 		protected static const FILL_COLOUR:uint = 0x666666;
+		protected static const FILL_COLOUR7:uint = 0xF5F5F5;
 		protected static const SHADOW_OFFSET:Number = 4.0;
 		protected static const SHADOW_COLOUR:uint = 0x000000;
 		protected static const SHADOW_ALPHA:Number = 0.2;
 		protected static const OVERLAP:Number = 24.0;
+		protected static const BUTTON_BAR_HEIGHT:Number = 26.0;
 		
 		protected var _curve:Number = CURVE;
 		protected var _centred:Boolean = false;
 		protected var _iMask:Shape = null;
 		protected var _colour:uint;
+		protected var _leftButton:UIBackButton = null;
+		protected var _rightButton:UIBackButton = null;
+		protected var _lineColour:uint = LINE_COLOUR;
 
 /**
  *  A MadComponents pop-up window
@@ -78,10 +83,22 @@ package com.danielfreeman.madcomponents {
 			if (curve>=0) {
 				_curve = curve;
 			}
-			if (_xml.@alt != "true") {
+			if (_xml.@alt != "true" && !_attributes.style7) {
 				addChild(mask = _iMask = new Shape());
 			}
-			drawBackground();
+			if (_xml.@leftButton.length() > 0) {
+				leftButtonText = _xml.@leftButton;
+			//	_leftButton = new UIBackButton(this, -_curve, _attributes.height - BUTTON_BAR_HEIGHT - 4, _xml.@leftButton, 0, false, false, false);
+			//	_leftButton.fixwidth = _attributes.width / 2 + _curve;
+			}
+			if (_xml.@rightButton.length() > 0) {
+				rightButtonText = _xml.@rightButton;
+			//	_rightButton = new UIBackButton(this, _attributes.width / 2, _attributes.height - BUTTON_BAR_HEIGHT - 4, _xml.@rightButton, 0, false, false, false);
+			//	_rightButton.fixwidth = _attributes.width / 2 + _curve;
+			}
+			if (!_leftButton && !_rightButton) {
+				drawBackground();
+			}
 		}
 		
 /**
@@ -93,14 +110,15 @@ package com.danielfreeman.madcomponents {
 				colours = _attributes.backgroundColours;
 			}
 			
-			if (colours.length>3) {
-				graphics.beginFill(colours[3], SHADOW_ALPHA);
+			if (!_attributes.style7) {
+				if (colours.length>3) {
+					graphics.beginFill(colours[3], SHADOW_ALPHA);
+				}
+				else {
+					graphics.beginFill(SHADOW_COLOUR, SHADOW_ALPHA);
+				}
+				graphics.drawRoundRect(_attributes.x-_curve + SHADOW_OFFSET, _attributes.y-_curve + SHADOW_OFFSET, _attributes.width + 2 * _curve, _attributes.height + 2 * _curve, _curve);
 			}
-			else {
-				graphics.beginFill(SHADOW_COLOUR, SHADOW_ALPHA);
-			}
-			graphics.drawRoundRect(_attributes.x-_curve + SHADOW_OFFSET, _attributes.y-_curve + SHADOW_OFFSET, _attributes.width + 2 * _curve, _attributes.height + 2 * _curve, _curve);
-
 			
 			if (colours.length==1) {
 				graphics.beginFill(_colour = colours[0]);
@@ -111,14 +129,13 @@ package com.danielfreeman.madcomponents {
 				graphics.beginGradientFill(GradientType.LINEAR, [_colour = colours[0],colours[1]], [1.0,1.0], [0x00,0xff], matr);
 			}
 			else {
-				graphics.beginFill(_colour = FILL_COLOUR);
+				graphics.beginFill(_colour = (_attributes.style7 ? FILL_COLOUR7 : FILL_COLOUR));
 			}
 
 			graphics.drawRoundRect(_attributes.x-_curve, _attributes.y-_curve, _attributes.width + 2 * _curve, _attributes.height + 2 * _curve, _curve);
 			graphics.endFill();
 			
 			if (_iMask) {
-				
 				_iMask.graphics.beginFill(0);
 				_iMask.graphics.drawRoundRect(_attributes.x-_curve, _attributes.y-_curve, _attributes.width + 2 * _curve, _attributes.height + 2 * _curve, _curve);
 				_iMask.graphics.endFill();
@@ -131,13 +148,23 @@ package com.danielfreeman.madcomponents {
 			}
 			
 			if (colours.length>2) {
-				graphics.lineStyle(OUTLINE + (_iMask ? OUTLINE : 0), colours[2], 1.0, true);
+				_lineColour = colours[2];
 			}
-			else {
-				graphics.lineStyle(OUTLINE + (_iMask ? OUTLINE : 0), LINE_COLOUR, 1.0, true);
-			}
-			graphics.drawRoundRect(_attributes.x-_curve, _attributes.y-_curve, _attributes.width + 2 * _curve, _attributes.height + 2 * _curve, _curve);
 			
+			if (!_attributes.style7) {
+				graphics.lineStyle(OUTLINE + (_iMask ? OUTLINE : 0), _lineColour, 1.0, true);
+			}
+			
+			graphics.drawRoundRect(_attributes.x-_curve, _attributes.y-_curve, _attributes.width + 2 * _curve, _attributes.height + 2 * _curve, _curve);
+			graphics.endFill();
+			if (_leftButton && _leftButton.visible || _rightButton && _rightButton.visible) {
+				graphics.beginFill(_lineColour);
+				graphics.lineStyle(0,0,0);
+				graphics.drawRect(-_curve, _attributes.height - BUTTON_BAR_HEIGHT, _attributes.width + 2 * _curve, 1);
+				if (_leftButton && _leftButton.visible && _rightButton && _rightButton.visible) {
+					graphics.drawRect(_attributes.width / 2, _attributes.height - BUTTON_BAR_HEIGHT + 1, 1, BUTTON_BAR_HEIGHT + _curve);
+				}
+			}
 		}
 		
 		
@@ -148,6 +175,43 @@ package com.danielfreeman.madcomponents {
 		
 		public function get centred():Boolean {
 			return _centred;
+		}
+		
+		
+		public function get leftButton():UIBackButton {
+			return _leftButton;
+		}
+		
+		
+		public function get rightButton():UIBackButton {
+			return _rightButton;
+		}
+		
+		
+		public function set rightButtonText(value:String):void {
+			if (_rightButton) {
+				_rightButton.text = value;
+			}
+			else {
+				_rightButton = new UIBackButton(this, _attributes.width / 2, _attributes.height - BUTTON_BAR_HEIGHT - 4, value, 0, false, false, false);
+			}
+			_rightButton.visible = value != "";
+			_rightButton.fixwidth = _attributes.width / 2 + _curve;
+			drawBackground();
+		}
+		
+		
+		
+		public function set leftButtonText(value:String):void {
+			if (_leftButton) {
+				_leftButton.text = value;
+			}
+			else {
+				_leftButton = new UIBackButton(this, -_curve, _attributes.height - BUTTON_BAR_HEIGHT - 4, value, 0, false, false, false);
+			}
+			_leftButton.visible = value != "";
+			_leftButton.fixwidth = _attributes.width / 2 + _curve;
+			drawBackground();
 		}
 		
 		

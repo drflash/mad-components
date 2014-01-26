@@ -266,7 +266,7 @@ package com.danielfreeman.madcomponents {
  * Is this the XML tag name of a UIForm container?
  */	
 		public static function isForm(name:String):Boolean {
-			return name=="frame" || name=="horizontal" || name=="vertical" || name=="columns" || name=="rows" || name=="group" || name=="clickableGroup";
+			return name=="frame" || name=="horizontal" || name=="vertical" || name=="columns" || name=="rows" || name=="group" || name=="clickableGroup" || name=="table";
 		}
 		
 /**
@@ -284,7 +284,7 @@ package com.danielfreeman.madcomponents {
 /**
  * Handler for orientation change
  */	
-		protected static function resize(event:Event):void {
+		public static function resize(event:Event = null):void {
 			layout(_screen.stage.stageWidth, _screen.stage.stageHeight);
 			_screen.dispatchEvent(new Event(RESIZED));
 		}
@@ -319,7 +319,9 @@ package com.danielfreeman.madcomponents {
 		
 		
 		public static function drawStageBackground():void {
-			drawBackgroundColour(_attributes.backgroundColours, _width, _height);
+			if (!isForm(_xml.localName())) {
+				drawBackgroundColour(_attributes.backgroundColours, _width, _height);
+			}
 		}
 		
 
@@ -357,7 +359,9 @@ package com.danielfreeman.madcomponents {
 			if (height<0) {
 				height = 0.8 * _attributes.height;
 			}
-			var window:UIWindow = new UIWindow(_windowLayer, xml, new Attributes(0, 0, width, height), curve, centre);
+			var attributes:Attributes = new Attributes(0, 0, width, height);
+			attributes.parse(xml);
+			var window:UIWindow = new UIWindow(_windowLayer, xml, attributes, curve, centre);
 			window.x = _root.x + _attributes.x + (_attributes.width - width) / 2;
 			window.y = _root.y + _attributes.y + (_attributes.height - height) / 2;
 			_popUps++;

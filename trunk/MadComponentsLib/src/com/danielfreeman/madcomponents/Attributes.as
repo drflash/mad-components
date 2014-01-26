@@ -44,10 +44,12 @@ package com.danielfreeman.madcomponents {
 		public static const CENTRE:String = "centre";
 		public static const TOP:String = "top";
 		public static const BOTTOM:String = "bottom";
-		public static const NO_SCROLL:String = "no scroll";
+	//	public static const NO_SCROLL:String = "no scroll";
 
-		protected static const GAP:uint = 8;
-		protected static const COLOUR:uint = 0x9999AA;
+		protected static const GAP:Number = 8;
+		protected static const GAP7:Number = 16;
+		public static const COLOUR:uint = 0x9999AA;
+		public static const COLOUR7:uint = 0xEFEFF4;
 		protected static const SCROLLBAR_COLOUR:uint = 0x555555;
 		protected static const ALIGN_V:String = "top";
 		protected static const ALIGN_H:String = "left";
@@ -65,13 +67,16 @@ package com.danielfreeman.madcomponents {
 		protected var _height:int = -1;
 		protected var _hasBorder:Boolean = false;
 		protected var _clickable:String = "";
+		protected var _style7:Boolean = false;
 
 
 		public function Attributes(x:Number = 0, y:Number = 0, width:Number = 0, height:Number = 0) {
-			if (width<0)
+			if (width<0) {
 				width = 0;
-			if (height<0)
-				height = 0;	
+			}
+			if (height<0) {
+				height = 0;
+			}	
 			super(x, y, width, height);
 		}
 		
@@ -80,12 +85,16 @@ package com.danielfreeman.madcomponents {
 * Extracts Attribute properties from XML
 */
 		public function parse(xml:XML):void {
+			if (xml.@style7.length() > 0) {
+				_style7 = xml.@style7 == "true";
+				_colour = _style7 ? COLOUR7 : COLOUR;
+			}
 			var value:* = xml.@gapV;
 			if (value)
 				_paddingV = (isNaN(value) || value==undefined) ? GAP : parseFloat(value);
 			value = xml.@gapH;
 			if (value)
-				_paddingH = (isNaN(value) || value==undefined) ? GAP : parseFloat(value);
+				_paddingH = (isNaN(value) || value==undefined) ? (_style7 ? GAP7 : GAP) : parseFloat(value);
 			
 			if ((value = xml.@width).length() > 0) {
 				_width = parseInt(value);
@@ -138,8 +147,10 @@ package com.danielfreeman.madcomponents {
 			copy._alignH = (!container || _alignH == FILL) ? _alignH : ALIGN_H;
 			copy._alignV = !container ? _alignV : ALIGN_V;
 			copy._hasBorder = _hasBorder;
-			if (xml)
+			copy._style7 = _style7;
+			if (xml) {
 				copy.parse(xml);
+			}
 			return copy;
 		}
 		
@@ -162,6 +173,13 @@ package com.danielfreeman.madcomponents {
  */		
 		public function get colour():uint {
 			return _colour;
+		}
+		
+/**
+ * Main colour of component
+ */		
+		public function set colour(value:uint):void {
+			_colour = value;
 		}
 		
 /**
@@ -219,9 +237,9 @@ package com.danielfreeman.madcomponents {
 /**
  * Is the container component scrollable?
  */
-		public function get noScroll():Boolean {
-			return _alignV == NO_SCROLL;
-		}
+//		public function get noScroll():Boolean {
+//			return _alignV == NO_SCROLL;
+//		}
 		
 /**
  * Initial visiblity of the component
@@ -249,6 +267,16 @@ package com.danielfreeman.madcomponents {
 		
 		public function get hasBorder():Boolean {
 			return _hasBorder;
+		}
+		
+		
+		public function get style7():Boolean {
+			return _style7;
+		}
+		
+		
+		public function set style7(value:Boolean):void {
+			_style7 = value;
 		}
 		
 /**

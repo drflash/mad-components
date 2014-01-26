@@ -79,7 +79,7 @@ package com.danielfreeman.madcomponents {
 		
 		public static var DRAWER_HEIGHT:Number = 220;
 		public static var SLIDE_INTERVAL:int = 40;
-		public static var STEPS:int = 8;
+		public static var STEPS:int = 4;
 		
 		protected static const PADDING:Number = 10.0;
 		protected static const DIM_ALPHA:Number = 0.4;
