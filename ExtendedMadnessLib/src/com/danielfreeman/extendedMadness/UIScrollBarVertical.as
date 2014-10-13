@@ -54,21 +54,21 @@ package com.danielfreeman.extendedMadness {
  * /&gt;
  * </pre>
  * */	
-	public class UIScrollBarVertical extends Sprite implements IContainerUI {
+	public class UIScrollBarVertical extends UIContainerBaseClass implements IContainerUI {
 		
 		protected static const SCROLLBAR_WIDTH:Number = 16.0;
 		protected static const PADDING:Number = 10.0;
 		
-		protected var _xml:XML;
-		protected var _attributes:Attributes;
+	//	protected var _xml:XML;
+	//	protected var _attributes:Attributes;
 		protected var _scrollBar:ScrollBar = null;
 		protected var _slider:UIPanel;
 		protected var _buttons:Boolean;
 		
 	
 		public function UIScrollBarVertical(screen:Sprite, xml:XML, attributes:Attributes) {
-			
-			screen.addChild(this);
+			super(screen, xml, attributes);
+		//	screen.addChild(this);
 			x = attributes.x;
 			y = attributes.y;
 			
@@ -81,8 +81,8 @@ package com.danielfreeman.extendedMadness {
 		}
 		
 		
-		public function layout(attributes:Attributes):void {
-			_attributes = attributes;
+		override public function layout(attributes:Attributes):void {
+			super.layout(attributes);
 			_slider.layout(sliderAttributes(attributes));
 			drawBackground(attributes.backgroundColours);
 			if (_scrollBar)
@@ -92,22 +92,22 @@ package com.danielfreeman.extendedMadness {
 		}
 		
 		
-		public function get attributes():Attributes {
-			return _attributes;
-		}
+	//	public function get attributes():Attributes {
+	//		return _attributes;
+	//	}
 		
 		
-		public function get xml():XML {
-			return _xml;
-		}
+	//	public function get xml():XML {
+	//		return _xml;
+	//	}
 		
 		
-		public function get pages():Array {
+		override public function get pages():Array {
 			return [_slider];
 		}
 		
 		
-		public function drawComponent():void {	
+		override public function drawComponent():void {	
 			drawBackground(_attributes.backgroundColours);
 		}
 		
@@ -129,18 +129,18 @@ package com.danielfreeman.extendedMadness {
 		}
 		
 		
-		public function findViewById(id:String, row:int=-1, group:int = -1):DisplayObject {
+		override public function findViewById(id:String, row:int=-1, group:int = -1):DisplayObject {
 			return IContainerUI(_slider).findViewById(id, row, group);
 		}
 		
 		
-		public function clear():void {
+		override public function clear():void {
 			IContainerUI(_slider).clear();
 		}
 		
 		
-		public function destructor():void {
-
+		override public function destructor():void {
+			IContainerUI(_slider).destructor();
 		}
 	}
 }

@@ -25,6 +25,8 @@
  
  
  package com.danielfreeman.extendedMadness {
+	import flash.system.Capabilities;
+	import flash.display.PixelSnapping;
 	import flash.geom.ColorTransform;
 	/**
 	 * @author danielfreeman
@@ -130,6 +132,7 @@ import flash.geom.Point;
 		protected var _rotation:Number = 0;
 		protected var _forwardBitmapData:BitmapData = null;
 		protected var _backwardBitmapData:BitmapData = null;
+		protected var _pixelSnapping:Boolean;
 		
 		
 		public function UIWheelMenu(screen:Sprite, xml:XML, attributes:Attributes) {
@@ -178,6 +181,7 @@ import flash.geom.Point;
 			if (xml.@rim.length() > 0) {
 				_rim = parseFloat(xml.@rim);
 			}
+			_pixelSnapping = xml.@pixelSnapping == "true";
 			
 			addChild(_segmentLayer = new Sprite());
 			addChild(_outerLayer = new Sprite());
@@ -547,7 +551,12 @@ import flash.geom.Point;
 			if (_images.length > index && _images[index]) {
 				removeChild(_images[index]);
 			}
-			var image:* = new ((value is BitmapData) ? new Bitmap(value) : value);
+			var image:Bitmap = new ((value is BitmapData) ? Bitmap(value) : value);
+			if (_pixelSnapping && value is Class) {
+				image.scaleX = image.scaleY = 1 / UI.scale;
+				image.pixelSnapping = PixelSnapping.ALWAYS;
+			}
+			
 			_segments[index].addChild(image);
 			_images[index] = image;
 			var midAngle:Number = index * _segmentAngle;
@@ -611,8 +620,30 @@ import flash.geom.Point;
 				}
 				segment.addChild(textLine);
 				_labels.push(textLine);
-				if (itemXML && itemXML.@image.length() > 0) {
-					setImage(i, getDefinitionByName(itemXML.@image) as Class);
+				if (itemXML) {
+					if (itemXML.@ldpi.length() > 0 && Capabilities.screenDPI < 160 ) {
+						_pixelSnapping = true;
+						setImage(i, getDefinitionByName(itemXML.@ldpi) as Class);
+					}
+					else if (itemXML.@mdpi.length() > 0 && Capabilities.screenDPI < 240) {
+						_pixelSnapping = true;
+						setImage(i, getDefinitionByName(itemXML.@mdpi) as Class);
+					}
+					else if (itemXML.@hdpi.length() > 0 && Capabilities.screenDPI < 320) {
+						_pixelSnapping = true;
+						setImage(i, getDefinitionByName(itemXML.@hdpi) as Class);
+					}
+					else if (itemXML.@xhdpi.length() > 0 && Capabilities.screenDPI < 400) {
+						_pixelSnapping = true;
+						setImage(i, getDefinitionByName(itemXML.@xhdpi) as Class);
+					}
+					else if (itemXML.@xxhdpi.length() > 0 && Capabilities.screenDPI >= 400) {
+						_pixelSnapping = true;
+						setImage(i, getDefinitionByName(itemXML.@xxhdpi) as Class);
+					}
+					else if (itemXML.@image.length() > 0) {
+						setImage(i, getDefinitionByName(itemXML.@image) as Class);
+					}
 				}
 				drawSegment(i);
 				drawSegment0(_outerLayer, i, _radius - SHADOW, _radius + _rim, _shadowColour, false, i == 0);
@@ -644,7 +675,7 @@ import flash.geom.Point;
  */
 		public function redraw():void {
 			clear();
-			_nSegments = _data.length();
+		//	_nSegments = _data.length();
 			initialiseSegments();
 			if (_skinBitmapData) {
 				drawBackgroundSkin();
@@ -655,15 +686,21 @@ import flash.geom.Point;
  * Set data with an array of objects
  */
 		public function set data(value:Array):void {
+			const fields:Vector.<String> = new <String>["label", "image", "colour", "ldpi", "mdpi", "hdpi", "xhdpi", "xxhdpi"];
 			_data = new XMLList();
 			var i:int = 0;
 			for each (var object:Object in value) {
 				if (object is String) {
-					_data[i++] = XML("<"+object+"/>");
+					_data[i++] = XML('<item label="'+object+'"/>');
 				}
 				else {
 					var item:XML = <item/>;
-					if (object.label) {
+					for each (var field:String in fields) {
+						if (object[field]) {
+							item.@[field] = object[field];
+						}
+					}
+				/*	if (object.label) {
 						item.@label = object.label;
 					}
 					if (object.image) {
@@ -671,7 +708,7 @@ import flash.geom.Point;
 					}
 					if (object.colour) {
 						item.@colour = object.colour;
-					}
+					}*/
 					_data[i++] = item;
 				}
 			}

@@ -31,14 +31,11 @@ package com.danielfreeman.madcomponents {
 /**
  * Interface for MadComponents containers
  */	
-	public interface IContainerUI {
+	public interface IContainerUI extends IComponentUI {
 		function clear():void;
 		function findViewById(id:String, row:int = -1, group:int = -1):DisplayObject;
-		function layout(attributes:Attributes):void;
 		function get pages():Array;
-		function get attributes():Attributes;
 		function get xml():XML;
 		function drawComponent():void;
-		function destructor():void;
 	}
 }

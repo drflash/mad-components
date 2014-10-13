@@ -63,7 +63,7 @@ package com.danielfreeman.extendedMadness {
 		
 		
 		override public function layout(attributes:Attributes):void {
-			_attributes = attributes;
+			super.layout(attributes);
 			drawBackground(attributes.backgroundColours);
 			if (_scrollBar)
 				removeChild(_scrollBar);

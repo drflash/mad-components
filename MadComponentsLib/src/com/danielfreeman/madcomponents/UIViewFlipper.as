@@ -200,6 +200,9 @@ package com.danielfreeman.madcomponents {
 			//		_dragTimer.start();
 			//	}
 			}
+			else if (_touchTimer.currentCount == TOUCH_DELAY && !_classic && Math.abs(_delta) <= DELTA_THRESHOLD) {
+				pressButton();
+			}
 		}
 		
 		
@@ -257,7 +260,8 @@ package com.danielfreeman.madcomponents {
  */
 		override protected function movement(event:TimerEvent):void {
 			if (_endSlider<0) {
-				_delta *= DECAY;
+			//	_delta *= DECAY;
+				_delta *= deltaToDecay(_delta);
 				sliderX = _slider.x + _delta;
 				if (_distance > THRESHOLD)
 					showScrollBar();

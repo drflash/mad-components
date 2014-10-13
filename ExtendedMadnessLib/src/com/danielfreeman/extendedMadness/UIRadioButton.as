@@ -102,6 +102,12 @@ package com.danielfreeman.extendedMadness
 		}
 		
 		
+		public function clearState():void {
+			_state = false;
+			buttonChrome();
+		}
+		
+		
 		override protected function redraw():void {
 			_group.dispatchEvent(new MyEvent(TOGGLE, this));
 			buttonChrome();

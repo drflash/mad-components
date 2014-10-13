@@ -98,7 +98,7 @@ package com.danielfreeman.madcomponents {
 		protected var _saveGroup:int = -1;
 		protected var _headingClicked:Boolean = false;
 		protected var _topGroupSpacing:Number = 0;
-		protected var _groupSpacing:Number = 0;
+		protected var _groupSpacing:int = 0;
 		
 		
 		public function UIGroupedList(screen:Sprite, xml:XML, attributes:Attributes) {
@@ -113,10 +113,20 @@ package com.danielfreeman.madcomponents {
 			_topGroupSpacing = ((xml.@topGroupSpacing.length() > 0) ? parseFloat(xml.@topGroupSpacing) : _groupSpacing);
 			super(screen, xml, attributes);
 			_autoLayout = false;
-			_field = "";
+		//	_field = "";
 		}
-		
-		
+
+
+/**
+ *  Dynamically set the list renderer
+ */
+ 		override public function set rendererXML(value:XML):void {
+			_renderer = value;
+			_simple = value == null;
+			_autoLayoutGroup = !_simple && _xml.@autoLayout == "true";
+		}
+
+
 		override protected function mouseUp(event:MouseEvent):void {
 			super.mouseUp(event);
 			if (_headingClicked) {
@@ -175,13 +185,11 @@ package com.danielfreeman.madcomponents {
 			_cellWidth = _attributes.width - 2 * _attributes.paddingH + 2 * PADDING;
 		}
 		
-/**
- *  Assign to list by passing an array of objects
- */
-		override public function set data(value:Object):void {
+		
+		protected function setGroupedData(value:Array):void {
 			_saveGroup = _group;
 			_saveIndex = -1;
-			_filteredData = noHeadings(_data = value as Array);
+			_filteredData = noHeadings(value);
 			initDrawGroups();
 			clearCellGroups();
 			setCellSize();
@@ -216,6 +224,13 @@ package com.danielfreeman.madcomponents {
 				doLayout();
 	//		}
 			_group = _saveGroup;
+		}
+		
+/**
+ *  Assign to list by passing an array of objects
+ */
+		override public function set data(value:Object):void {
+			setGroupedData(_data = value as Array);
 		}
 		
 		
@@ -287,13 +302,13 @@ package com.danielfreeman.madcomponents {
 				_cellTop = groupDetails.top;
 				headingChrome();
 				if (groupDetails.visible) {
-					var cellHeight:Number;
+					var cellHeight:int;
 					for (var i:int=0; i<_length; i++) {
 						cellHeight = groupDetails.cellHeight;
 						if (autoLayout) {
 							var renderer:DisplayObject = byGroupAndRow(_group,i);
 							if (!_simple) {
-								cellHeight = renderer.height + 2 * _attributes.paddingV;
+								cellHeight = Math.ceil(renderer.height + 2 * _attributes.paddingV);
 							}
 							renderer.y = last + _attributes.paddingV * (_simple ? 2.0 : 1.0);
 							last += cellHeight;
@@ -391,6 +406,7 @@ package com.danielfreeman.madcomponents {
 				heading.name = "heading_"+_group.toString();
 				_gapBetweenGroups = 2*_attributes.paddingV;
 			}
+			_lastPosition = _cellTop;
 		}
 		
 		
@@ -400,7 +416,7 @@ package com.danielfreeman.madcomponents {
 		
 		protected function clearCellGroups():void {
 			super.clearCells();
-			_cellTop = 0;
+			_lastPosition = _cellTop = 0;
 		}
 		
 		
@@ -409,6 +425,7 @@ package com.danielfreeman.madcomponents {
 			resizeRefresh();
 			_slider.graphics.beginFill(0,0);
 			_slider.graphics.drawRect(0,-4*_attributes.paddingV-(_refresh ? TOP : 0),1,1);
+			_lastPosition = _cellTop;
 		}
 		
 /**
@@ -523,12 +540,12 @@ package com.danielfreeman.madcomponents {
 					
 					if (_autoLayoutGroup && !_simple) {
 						_row = null;
-						for (var i:int=_header; i<detail.length && !_row; i++) {
+						for (var i:int=Math.max(_header,0); i<detail.length && !_row; i++) {
 							var renderer:DisplayObject = byGroupAndRow(group,i);
-							if (renderer is UIForm && sliderMouseY > 
+							if ( sliderMouseY > 
 							renderer.y-_attributes.paddingV && sliderMouseY<renderer.y+renderer.height+_attributes.paddingV) {
 								_pressedCell = i;
-								_row = UIForm(renderer);
+								_row = DisplayObject(renderer);
 								return _row != null;
 							}
 						}
@@ -557,20 +574,27 @@ package com.danielfreeman.madcomponents {
 /**
  *  Group heading text colour
  */
-		public function set headingColour(value:uint):void {
+		public function set headingTextColour(value:uint):void {
 			_headingFormat.color = value;
+		}
+		
+		
+		public function set headingShadowColour(value:uint):void {
+			_shadowFormat.color = value;
 		}
 		
 
 	//	The following overrides enable the setIndex method to work correctly
 	
 		override protected function indexToScrollPosition(value:int):Number {
-			return _groupPositions[_group].cellHeight * value + _groupPositions[_group].top;
+			return (_groupPositions.length > _group) ? _groupPositions[_group].cellHeight * value + _groupPositions[_group].top : 0;
 		}
 		
 		
-		override protected function illuminate(pressedCell:int = -1, dispatch:Boolean = true):void {
-			drawHighlight();
+		override protected function illuminate(pressedCell:int = -1, dispatch:Boolean = true, show:Boolean = true):void {
+			if (show) {
+				drawHighlight();
+			}
 		}
 		
 /**
@@ -588,7 +612,7 @@ package com.danielfreeman.madcomponents {
 /**
  *  Return DisplyObject of button pressed
  */
-		override protected function pressButton():DisplayObject {
+		override protected function pressButton(show:Boolean = true):DisplayObject {
 			var sliderMouseY:Number = _slider.visible ? _slider.mouseY : mouseY - _sliderPosition;
 			_scrollBarLayer.graphics.clear();
 			clearPressed();
@@ -597,7 +621,9 @@ package com.danielfreeman.madcomponents {
 			}
 			if (!_pressButton && _clickRow) {
 				if (isPressButton()) {
-					drawHighlight();
+					if (show) {
+						drawHighlight();
+					}
 					activate();
 				}
 				else if (sliderMouseY > _top) {
@@ -624,7 +650,7 @@ package com.danielfreeman.madcomponents {
 			}
 			else {
 				var container:DisplayObject = byGroupAndRow(group,row);
-				return (container && container is UIForm) ? UIForm(container).findViewById(id, row, group) : container;
+				return (container && container is IContainerUI) ? IContainerUI(container).findViewById(id, row, group) : container;
 			}
 		}
 
@@ -682,11 +708,25 @@ package com.danielfreeman.madcomponents {
 			return result;
 		}
 		
+		
+		override protected function highlightForIndex(rowIndex:int):Boolean {
+			if (_filteredData.length <= _group) {
+				return false;
+			}
+			var rowData:* = _filteredData[_group][rowIndex];
+			if (rowData.hasOwnProperty("$highlight")) {
+				return rowData.$highlight;
+			}
+			else {
+				return _highlightPressed;
+			}
+		}
+		
 /**
  *  Draw highlight when a row is clicked
  */
 		protected function drawHighlight():void {
-			if (_highlightPressed) {
+			if (highlightForIndex(_pressedCell)) {
 				_highlightIsOn = true;
 				var autoLayout:Boolean = _autoLayoutGroup && !_simple;
 				var groupDetails:Object = _groupPositions[_group];
@@ -714,7 +754,39 @@ package com.danielfreeman.madcomponents {
 		}
 		
 		
-		override protected function searchHandler(event:Event):void {
+	//	override protected function searchHandler(event:Event):void {
+	//	}
+	
+		override public function set filteredData(value:Array):void {
+			setGroupedData(value);
+		}
+
+	
+		override public function filter(searchFor:String, field:String = "", caseSensitive:Boolean = false, begins:Boolean = false):void {
+			if (searchFor == "") {
+				filteredData = _data;
+			}
+			else {
+				if (field == "") {
+					field = _field;
+				}
+				var result:Array = [];
+				var heading:* = null;
+				for each(var group:* in _data) {
+					if (group is Array) {
+						var filteredGroup:Array = filterArray(group, searchFor, field, caseSensitive, begins);
+						if (heading && filteredGroup.length > 0) {
+							result.push(heading);
+							result.push(filteredGroup);
+						}
+						heading = null;
+					}
+					else {
+						heading = group;
+					}
+				}
+				filteredData = result; 
+			}
 		}
 		
 	}

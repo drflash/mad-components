@@ -139,19 +139,19 @@ package com.danielfreeman.madcomponents {
 * Returns a duplicate of this Attributes class
 */
 		public function copy(xml:XML=null, container:Boolean = false):Attributes {
-			var copy:Attributes = new Attributes(x, y, width, height);
-			copy._paddingV = _paddingV;
-			copy._paddingH = _paddingH;
-			copy._colour = _colour;
-			copy._scrollBarColour = _scrollBarColour;
-			copy._alignH = (!container || _alignH == FILL) ? _alignH : ALIGN_H;
-			copy._alignV = !container ? _alignV : ALIGN_V;
-			copy._hasBorder = _hasBorder;
-			copy._style7 = _style7;
+			var result:Attributes = new Attributes(x, y, width, height);
+			result._paddingV = _paddingV;
+			result._paddingH = _paddingH;
+			result._colour = _colour;
+			result._scrollBarColour = _scrollBarColour;
+			result._alignH = (!container || _alignH == FILL) ? _alignH : ALIGN_H;
+			result._alignV = !container ? _alignV : ALIGN_V;
+			result._hasBorder = _hasBorder;
+			result._style7 = _style7;
 			if (xml) {
-				copy.parse(xml);
+				result.parse(xml);
 			}
-			return copy;
+			return result;
 		}
 		
 /**

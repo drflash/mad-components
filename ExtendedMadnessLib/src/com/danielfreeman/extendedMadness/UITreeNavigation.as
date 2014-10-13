@@ -99,7 +99,7 @@ package com.danielfreeman.extendedMadness
 			_lastPage = _thisPage;
 			_thisPage = new UIList(this, <null/>, _attributes.copy());
 			UIList(_thisPage).xmlData = _newPage;
-			_treeLists.push(_thisPage);
+			_treeLists.push(UIList(_thisPage));
 			_treePointer = _newPage;
 			if (_lastPage) {
 				doTransition(SLIDE_LEFT);

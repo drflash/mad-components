@@ -48,7 +48,7 @@ package com.danielfreeman.extendedMadness
  * /&gt;
  * </pre>
  * */
-	public class UISegmentedControl extends UICutCopyPaste implements IContainerUI
+	public class UISegmentedControl extends UICutCopyPaste implements IComponentUI
 	{
 		protected static const BUTTON_COLOUR:uint = 0xE6E6E6;
 		protected static const BUTTON_COLOUR7:uint = 0xFFFFFF;
@@ -56,7 +56,7 @@ package com.danielfreeman.extendedMadness
 		protected static const TEXT_COLOUR7:uint = PRESSED_COLOUR;
 		protected static const CONTROL_CURVE:Number = 12.0;
 		
-		protected var _attributes:Attributes;
+	//	protected var _attributes:Attributes;
 		protected var _xml:XML;
 		protected var _textColour:uint;
 		
@@ -73,7 +73,8 @@ package com.danielfreeman.extendedMadness
 				_font = xml.font[0];
 			}
 			var colour:uint = attributes.backgroundColours.length>0 ? attributes.backgroundColours[0] : (attributes.style7 ? BUTTON_COLOUR7 : BUTTON_COLOUR);
-			super(screen, 0, 0, 0, colour, _attributes.style7 != (xml.@alt == "true"), null, attributes.style7);
+			super(screen, 0, 0, 0, colour, attributes.style7 != (xml.@alt == "true"), null, attributes.style7);
+			
 			colourButtons();
 			if (attributes.fillH) {
 				fixwidth = attributes.widthH;
@@ -99,8 +100,8 @@ package com.danielfreeman.extendedMadness
 		}
 		
 		
-		public function layout(attributes:Attributes):void {
-			_attributes = attributes;
+		override public function layout(attributes:Attributes):void {
+			super.layout(attributes);
 			if (attributes.fillH) {
 				fixwidth = attributes.widthH;
 			}
@@ -204,14 +205,14 @@ package com.danielfreeman.extendedMadness
 		}
 
 
-		public function get attributes():Attributes {
-			return _attributes;
-		}
+	//	public function get attributes():Attributes {
+	//		return _attributes;
+	//	}
 		
 		
-		public function findViewById(id:String, row:int = -1, group:int = -1):DisplayObject {
-			return null;
-		}
+	//	public function findViewById(id:String, row:int = -1, group:int = -1):DisplayObject {
+	//		return null;
+	//	}
 		
 		
 		public function clear():void {
@@ -221,14 +222,14 @@ package com.danielfreeman.extendedMadness
 		}
 		
 		
-		public function get pages():Array {
-			return [];
-		}
+	//	public function get pages():Array {
+	//		return [];
+	//	}
 		
 		
-		public function get xml():XML {
-			return _xml;
-		}
+	//	public function get xml():XML {
+	//		return _xml;
+	//	}
 		
 		
 		public function clearPressed():void {

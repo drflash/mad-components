@@ -36,13 +36,12 @@ package com.danielfreeman.madcomponents {
 	protected var _masking:Boolean = false;
 	protected var _mask:Shape = null;
 	protected var _xml:XML;
-	protected var _attributes:Attributes;
 	protected var _maskSize:Point;
 	
 		
-		public function MadMasking(xml:XML, attributes:Attributes) {
+		public function MadMasking(screen:Sprite, xml:XML, attributes:Attributes) {
 			_xml = xml;
-			_attributes = attributes.copy();
+			super(screen, attributes.copy());
 			_maskSize = new Point(attributes.widthH, attributes.heightV);
 		}
 		

@@ -54,6 +54,7 @@ package com.danielfreeman.extendedMadness
 		protected var _skin:DisplayObject = null;
 		protected var _skinContainer:Sprite = new Sprite();
 		protected var _skinBitmap:Bitmap = null;
+		protected var _colour:uint = 0xffffff;
 
 
 		public function UIImage9(screen:Sprite, xml:XML, attributes:Attributes) {
@@ -63,25 +64,34 @@ package com.danielfreeman.extendedMadness
 		
 		
 		override public function drawComponent():void {
-			if (!_skin)
-				return;
+			graphics.clear();
 			if (_skinBitmap) {
 				removeChild(_skinBitmap);
 			}
-			_skin.width = _attributes.widthH;
-			_skin.height = _attributes.heightV;
-			var myBitmapData:BitmapData = new BitmapData(_attributes.widthH, _attributes.heightV, true, 0x00FFFFFF);
-			myBitmapData.draw(_skinContainer);
-			addChild(_skinBitmap = new Bitmap(myBitmapData));
-			_skinBitmap.smoothing = true;
+			if (!_skin) {
+				graphics.beginFill(_colour);
+				graphics.drawRect(0, 0, _attributes.widthH, _attributes.heightV);
+			}
+			else {
+				_skin.width = _attributes.widthH;
+				_skin.height = _attributes.heightV;
+				var myBitmapData:BitmapData = new BitmapData(_attributes.widthH, _attributes.heightV, true, 0x00FFFFFF);
+				myBitmapData.draw(_skinContainer);
+				addChild(_skinBitmap = new Bitmap(myBitmapData));
+				_skinBitmap.smoothing = true;
+			}
 		}		
 		
 /**
  * Set image
  */	
 		public function set text(value:String):void {
-			if (value!="")
+			if (value.substr(0,1) == "#") {
+				_colour = parseInt(value.substr(1), 16);
+			}
+			else if (value!="") {
 				skinClass = getDefinitionByName(value) as Class;
+			}
 		}
 		
 		

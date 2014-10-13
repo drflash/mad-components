@@ -46,7 +46,7 @@ package com.danielfreeman.extendedMadness
  * /&gt;
  * </pre>
  * */	
-	public class UICheckBox extends MadSprite
+	public class UICheckBox extends MadSprite implements IComponentUI
 	{
 		protected static const SIZE:Number = 26.0;
 		protected static const ALT_SIZE:Number = 18.0;
@@ -69,7 +69,8 @@ package com.danielfreeman.extendedMadness
 
 		public function UICheckBox(screen:Sprite, xml:XML, attributes:Attributes)
 		{
-			screen.addChild(this);
+		//	screen.addChild(this);
+			super(screen, attributes);
 			_alt = xml.@alt.length()>0 && xml.@alt[0]!="false";
 			_colour = attributes.backgroundColours.length>0 ? attributes.backgroundColours[0] : COLOUR;
 			_onColour = attributes.backgroundColours.length>1 ? attributes.backgroundColours[1] : ON_COLOUR;
@@ -192,7 +193,8 @@ package com.danielfreeman.extendedMadness
 		}
 		
 		
-		public function destructor():void {
+		override public function destructor():void {
+			super.destructor();
 			removeEventListener(MouseEvent.MOUSE_UP,mouseUp);
 		}
 	}

@@ -82,7 +82,7 @@ package com.danielfreeman.extendedMadness {
 		}
 		
 		
-		override protected function pressButton():DisplayObject {
+		override protected function pressButton(show:Boolean = true):DisplayObject {
 			super.pressButton();
 			if (_classic && _lastPressedCell != _pressedCell && _clickRow) {
 				var lastTick:UITick = UITick(_slider.getChildByName("tick_"+_lastPressedCell.toString()));

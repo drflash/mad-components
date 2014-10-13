@@ -49,12 +49,12 @@ package com.danielfreeman.extendedMadness
 	 * /&gt;
 	 * </pre>
 	 * */	
-	public class UIPieChart extends MadSprite implements IContainerUI
+	public class UIPieChart extends MadSprite implements IComponentUI
 	{
 		protected static const OFFSET:Number = 38.0;
 		
-		protected var _attributes:Attributes;
-		protected var _xml:XML;
+	//	protected var _attributes:Attributes;
+	//	protected var _xml:XML;
 		protected var _graph:GraphPalette;
 		protected var _packet:Packet;
 		
@@ -69,14 +69,15 @@ package com.danielfreeman.extendedMadness
 				_packet.localdata = [[]];
 			}
 			
-			_attributes = attributes;
-			_xml = xml;
+		//	_attributes = attributes;
+		//	_xml = xml;
 			
-			screen.addChild(this);
+		//	screen.addChild(this);
+			super(screen, attributes);
 			createGraph(_packet);
 			if (xml.colours.length()>0) {
 				var colourString:String = xml.colours[0].toString();
-				colourString.replace(/ /gi, "");
+				colourString = colourString.replace(/ /gi, "");
 				var stValues:Array = colourString.split(",");
 				var i:int = 0;
 				for each(var value:String in stValues) {
@@ -166,8 +167,8 @@ package com.danielfreeman.extendedMadness
 		}
 		
 		
-		public function drawComponent():void {	
-		}
+	//	public function drawComponent():void {	
+	//	}
 		
 		
 		override public function get height():Number {
@@ -180,36 +181,36 @@ package com.danielfreeman.extendedMadness
 		}
 		
 		
-		public function layout(attributes:Attributes):void {
-			_attributes = attributes;
+		override public function layout(attributes:Attributes):void {
+			super.layout(attributes);
 			_graph.resize2(attributes.width,attributes.height);
 			_graph.contained();
 			_graph.controls.visible = false;
 		}
 		
 		
-		public function get attributes():Attributes {
-			return _attributes;
-		}
+	//	public function get attributes():Attributes {
+	//		return _attributes;
+	//	}
 		
 		
-		public function get xml():XML {
-			return _xml;
-		}
+	//	public function get xml():XML {
+	//		return _xml;
+	//	}
 		
 		
-		public function findViewById(id:String, row:int = -1, group:int = -1):DisplayObject {
-			return null;
-		}
+	//	public function findViewById(id:String, row:int = -1, group:int = -1):DisplayObject {
+	//		return null;
+	//	}
 		
 		
-		public function clear():void {
-		}
+	//	public function clear():void {
+	//	}
 		
 		
-		public function get pages():Array {
-			return [];
-		}
+	//	public function get pages():Array {
+	//		return [];
+	//	}
 		
 		
 		public function set increment(value:Number):void {
@@ -245,7 +246,8 @@ package com.danielfreeman.extendedMadness
 		}
 		
 		
-		public function destructor():void {
+		override public function destructor():void {
+			super.destructor();
 			_graph.destructor();
 		}
 	}

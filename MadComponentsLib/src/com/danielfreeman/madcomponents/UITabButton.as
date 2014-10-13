@@ -142,7 +142,8 @@ package com.danielfreeman.madcomponents {
 		
 		
 		public function pixelSnapImage(offset:Number):void {
-			_iconBitmap.scaleX = _iconBitmap.scaleY = 1 / UI.scale;
+		//	_iconBitmap.scaleX = _iconBitmap.scaleY = 1 / UI.scale;
+			_icon.scaleX = _icon.scaleY = 1 / UI.scale;
 			_icon.y = (TAB_HEIGHT - _icon.height) / 2 + 2 + offset;
 			_iconBitmap.pixelSnapping = PixelSnapping.ALWAYS;
 		}

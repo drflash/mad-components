@@ -82,7 +82,9 @@ package com.danielfreeman.extendedMadness {
 		public static const EDIT_BUTTON_MOUSE_UP:String = "editButtonMouseUp";
 		public static const EDIT_BUTTON_LONG_CLICK:String = "editButtonLongClick";
 		public static const EDIT_BUTTON_LONG_CLICK_END:String = "editButtonLongClickEnd";
+		public static const ROW_CLICKED:String = "rowClicked";
 		public static const ROW_SELECTED:String = "rowSelected";
+		public static const LONG_ROW_SELECTED:String = "longRowSelected";
 		public static const HEADER_DOWN:String = "headerDown";
 		public static const HEADER_CLICKED:String = "headerClicked";
 		public static const PAGE_UP:String = "pageUp";
@@ -109,12 +111,13 @@ package com.danielfreeman.extendedMadness {
 		protected static const BUTTON_COLOUR:uint = 0x333333;
 		protected static const PAGE_BUTTON_SENSOR_RADIUS:Number = 40.0;
 		protected static const PAGE_BUTTON_RADIUS:Number = 30.0;
+		protected static const LONG_ROW_THRESHOLD:int = 64;
 		
 		protected var _clickDelay:Timer = new Timer(150, 1);
 		protected var _slideTimer:Timer = new Timer(50, STEPS);
 		protected var _rowSelectColour:uint = ROW_SELECT_COLOUR;
 		protected var _highlightedRowIndex:int = -1;
-		protected var _highlightedDataGrid:UIFastDataGrid = null;
+		protected var _highlightedDataGrid:UISimpleDataGrid = null;
 		protected var _originalNoScroll:Boolean;
 		protected var _clickedRowIndex:int;
 		protected var _lastMousePoint:Point = new Point(0,0);
@@ -171,6 +174,11 @@ package com.danielfreeman.extendedMadness {
 				positionPageButtons();
 			}
 
+		}
+		
+		
+		public function set showPressed(value:Boolean):void {
+			_showPressed = value;
 		}
 		
 		
@@ -256,7 +264,6 @@ package com.danielfreeman.extendedMadness {
  * Edit button mousedown handler
  */
 		protected function editButtonMouseDown(event:Event):void {
-			
 			stage.addEventListener(MouseEvent.MOUSE_UP, editButtonMouseUp);
 			stage.addEventListener(MouseEvent.MOUSE_MOVE, editButtonMouseMove);
 			_editButtonMouseDown = true;
@@ -344,7 +351,7 @@ package com.danielfreeman.extendedMadness {
 /**
  * Convert y coordinate to the grid at that position
  */
-		protected function yToDataGrid(y:Number):UIFastDataGrid {
+		protected function yToDataGrid(y:Number):UISimpleDataGrid {
 			var index:int = 0;
 			while (index + 1 < _dataGrids.length && _dataGrids[index + 1].includeInLayout && y > _dataGrids[index + 1].y) {
 				index ++;
@@ -353,22 +360,23 @@ package com.danielfreeman.extendedMadness {
 		}
 		
 		
-		protected function temporaryRowHighlightDraw(highlightedDataGrid:UIFastDataGrid, highlightedRowIndex:int, colour:uint = uint.MAX_VALUE):void {
-			if (highlightedRowIndex >= 0 && highlightedRowIndex < highlightedDataGrid.tableCells.length) {
+		protected function temporaryRowHighlightDraw(highlightedDataGrid:UISimpleDataGrid, highlightedRowIndex:int, colour:uint = uint.MAX_VALUE):void {
+			_temporaryRowHighlight.graphics.clear();
+			if (_showPressed && highlightedRowIndex >= 0 && highlightedRowIndex < highlightedDataGrid.numberOfRows) {
 				_temporaryRowHighlight.visible = true;
-				_temporaryRowHighlight.graphics.clear();
-				var firstCell:UICell = highlightedDataGrid.tableCells[highlightedRowIndex][0];	
+			//	var firstCell:UICell = highlightedDataGrid.tableCells[highlightedRowIndex][0];	
 				_temporaryRowHighlight.graphics.beginFill(colour < uint.MAX_VALUE ? colour : _rowSelectColour); //, ALPHA);
 			//	_temporaryRowHighlight.graphics.lineStyle(ROW_BORDER,_rowSelectColour);
 			//	_temporaryRowHighlight.graphics.drawRect(_titleSlider.x, _titleSlider.y + highlightedDataGrid.y + firstCell.y, _slider.getBounds(_slider).right, firstCell.height);
-				_temporaryRowHighlight.graphics.drawRect(0, highlightedDataGrid.y + firstCell.y, stage.stageWidth * UI.scale, firstCell.height);
+			//	_temporaryRowHighlight.graphics.drawRect(0, highlightedDataGrid.y + firstCell.y, stage.stageWidth * UI.scale, firstCell.height);
+				_temporaryRowHighlight.graphics.drawRect(0, highlightedDataGrid.y + highlightedDataGrid.rowPosition(highlightedRowIndex), stage.stageWidth * UI.scale, highlightedDataGrid.rowHeight(highlightedRowIndex));
 				_temporaryRowHighlight.graphics.endFill();
 			}
 		}
 		
 		
 		protected function temporaryRowHighlight():void {
-			var highlightedDataGrid:UIFastDataGrid = yToDataGrid(_slider.mouseY);
+			var highlightedDataGrid:UISimpleDataGrid = yToDataGrid(_slider.mouseY);
 			var highlightedRowIndex:int = highlightedDataGrid ? highlightedDataGrid.yToRow(highlightedDataGrid.mouseY) : -1;
 			temporaryRowHighlightDraw(highlightedDataGrid, highlightedRowIndex);
 		}
@@ -432,15 +440,17 @@ package com.danielfreeman.extendedMadness {
 		
 		public function clearHighlightRow():void {
 			temporaryRowClear();
+			_highlightedRowIndex = -1;
 		}		
 		
 		
 		public function setHighlightRow(slidein:Boolean = false):void {
-			if (_highlightedDataGrid && _highlightedRowIndex >= 0 && _highlightedRowIndex < _highlightedDataGrid.tableCells.length) {
+			if (_highlightedDataGrid && _highlightedRowIndex >= 0 && _highlightedRowIndex < _highlightedDataGrid.numberOfRows) {
 				if (_editButton && (!_highlightedDataGrid.hasHeader || _highlightedRowIndex > 0)) {
-					var firstCell:UICell = _highlightedDataGrid.tableCells[_highlightedRowIndex][0];
+				//	var firstCell:UICell = _highlightedDataGrid.tableCells[_highlightedRowIndex][0];
 					_editButton.x = _attributes.width - (slidein ? _editButton.width : 0);
-					_editButton.y = _highlightedDataGrid.y + firstCell.y + firstCell.height / 2 - _editButton.height / 2;
+				//	_editButton.y = _highlightedDataGrid.y + firstCell.y + firstCell.height / 2 - _editButton.height / 2;
+					_editButton.y = _highlightedDataGrid.y + _highlightedDataGrid.rowPosition(_highlightedRowIndex) + _highlightedDataGrid.rowHeight(_highlightedRowIndex) / 2 - _editButton.height / 2;
 					_editButton.visible = true;
 				}
 			}
@@ -470,7 +480,6 @@ package com.danielfreeman.extendedMadness {
 				if (_pageButtonTarget) {
 					resetPageButtons();
 				}
-				
 			}
 
 			super.mouseMove(event);
@@ -485,17 +494,35 @@ package com.danielfreeman.extendedMadness {
 				}
 				else {
 					if (deltaMoveX > ROW_SELECT_LIMIT || _mouseDistanceY > SMALL_Y_THRESHOLD) {
-						refreshHighlight();
-						abortRowSelection();
-						_rowSelect = false;
+						abortClick();
 					}
+				}
+				if (Timer(event.currentTarget).currentCount == LONG_ROW_THRESHOLD && _mouseDistance < 2 * THRESHOLD) {
+					dispatchEvent(new Event(LONG_ROW_SELECTED));
 				}
 			}
 		}
 		
 		
+		public function abortClick():void {
+			refreshHighlight();
+			abortRowSelection();
+			_rowSelect = false;
+		}
+		
+		
+		public function confirmClick():void {
+			rowSelectHandler();
+			if (_highlightedDataGrid) {
+				_clickedRowIndex = _highlightedRowIndex;
+				_dataGrid = _highlightedDataGrid;
+			}
+			stopScrolling();
+		}
+		
+		
 		protected function rowSelectHandler():Boolean {
-			var highlightedDataGrid:UIFastDataGrid = yToDataGrid(_slider.mouseY);
+			var highlightedDataGrid:UISimpleDataGrid = yToDataGrid(_slider.mouseY);
 			var highlightedRowIndex:int = highlightedDataGrid ? highlightedDataGrid.yToRow(highlightedDataGrid.mouseY) : -1;
 			if (!_headerClicked && highlightedDataGrid && highlightedRowIndex < 0) {
 				highlightedRowIndex = (highlightedDataGrid.hasHeader ? 1 : 0);
@@ -540,7 +567,7 @@ package com.danielfreeman.extendedMadness {
 				_rowSelect = false;
 				_clickDelay.reset();
 				_clickDelay.start();
-				temporaryRowHighlight();
+			//	temporaryRowHighlight();
 			}
 			_lastMousePoint.x = mouseX;
 			_lastMousePoint.y = mouseY;
@@ -574,7 +601,6 @@ package com.danielfreeman.extendedMadness {
 			else if (event.target != _editButton) {
 				super.mouseUp(event);
 				_clickDelay.stop();
-				
 				if (_rowSelect || _mouseDistance < THRESHOLD) {
 					_rowSelect = false;
 					_noScroll = _originalNoScroll;
@@ -587,6 +613,9 @@ package com.danielfreeman.extendedMadness {
 						slideEditButton(true);
 					}
 					dispatchRowSelected();
+					if (_distance < THRESHOLD) {
+						dispatchEvent(new Event(ROW_CLICKED));
+					}
 				}
 				else if (_alt) {
 					temporaryRowClear();
@@ -628,15 +657,6 @@ package com.danielfreeman.extendedMadness {
  * The index of the datagrid that is selected.  First datagrid is 0, second = 1, etc...
  */
 		public function get selectDataGrid():int {
-			//DEPRECIATED
-		//	if (_dataGrid) {
-		//		for (var index:String in _dataGrids) {
-		//			if (_dataGrid == _dataGrids[index]) {
-		//				trace("*depreciated code would have returned:", parseInt(index));
-		//			}
-		//		}
-		//	}
-			//
 			if (_highlightedDataGrid) {
 				for (var index:String in _dataGrids) {
 					if (_highlightedDataGrid == _dataGrids[index]) {
@@ -652,6 +672,7 @@ package com.danielfreeman.extendedMadness {
 			if (_mouseDistance < THRESHOLD) {
 				_noScroll = _alt;
 				_rowSelect = true;
+				temporaryRowHighlight();
 				if (_editButton && _editButton.visible) {
 					slideEditButton(false);
 				}

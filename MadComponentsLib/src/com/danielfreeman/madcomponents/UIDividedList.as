@@ -61,13 +61,18 @@ package com.danielfreeman.madcomponents {
 	public class UIDividedList extends UIGroupedList {
 		
 		protected var _headingColour:uint;
-		protected var _headingOffColour:uint;
+		protected var _headingOffColour:uint; // Depreciated
 		
 		public function UIDividedList(screen:Sprite, xml:XML, attributes:Attributes) {
 			_headingOffColour = _headingColour = (xml.@headingColour.length() > 0) ? UI.toColourValue(xml.@headingColour) : attributes.colour;
 			super(screen, xml, attributes);
 
 		//	doLayout();
+		}
+		
+		
+		public function set headingColour(value:uint):void {
+			_headingColour = value;
 		}
 		
 		
@@ -83,7 +88,7 @@ package com.danielfreeman.madcomponents {
  *  When a list row is clicked, display a highlight
  */	
 		override protected function drawHighlight():void {
-			if (_highlightPressed && _groupPositions && _groupPositions.length > _group) {
+			if (highlightForIndex(_pressedCell) && _groupPositions && _groupPositions.length > _group) {
 				_highlight.graphics.clear();
 				var groupDetails:Object = _groupPositions[_group];
 				var autoLayout:Boolean = _autoLayoutGroup && !_simple;
@@ -109,7 +114,7 @@ package com.danielfreeman.madcomponents {
  *  Draw a group heading
  */	
 		override protected function initDraw():void {
-			var top:Number = _cellTop;// - 3 * _attributes.paddingV;
+			var top:int = _cellTop;// - 3 * _attributes.paddingV;
 			var matr:Matrix=new Matrix();
 			var headingColour:uint = (_groupPositions.length > _group ? _groupPositions[_group].visible : false) ? _headingColour : _headingOffColour;
 			var gradient:Array = [Colour.lighten(headingColour,64), headingColour];
@@ -131,7 +136,7 @@ package com.danielfreeman.madcomponents {
 				_slider.graphics.drawRect(0, barBottom - 1, _width, 1);
 			}
 			else {
-				var last:Number = (_group > 0) ? _groupPositions[_group-1].bottom + (autoLayout ? _attributes.paddingV : 0) : 0;
+				var last:int = (_group > 0) ? _groupPositions[_group-1].bottom + (autoLayout ? _attributes.paddingV : 0) : 0;
 				var filling:Boolean = (_group == 0) || (top-last) > 2;
 				if (_attributes.style7) {
 					_slider.graphics.beginFill(headingColour);

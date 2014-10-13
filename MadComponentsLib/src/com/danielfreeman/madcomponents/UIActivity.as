@@ -45,10 +45,10 @@ package com.danielfreeman.madcomponents {
 		
 		protected var timer:Timer = new Timer(INTERVAL);
 
-		public function UIActivity(screen:Sprite, xx:Number, yy:Number, visible:Boolean = false) {
+		public function UIActivity(screen:Sprite, xx:Number, yy:Number, visible:Boolean = false, colour:uint = 0xFFFFFF) {
 			screen.addChild(this);
 			x=xx;y=yy;
-			drawActivityIndicator();
+			drawActivityIndicator(colour);
 			timer.addEventListener(TimerEvent.TIMER,rotateHandler);
 			mouseEnabled = false;
 			super.visible = visible;
@@ -60,12 +60,11 @@ package com.danielfreeman.madcomponents {
 		}
 		
 		
-		protected function drawActivityIndicator():void {
+		protected function drawActivityIndicator(colour:uint):void {
 			for (var i:int = 1; i<=SPOKES; i++) {
-				graphics.lineStyle(THICKNESS,Colour.darken(0xFFFFFF,-i*INCREMENT));
+				graphics.lineStyle(THICKNESS,Colour.darken(colour,-i*INCREMENT));
 				graphics.moveTo(-INNER*Math.sin(DEGTORAD*i/SPOKES),-INNER*Math.cos(DEGTORAD*i/SPOKES));
 				graphics.lineTo(-OUTER*Math.sin(DEGTORAD*i/SPOKES),-OUTER*Math.cos(DEGTORAD*i/SPOKES));
-
 			}
 		}
 		

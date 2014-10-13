@@ -50,15 +50,15 @@ package com.danielfreeman.extendedMadness
  * /&gt;
  * </pre>
  */
-	public class UIProgressBar extends UISlider implements IContainerUI {
+	public class UIProgressBar extends UISlider implements IComponentUI {
 		
 		protected var _xml:XML;
-		protected var _attributes:Attributes;
+	//	protected var _attributes:Attributes;
 
 		
 		public function UIProgressBar(screen:Sprite, xml:XML, attributes:Attributes) {
 			_xml = xml;
-			_attributes = attributes;
+		//	_attributes = attributes;
 			super(screen, 0, 0, attributes.backgroundColours, xml.@alt == "true");
 			if (attributes.fillH) {
 				fixwidth = attributes.widthH;
@@ -76,37 +76,37 @@ package com.danielfreeman.extendedMadness
 		}
 		
 		
-		public function layout(attributes:Attributes):void {
-			_attributes = attributes;
+		override public function layout(attributes:Attributes):void {
+			super.layout(attributes);
 			if (attributes.fillH) {
 				fixwidth = attributes.widthH;
 			}
 		}
 		
 		
-		public function get attributes():Attributes {
-			return _attributes;
-		}
+	//	public function get attributes():Attributes {
+	//		return _attributes;
+	//	}
 		
 		
-		public function get xml():XML {
-			return _xml;
-		}
+	//	public function get xml():XML {
+	//		return _xml;
+	//	}
 		
 		
-		public function findViewById(id:String, row:int = -1, group:int = -1):DisplayObject {
-			return null;
-		}
+	//	public function findViewById(id:String, row:int = -1, group:int = -1):DisplayObject {
+	//		return null;
+	//	}
 		
 		
-		public function clear():void {
-			graphics.clear();
-		}
+	//	public function clear():void {
+	//		graphics.clear();
+	//	}
 		
 		
-		public function get pages():Array {
-			return [];
-		}
+	//	public function get pages():Array {
+	//		return [];
+	//	}
 
 
 /**

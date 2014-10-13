@@ -25,22 +25,22 @@ package com.danielfreeman.extendedMadness {
 	
 		protected function useThisOne(size:String):Boolean {
 			var result:Boolean = true;
-			if (size.substr(-3,3) == "DPI") {
+			if (size.substr(-3,3).toUpperCase() == "DPI") {
 				return parseFloat(size.substr(0,-3)) >= Capabilities.screenDPI;
 			}
-			if (size.substr(-1,1) == "C") {
+			if (size.substr(-1,1).toUpperCase() == "C") {
 				size = size.substr(0,-1);
 			}
-			if (size.substr(0,1) == "L") {
+			if (size.substr(0,1).toUpperCase() == "L") {
 				result = UI.attributes.width >= UI.attributes.height;
 				size = size.substr(1);
 			}
-			else if (size.substr(0,1) == "P") {
+			else if (size.substr(0,1).toUpperCase() == "P") {
 				result = UI.attributes.width <= UI.attributes.height;
 				size = size.substr(1);
 			}
 			if (size.length > 0) {
-				var xPosition:int = size.indexOf("X");
+				var xPosition:int = Math.max(size.indexOf("X"), size.indexOf("x"));
 				if (xPosition > 0) {
 					result = result && (UI.attributes.width >= parseInt(size.substring(0, xPosition))) && (UI.attributes.height >= parseInt(size.substring(xPosition + 1)));
 				}

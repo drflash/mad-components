@@ -76,6 +76,8 @@ package com.danielfreeman.madcomponents {
 		public static const SLIDE_DOWN:String = "down";
 		public static const DRAWER_UP:String = "drawerUp";
 		public static const DRAWER_DOWN:String = "drawerDown";
+		public static const SLIDE_LEFT_OVER:String = "leftOver";
+		public static const SLIDE_RIGHT_OVER:String = "rightOver";
 		
 		public static var DRAWER_HEIGHT:Number = 220;
 		public static var SLIDE_INTERVAL:int = 40;
@@ -83,6 +85,7 @@ package com.danielfreeman.madcomponents {
 		
 		protected static const PADDING:Number = 10.0;
 		protected static const DIM_ALPHA:Number = 0.4;
+		protected static const UNDER:Number = 0.2;
 
 		protected var _pages:Array = [];
 		protected var _page:int = 0;
@@ -105,40 +108,43 @@ package com.danielfreeman.madcomponents {
 		protected var _shade:Shape = new Shape();
 		protected var _savePageIndex:int;
 		protected var _drawerHeight:Number = DRAWER_HEIGHT;
+		protected var _over:Boolean;
+		protected var _slideOver:Boolean = false;
 		
 		
 		public function UIPages(screen:Sprite, xml:XML, attributes:Attributes) {
 			
 		//	_xml = xml;
-			super(xml, attributes);
+			super(null, xml, attributes);
 			_attributes = attributes.copy(xml);
 			
 			UI.drawBackgroundColour(_attributes.backgroundColours, _attributes.width, _attributes.y + _attributes.height, this);
 			_attributes.x=0;_attributes.y=0;
 
 			_easing = xml.@easing == "true";
-			if (xml.@easeIn.length()>0)
+			if (xml.@easeIn.length()>0) {
 				_easeIn = parseFloat(xml.@easeIn);
-			if (xml.@easeOut.length()>0)
+			}
+			if (xml.@easeOut.length()>0) {
 				_easeOut = parseFloat(xml.@easeOut);
+			}
+			_slideOver = xml.@slideOver == "true";
 			
 			screen.addChildAt(this,0);
 			var children:XMLList = xml.children();
-			for each (var child0:XML in children) if (child0.nodeKind() != "text") {
-				if (child0.localName()!="data") {
-					var childstr:String = child0.toXMLString();
-					var child:XML = XML('<page lazyRender="'+(xml.@lazyRender)+'" recycle="'+(xml.@recycle)+'">'+childstr+'</page>');
-					var newAttributes:Attributes = _attributes.copy();
-					newAttributes.parse(child0);
-					if (child0.@border!="false") {
-						addPadding(child0.localName(), newAttributes);
-					}
-					var page:* = new UI.FormClass(this, child, newAttributes);
-					_attributes.position(page);
-					page.name = "+";
-					page.visible = false;
-					_pages.push(page);
+			for each (var child0:XML in children) if (child0.nodeKind() != "text" && child0.localName()!="data") {
+				var childstr:String = child0.toXMLString();
+				var child:XML = XML('<page lazyRender="'+(xml.@lazyRender)+'" recycle="'+(xml.@recycle)+'">'+childstr+'</page>');
+				var newAttributes:Attributes = _attributes.copy();
+				newAttributes.parse(child0);
+				if (child0.@border!="false") {
+					addPadding(child0.localName(), newAttributes);
 				}
+				var page:* = new UI.FormClass(this, child, newAttributes);
+				_attributes.position(page);
+				page.name = "+";
+				page.visible = false;
+				_pages.push(page);
 			}
 			setInitialPage();
 			_slideTimer.addEventListener(TimerEvent.TIMER, slide);
@@ -178,11 +184,6 @@ package com.danielfreeman.madcomponents {
 		}
 		
 		
-		public function get attributes():Attributes {
-			return _attributes;
-		}
-		
-		
 		public function get xml():XML {
 			return _xml;
 		}
@@ -190,14 +191,14 @@ package com.danielfreeman.madcomponents {
 /**
  *  Rearrange the layout to new screen dimensions
  */	
-		public function layout(attributes:Attributes):void {
+		override public function layout(attributes:Attributes):void {
 			if (_slideTimer.running) {
 				_layoutAfterSlide = attributes;
 				return;
 			}
 			var children:XMLList = _xml.children();
 			var idx:int = 0;
-			_attributes = attributes.copy(_xml);
+			super.layout(attributes.copy(_xml));
 			UI.drawBackgroundColour(_attributes.backgroundColours, _attributes.width, _attributes.y + _attributes.height, this);
 			_attributes.x=0;_attributes.y=0;
 			for (var i:int = 0; i<children.length(); i++) {
@@ -285,11 +286,14 @@ package com.danielfreeman.madcomponents {
 			_transition = transition;
 			_thisPage.x = _attributes.x;
 			_thisPage.y = _attributes.y;
+			_over = _slideOver;
 			switch (transition) {
+				case SLIDE_LEFT_OVER:	_over = true;
 				case SLIDE_LEFT:	_thisPage.x = _attributes.width + _attributes.x;
 									startSlide();
 									break;
-				case SLIDE_RIGHT:	_thisPage.x = - _attributes.width + _attributes.x;
+				case SLIDE_RIGHT_OVER:	_over = true;
+				case SLIDE_RIGHT:	_thisPage.x = - (_over ? UNDER : 1.0) * _attributes.width + _attributes.x;
 									startSlide();
 									break;
 				case SLIDE_UP:		_thisPage.y = _attributes.height + _attributes.y;
@@ -335,6 +339,7 @@ package com.danielfreeman.madcomponents {
 		//	_lastPage.cacheAsBitmap=true;
 			_slideX = (_attributes.x - _thisPage.x)/STEPS;
 			_slideY = (slideY==0) ? (_attributes.y - _thisPage.y)/STEPS : slideY;
+			
 			_slideTimer.reset();
 			_slideTimer.start();
 			dispatchEvent(new Event(Event.CHANGE));
@@ -344,7 +349,7 @@ package com.danielfreeman.madcomponents {
  *  Is this a simple transition, left right, or change
  */	
 		protected function isSimpleTransition(transition:String):Boolean {
-			return transition=="" || transition==SLIDE_LEFT || transition==SLIDE_RIGHT;
+			return transition=="" || transition==SLIDE_LEFT || transition==SLIDE_RIGHT || transition==SLIDE_LEFT_OVER || transition==SLIDE_RIGHT_OVER;
 		}
 		
 		
@@ -417,7 +422,7 @@ package com.danielfreeman.madcomponents {
  */	
 		protected function slide(event:TimerEvent):void {
 			var t:Number = Timer(event.currentTarget).currentCount/STEPS;
-			_lastPage.x += delta(t, _slideX);
+			_lastPage.x += ((_over && _slideX < 0) ? UNDER : ((_over && _slideX > 0) ? 1/UNDER : 1.0)) * delta(t, _slideX);
 			_thisPage.x += delta(t, _slideX);
 			_thisPage.y += delta(t, _slideY);
 			if (Timer(event.currentTarget).currentCount == STEPS) {
@@ -458,6 +463,16 @@ package com.danielfreeman.madcomponents {
 				}
 			}
 			return false;
+		}
+		
+		
+		public function pageId(id:String):DisplayObject {
+			for (var i:int = 0; i < _pages.length; i++) {
+				if (Sprite(_pages[i]).getChildAt(0).name == id) {
+					return Sprite(_pages[i]).getChildAt(0);
+				}
+			}
+			return null;
 		}
 		
 /**
@@ -509,7 +524,8 @@ package com.danielfreeman.madcomponents {
 		}
 		
 		
-		public function destructor():void {
+		override public function destructor():void {
+			super.destructor();
 			_slideTimer.removeEventListener(TimerEvent.TIMER,slide);
 			for each (var view:IContainerUI in _pages)
 				view.destructor();

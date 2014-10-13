@@ -12,7 +12,7 @@ package com.danielfreeman.madcomponents
 	import flash.display.DisplayObject;
 	import flash.display.Sprite;
 
-	public class UISwitch extends MadSprite {
+	public class UISwitch extends MadSprite implements IComponentUI {
 		
 		protected static const ON_COLOUR:uint = 0x4CD263;
 		protected static const OFF_COLOUR:uint = 0xFFFFFF;
@@ -39,7 +39,8 @@ package com.danielfreeman.madcomponents
 
 
 		public function UISwitch(screen:Sprite, xml:XML, attributes:Attributes) {
-			screen.addChild(this);
+		//	screen.addChild(this);
+			super(screen, attributes);
 			if (xml.@onColour.length() > 0) {
 				_onColour = UI.toColourValue(xml.@onColour);
 			}
@@ -181,7 +182,8 @@ package com.danielfreeman.madcomponents
 		}
 		
 		
-		public function destructor():void {
+		override public function destructor():void {
+			super.destructor();
 			removeEventListener(MouseEvent.MOUSE_DOWN, mouseDown);
 			stage.removeEventListener(MouseEvent.MOUSE_UP, mouseUp);
 			stage.removeEventListener(MouseEvent.MOUSE_MOVE, mouseMove);

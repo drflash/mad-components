@@ -23,61 +23,18 @@
  * <p>Redistributions of files must retain the above copyright notice.</p>
  */
 
-package com.danielfreeman.madcomponents
-{
-	import flash.display.Sprite;
-	
-/**
- *  MadSprite adds clickable property
- */
-	public class MadSprite extends Sprite implements IComponentUI
-	{
-		protected var _clickable:Boolean = true;
-		protected var _includeInLayout:Boolean = true;
-		protected var _attributes:Attributes = null;
+package com.danielfreeman.madcomponents {
 
-		
-		public function MadSprite(screen:Sprite, attributes:Attributes = null) {
-			if (screen) {
-				screen.addChild(this);
-			}
-			if (attributes) {
-				_attributes = attributes;
-			}
-			else {
-				_attributes = new Attributes();
-			}
-		}
-		
-		public function set clickable(value:Boolean):void {
-			_clickable = value;
-		}
-		
-		public function get clickable():Boolean {
-			return _clickable;
-		}
-		
-		public function set includeInLayout(value:Boolean):void {
-			_includeInLayout = value;
-		}
-		
-		public function get includeInLayout():Boolean {
-			return _includeInLayout;
-		}
-		
-		public function touchCancel():void {
-			//override to implement scroll cancel
-		}
-		
-		public function get attributes():Attributes {
-			return _attributes;
-		}
-		
-		public function layout(attributes:Attributes):void {
-			_attributes = attributes;
-		}
-		
-		public function destructor():void {
-		}
+/**
+ * Interface for MadComponents containers
+ */	
+	public interface IComponentUI {
+		function layout(attributes:Attributes):void;
+		function set clickable(value:Boolean):void;
+		function get clickable():Boolean;
+		function set includeInLayout(value:Boolean):void;
+		function get includeInLayout():Boolean;
+		function get attributes():Attributes;
+		function destructor():void;		
 	}
 }

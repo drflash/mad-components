@@ -100,7 +100,7 @@ package com.danielfreeman.madcomponents
 				_jogable = xml.@clickable == "true";
 			}
 			super(screen, xml, attributes);
-			_decay = PICKER_DECAY;
+		//	_decay = PICKER_DECAY;
 			_deltaThreshold = 4.0;
 			_mask = new Shape();
 			_spinner = new Shape();
@@ -109,6 +109,11 @@ package com.danielfreeman.madcomponents
 			drawSpinner();
 			addChild(_spinner);
 			addChild(this.mask = _mask);
+		}
+		
+		
+		override protected function deltaToDecay(delta:Number):Number {
+			return PICKER_DECAY;
 		}
 
 /**
@@ -291,9 +296,9 @@ package com.danielfreeman.madcomponents
 		}
 		
 		
-		override protected function illuminate(pressedCell:int = -1, dispatch:Boolean = true):void {
+		override protected function illuminate(pressedCell:int = -1, dispatch:Boolean = true, show:Boolean = true):void {
 			if (_pressedCell >= 0 && _pressedCell < _count) {
-				if (_highlightPressed) {
+				if (show && _highlightPressed) {
 					_highlight.graphics.beginFill(_highlightColour);
 					_highlight.graphics.drawRect(0, _top + (_pressedCell+1) * _cellHeight +1, _width, _cellHeight -1); //_attributes.x + 
 				}
@@ -325,7 +330,7 @@ package com.danielfreeman.madcomponents
 		}
 		
 		
-		override protected function pressButton():DisplayObject {
+		override protected function pressButton(show:Boolean = true):DisplayObject {
 			if (_jogable && _classic) {
 				jogPicker();
 			}

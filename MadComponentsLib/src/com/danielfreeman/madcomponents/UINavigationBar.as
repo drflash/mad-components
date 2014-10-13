@@ -58,6 +58,7 @@ package com.danielfreeman.madcomponents {
 		protected var _rightArrow:UIBackButton;
 		protected var _colour:uint;
 		protected var _centrePanel:Sprite;
+		protected var _centreItem:Sprite = null;
 		protected var _xml:XML;
 		
 	
@@ -74,10 +75,10 @@ package com.danielfreeman.madcomponents {
 			var shadowFormat:TextFormat = default7 ? DARK_FORMAT7 : DARK_FORMAT;
 			_shadowLabel = new UILabel(this, 0, Y+1, "", shadowFormat);
 			_label = new UILabel(this, 0, Y+2, "", format);
-			_leftButton = new UIButton(this, 8, Y - 1, '<font size="14">left</font>', LEFTCOLOUR, new <uint>[], true, attributes.style7);		// JSS
+			_leftButton = new UIButton(this, 8, Y - 1, '<font size="14">left</font>', _attributes.style7 ? _colour : LEFTCOLOUR, new <uint>[], true, attributes.style7);		// JSS
 			_backButton = new UIBackButton(this, 4, 0, "Back", COLOUR, false, !_attributes.style7, xml.@leftLink.length() == 0);
 			_rightArrow = new UIBackButton(this, 200, 0, "Next", COLOUR, true, !_attributes.style7, xml.@rightArrow.length() > 0);
-			_rightButton = new UIButton(this, 200, Y - 1, '<font size="14">done</font>', DONECOLOUR, new <uint>[], true, attributes.style7);
+			_rightButton = new UIButton(this, 200, Y - 1, '<font size="14">done</font>', _attributes.style7 ? _colour : DONECOLOUR, new <uint>[], true, attributes.style7);
 			_backButton.visible = _leftButton.visible = _rightButton.visible = _rightArrow.visible = false;
 			addChild(_centrePanel = new Sprite());
 			initialiseClassicButtons();
@@ -224,14 +225,20 @@ package com.danielfreeman.madcomponents {
 		
 		
 		public function get centrePanel():Sprite {
-			return _centrePanel;	
+			return _centrePanel;
 		}
 		
 		
 		public function set centrePanel(value:Sprite):void {
-			_centrePanel.addChild(value);
-			value.x = -value.width / 2;
-			value.y = (HEIGHT - value.height) / 2;
+			if (_centreItem) {
+				_centrePanel.removeChild(_centreItem);
+				_centreItem = null;
+			}
+			if (value) {
+				_centrePanel.addChild(_centreItem = value);
+				value.x = -value.width / 2;
+				value.y = (HEIGHT - value.height) / 2;
+			}
 		}
 		
 /**

@@ -55,7 +55,7 @@ package com.danielfreeman.extendedMadness
  * /&gt;
  * </pre>
  */
-	public class UISplitView extends Sprite implements IContainerUI {
+	public class UISplitView extends MadSprite implements IContainerUI {
 		
 		protected static const LEFT:Number = 260.0;
 		protected static const LINE:Number = 2.0;
@@ -65,7 +65,7 @@ package com.danielfreeman.extendedMadness
 		protected static const LIST:XML = <list id="list" mask="true" background="#FFFFFF"/>;
 		
 		protected var _xml:XML;
-		protected var _attributes:Attributes;
+	//	protected var _attributes:Attributes;
 
 		protected var _leftXML:XML = <navigation mask="true"/>;
 		protected var _rightXML:XML = <pages/>;
@@ -78,9 +78,10 @@ package com.danielfreeman.extendedMadness
 		protected var _hideDelay:Timer = new Timer(50,1);
 
 		public function UISplitView(screen:Sprite, xml:XML, attributes:Attributes) {
-			screen.addChild(this);
+		//	screen.addChild(this);
 			_xml = xml;
-			_attributes = attributes;
+		//	_attributes = attributes;
+			super(screen, attributes);
 			for each(var child:XML in xml.children()) {
 				if (child.localName() != "data") {
 					_rightXML.appendChild(child);
@@ -195,7 +196,8 @@ package com.danielfreeman.extendedMadness
 		}
 		
 		
-		public function layout(attributes:Attributes):void {
+		override public function layout(attributes:Attributes):void {
+			super.layout(attributes);
 			stage.removeEventListener(MouseEvent.MOUSE_UP, mouseUp);
 			_landscape = attributes.width > attributes.height;
 			_attributes = attributes;
@@ -232,9 +234,9 @@ package com.danielfreeman.extendedMadness
 		}
 		
 		
-		public function get attributes():Attributes {
-			return _attributes;
-		}
+	//	public function get attributes():Attributes {
+	//		return _attributes;
+	//	}
 		
 		
 		public function get xml():XML {
@@ -242,7 +244,8 @@ package com.danielfreeman.extendedMadness
 		}
 		
 		
-		public function destructor():void {
+		override public function destructor():void {
+			super.destructor();
 			_hideDelay.removeEventListener(TimerEvent.TIMER, hideMenuDelayed);
 			stage.removeEventListener(MouseEvent.MOUSE_UP, mouseUp);
 			_button.removeEventListener(UIButton.CLICKED, showMenu);

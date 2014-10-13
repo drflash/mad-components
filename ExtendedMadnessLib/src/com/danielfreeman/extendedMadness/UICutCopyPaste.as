@@ -73,7 +73,8 @@ package com.danielfreeman.extendedMadness
  * Cut / Copy / Paste style buttons
  */
 		public function UICutCopyPaste(screen:Sprite, xx:Number, yy:Number, arrowPosition:Number = 0, colour:uint = 0x666666, alt:Boolean = false, words:Vector.<String> = null, style7:Boolean = false) {
-			screen.addChild(this);
+		//	screen.addChild(this);
+			super(screen, _attributes);
 			x=xx;y=yy;
 			_colour = colour;
 			_style7 = style7;
@@ -283,7 +284,8 @@ package com.danielfreeman.extendedMadness
 		}
 		
 		
-		public function destructor():void {
+		override public function destructor():void {
+			super.destructor();
 			removeEventListener(MouseEvent.MOUSE_UP,mouseUp);
 		}
 	}

@@ -43,7 +43,7 @@ package com.danielfreeman.extendedMadness {
  * /&gt;
  * </pre>
  */	
-	public class UITick extends MadSprite {
+	public class UITick extends Sprite {
 		
 		public static const SIZE:Number = 18.0;
 		public static const HEAD:Number = 6.0;
@@ -56,7 +56,8 @@ package com.danielfreeman.extendedMadness {
 		public function UITick(screen:Sprite, xx:Number, yy:Number, colour:uint, alt:Boolean = false) {
 			screen.addChild(this);
 			x=xx;y=yy;
-			clickable = mouseEnabled = false;
+		//	clickable = 
+			mouseEnabled = false;
 			if (alt)
 				_width = 6;
 			this.colour = colour;

@@ -1,30 +1,7 @@
-/**
- * <p>Original Author: Daniel Freeman</p>
- *
- * <p>Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:</p>
- *
- * <p>The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.</p>
- *
- * <p>THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.</p>
- *
- * <p>Licensed under The MIT License</p>
- * <p>Redistributions of files must retain the above copyright notice.</p>
- */
-
 package com.danielfreeman.madcomponents {
 	
+	import flash.utils.getDefinitionByName;
+	import flash.system.Capabilities;
 	import flash.display.DisplayObject;
 	import flash.display.GradientType;
 	import flash.display.Sprite;
@@ -70,19 +47,133 @@ package com.danielfreeman.madcomponents {
 			_attributes = attributes;
 			_colour = attributes.colour;
 			_alt = xml.@alt == "true";
-			_pixelSnapping = xml.@pixelSnapping == "true";
+			_pixelSnapping = xml.@pixelSnapping == "true" || (xml.data && xml.data.length() > 0);
 			_iconOffset = xml.@iconOffset.length() > 0 ? parseFloat(xml.@iconOffset) : 0;
-			initialiseButtonBar(xml,attributes);
+			initialiseButtonBar(xml, attributes);
 			super(screen, xml, attributes);
 			_buttonBar.addEventListener(MouseEvent.MOUSE_DOWN, mouseDown);			
 			_buttonBar.addEventListener(MouseEvent.MOUSE_UP, mouseUp);
 			setChildIndex(_buttonBar, numChildren-1);
+			extractData(xml);
+		}
+		
+		
+		protected function extractData(xml:XML):void {
+			for each (var data:XML in xml.data) {
+				if (data.@size.length() == 0) {
+					xmlData = data;
+					return;
+				}
+			/*	else if (String(data.@size).toUpperCase() == "LDPI" && Capabilities.screenDPI < 160 ) {
+					xmlData = data;
+					return;
+				}
+				else if (String(data.@size).toUpperCase() == "MDPI" && Capabilities.screenDPI < 240) {
+					xmlData = data;
+					return;
+				}
+				else if (String(data.@size).toUpperCase() == "HDPI" && Capabilities.screenDPI < 320) {
+					xmlData = data;
+					return;
+				}
+				else if (String(data.@size).toUpperCase() == "XHDPI" && Capabilities.screenDPI < 400) {
+					xmlData = data;
+					return;
+				}
+				else if (String(data.@size).toUpperCase() == "XXHDPI" && Capabilities.screenDPI >= 400) {
+					xmlData = data;
+					return;
+				} */
+				else if (data.@size.substr(-3,3).toUpperCase() == "DPI" && parseFloat(data.@size.substr(0,-3)) >= Capabilities.screenDPI) {
+					xmlData = data;
+					return;
+				}
+			}
+		}
+		
+		
+		protected function imageAttributeClass(item:Object):Class {
+			if (item.ldpi && Capabilities.screenDPI < 160 ) {
+				_pixelSnapping = true;
+				return Class(getDefinitionByName(item.ldpi));
+			}
+			else if (item.mdpi && Capabilities.screenDPI < 240) {
+				_pixelSnapping = true;
+				return Class(getDefinitionByName(item.mdpi));
+			}
+			else if (item.hdpi && Capabilities.screenDPI < 320) {
+				_pixelSnapping = true;
+				return Class(getDefinitionByName(item.hdpi));
+			}
+			else if (item.xhdpi && Capabilities.screenDPI < 400) {
+				_pixelSnapping = true;
+				return Class(getDefinitionByName(item.xhdpi));
+			}
+			else if (item.xxhdpi && Capabilities.screenDPI >= 400) {
+				_pixelSnapping = true;
+				return Class(getDefinitionByName(item.xxhdpi));
+			}
+			else if (item.image) {
+				return Class(getDefinitionByName(item.image));
+			}
+			else {
+				return null;
+			}
+		}
+		
+		
+		public function set data(value:Array):void {
+			var index:int = 0;
+			for each (var item:Object in value) {
+				if (item is String) {
+					setTab(index++, String(item));
+				}
+				else {
+					setTab(index++, item.hasOwnProperty("label") ? item.label : "", imageAttributeClass(item));
+				}
+			}
+		}
+		
+		
+/**
+ *  Set XML data
+ */
+		public function set xmlData(value:XML):void {
+			var result:Array = [];
+			var children:XMLList = value.children();
+			for each (var child:XML in children) {
+				if (child.nodeKind()!="text") {
+					result.push(attributesToObject(child));
+				}
+			}
+			data = result;
+		}
+		
+		
+		protected function attributesToObject(child:XML):Object {
+			var attributes:XMLList = child.attributes();
+			if (attributes.length()==0) {
+				return {label:child.localName()};
+			}
+			else {
+				var result:Object = new Object();
+				for (var i:int=0; i<attributes.length(); i++) {
+					result[attributes[i].name().toString()] = attributes[i].toString();
+				}
+				return result;
+			}
 		}
 		
 		
 		protected function initialiseButtonBar(xml:XML, attributes:Attributes):void {
 			addChild(_buttonBar=new Sprite());
-			makeTabButtons(attributes, xml.children().length(), _alt);
+			var count:int = 0;
+			for each(var child:XML in xml.children()) {
+				if (child.nodeKind() != "text" && child.localName() != "data") {
+					count++;
+				}
+			}
+			makeTabButtons(attributes, count, _alt);
 			_pagesAttributes = attributes.copy();
 			_pagesAttributes.height -= (_buttonBar.height - (_alt ? 1 : TWEAK));
 			_buttonBar.y = _pagesAttributes.height;

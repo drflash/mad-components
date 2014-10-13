@@ -387,7 +387,7 @@ package com.danielfreeman.madcomponents {
 /**
  * AMF object property
  */	
-		public function get dataAMF():Object {
+		public function get dataAMF():* {
 			return _amfData;
 		}
 		
@@ -405,7 +405,7 @@ package com.danielfreeman.madcomponents {
 					}
 			}
 			else {
-				var schemaName:String = schema.localName().toString();
+			//	var schemaName:String = schema.localName().toString();
 				var schemaChildren:XMLList = schema.children();
 				if (items.length()==1 && schemaChildren.length()==1 && schemaChildren[0].hasComplexContent()) {
 					result = listData(items[0], schemaChildren[0]);
@@ -415,9 +415,12 @@ package com.danielfreeman.madcomponents {
 				if (items.length()>1) {
 					result = [];
 					var schemaGrandChildren:XMLList = schemaChildren.children();
+				//	trace("schemaChildren=",schemaChildren);
 					for each (var item:XML in items) {
-						if (schema.child(item.localName()).length()>0) {
-							result.push(listObject(item, schemaGrandChildren));
+						if (schema.child(item.localName()).length() > 0) {
+							var rowResult:Object = listObject(item, schemaGrandChildren);
+							attributeValues(item, schemaChildren[0], rowResult);
+							result.push(rowResult);
 						}
 					}
 				}
@@ -425,20 +428,32 @@ package com.danielfreeman.madcomponents {
 			return result;
 		}
 		
+		
+		protected function attributeValues(item:XML, childSchema:XML, result:Object):void {
+			var schemaAttributes:XMLList = childSchema.attributes();
+			for (var i:int=0; i<schemaAttributes.length(); i++) {
+				var schemaAttributeKey:String = schemaAttributes[i].name().toString();
+				var schemaAttributeValue:String = schemaAttributes[i].toString();
+				result[schemaAttributeValue != "" ? schemaAttributeValue : schemaAttributeKey] = item.attribute(schemaAttributeKey)[0].toString();
+			}
+		}
+		
 /**
  * Convert XML to an array of objects
  */	
 		protected function listValues(item:XML, childSchema:XML):Object {
+			var result:Object = new Object();
 			if (childSchema == null) {
 				return xmlToObject(item);
 			}
 			else if (item.hasSimpleContent()) {
-				var result:Object = new Object();
+				attributeValues(item, childSchema, result);
 				result[childSchema.localName().toString()] = item.toString();
 				return result;
 			}
 			else {
-				return listObject(item, childSchema.children());
+				attributeValues(item, childSchema, result);
+				return listObject(item, childSchema.children(), result);
 			}
 		}
 		
@@ -459,12 +474,15 @@ package com.danielfreeman.madcomponents {
 				var tagName:String = child.localName().toString();
 				if (child.hasSimpleContent()) {
 					var field:String = child.toString();
-					if (field == "")
+					if (field == "") {
 						field = tagName;
+					}
+					attributeValues(item.child(tagName)[0], child, result);
 					var head:String = result[field];
 					result[field] = (head ? head+" " : "") + item.child(tagName)[0].toString();
 				}
 				else {
+					attributeValues(item.child(tagName)[0], child.children(), result);
 					result = listObject(item.child(tagName)[0], child.children(), result);
 				}
 			}

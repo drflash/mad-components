@@ -46,11 +46,12 @@ package com.danielfreeman.madcomponents {
  *   prompt = "TEXT"
  *   promptColour = "#rrggbb"
  *   field = "IDENTIFIER"
+ *   begins = "true|false"
  *   clearButton = "true|false"
  * /&gt;
  * </pre>
  */
-	public class UISearch extends UIInput {
+	public class UISearch extends UIInput implements IComponentUI {
 
 		protected static const HEIGHT:Number = 40.0;
 		protected static const GAP:Number = 10.0;
@@ -62,7 +63,7 @@ package com.danielfreeman.madcomponents {
 		protected static const CURVE7:Number = 10.0;
 		
 
-		protected var _attributes:Attributes;
+	//	protected var _attributes:Attributes;
 		protected var _over:Shape;
 		protected var _iconColour:uint;
 		protected var _clear:Sprite;
@@ -156,6 +157,20 @@ package com.danielfreeman.madcomponents {
 		//	_clear.visible = false;
 		_clear.x = _attributes.width-GAP - WINDOW_HEIGHT/2;
 			_clear.addEventListener(MouseEvent.MOUSE_UP, clearLabel);
+		}
+		
+		
+		override public function layout(attributes:Attributes):void {
+			super.layout(attributes);
+			fixwidth = attributes.width;
+		}
+		
+		
+		override public function destructor():void {
+			super.destructor();
+			if (_clear) {
+				_clear.removeEventListener(MouseEvent.MOUSE_UP, clearLabel);
+			}
 		}
 
 	}

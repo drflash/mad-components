@@ -114,7 +114,8 @@ package com.danielfreeman.madcomponents {
 				_alt = true;
 			}
 			_format = style7 ? FORMAT7 : FORMAT;
-			screen.addChild(this);
+		//	screen.addChild(this);
+			super(screen, null);
 			x=xx;y=yy;
 			_style7 = style7;
 			_colour = (colours && colours.length==1) ? colours[0] : colour;
@@ -287,34 +288,42 @@ package com.danielfreeman.madcomponents {
 			else {
 				var height:Number = _skinHeight>0 ? _skinHeight : _label.height + sizeY();
 				
-				if (_style7) {
-					graphics.beginFill(0, 0);
-					graphics.drawRect(0, 0, width, height);
-					_label.setTextFormat(new TextFormat(null, null, pressed ? Colour.lighten(_textColour, 64) : _textColour));
-				}
-				else {
+			//	if (_style7) {
+			//		graphics.beginFill( (_colours.length > 0) ? _colours[0] : _colour);
+			//		graphics.drawRoundRect(0, 0, width, height, _curve);
+			//		_label.setTextFormat(new TextFormat(null, null, _textColour); //pressed ? Colour.lighten(_textColour, 64) : _textColour));
+			//	}
+			//	else {
 					var matr:Matrix=new Matrix();
 					var gradient:Array = pressed ? [Colour.darken(_colour,128),Colour.lighten(_colour),Colour.darken(_colour)]
 											: [Colour.lighten(_colour,80),Colour.darken(_colour),Colour.darken(_colour)];
 					matr.createGradientBox(width, height, Math.PI/2, 0, 0);
-					if (_colours.length>0) {
+					if (_colours.length > 0) {
 						graphics.beginFill(_colours[0]);
 					}
 					else {
-						graphics.beginGradientFill(GradientType.LINEAR, [Colour.darken(_colour),Colour.lighten(_colour)], [1.0,1.0], [0x00,0xff], matr);
+						if (_style7) {
+							graphics.beginFill( (_colours.length > 0) ? _colours[0] : _colour);
+						//	graphics.beginFill(0xcc9900);
+						}
+						else {
+							graphics.beginGradientFill(GradientType.LINEAR, [Colour.darken(_colour),Colour.lighten(_colour)], [1.0,1.0], [0x00,0xff], matr);
+						}
 					}
 					graphics.drawRoundRect(0, 0, width, height, _curve);
 					
-					if (_colours.length>2 && pressed) {
-						graphics.beginFill(_colours[2]);
+					if (!_style7) {
+						if (_colours.length>2 && pressed) {
+							graphics.beginFill(_colours[2]);
+						}
+						else if (_colours.length>1) {
+							graphics.beginFill(_colours[1]);
+						}
+						else {
+							graphics.beginGradientFill(GradientType.LINEAR, gradient, [1.0,1.0,1.0], [0x00,0x80,0xff], matr);
+						}
+						graphics.drawRoundRect(_border, _border, width-2*_border, height-2*_border, _curve);
 					}
-					else if (_colours.length>1) {
-						graphics.beginFill(_colours[1]);
-					}
-					else {
-						graphics.beginGradientFill(GradientType.LINEAR, gradient, [1.0,1.0,1.0], [0x00,0x80,0xff], matr);
-					}
-					graphics.drawRoundRect(_border, _border, width-2*_border, height-2*_border, _curve);
 					if (_skinHeight>0) {
 						_label.y = (_skinHeight-_label.height)/2;
 						_shadowLabel.y = _label.y - 1;				
@@ -324,7 +333,7 @@ package com.danielfreeman.madcomponents {
 						_shadowLabel.y = _sizeY-SHADOW_OFFSET -1;
 					}
 				
-				}
+			//	}
 			}
 			if (_fixwidth > _label.width + 2 * _gap) {
 				_label.x = (_fixwidth-_label.width)/2;
@@ -362,7 +371,7 @@ package com.danielfreeman.madcomponents {
 		}
 		
 		
-		public function destructor():void {
+		override public function destructor():void {
 			removeEventListener(MouseEvent.MOUSE_DOWN, mouseDown);
 			stage.removeEventListener(MouseEvent.MOUSE_UP, mouseUp);
 		}

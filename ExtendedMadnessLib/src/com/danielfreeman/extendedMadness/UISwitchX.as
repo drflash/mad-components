@@ -58,7 +58,7 @@ package com.danielfreeman.extendedMadness {
  * /&gt;
  * </pre>
  */
-	public class UISwitchX extends UIContainerBaseClass {
+	public class UISwitchX extends MadSprite implements IComponentUI {
 	
 		protected static const DELTA:int = 40;
 		protected static const MOVE_X:Number = 10.0;
@@ -102,7 +102,7 @@ package com.danielfreeman.extendedMadness {
 		public function UISwitchX(screen:Sprite, xml:XML, attributes:Attributes) {
 		//	screen.addChild(this);
 		//	x=xx;y=yy;
-			super(screen, xml, attributes);
+			super(screen, attributes);
 			
 			_extra = (xml.@alt == "true") ? 8 : 0;
 			_curve = (xml.@alt == "true") ? ALT_CURVE : CURVE;

@@ -44,6 +44,7 @@ package com.danielfreeman.madcomponents {
  *    stageColour = "#rrggbb,#rrggbb,..."
  *    autoScale = "true|false"
  *    autoResize = "true|false"
+ *    activityIndicatorColour = "#rrggbb"
  * /&gt;
  * </pre>
  */	
@@ -62,8 +63,8 @@ package com.danielfreeman.madcomponents {
 		protected static const HEIGHT:Number = 454;
 		protected static const COLOUR:uint = 0x9999AA;
 		
-		protected static const TOKENS:Array = ["scrollVertical","viewFlipper","list","groupedList","dividedList","pages","tabPages","navigation","navigationPages","longList"];
-		protected static const CLASSES:Array = [UIScrollVertical,UIViewFlipper,UIList,UIGroupedList,UIDividedList,UIPages,UITabPages,UINavigation,UINavigationPages,UILongList];
+		protected static const TOKENS:Array = ["scrollVertical","viewFlipper","list","groupedList","dividedList","pages","tabPages","navigation","navigationPages","longList", "imageLoader", "image", "switch", "search", "button", "label", "slider", "input", "renderer"];
+		protected static const CLASSES:Array = [UIScrollVertical,UIViewFlipper,UIList,UIGroupedList,UIDividedList,UIPages,UITabPages,UINavigation,UINavigationPages,UILongList, UIImageLoader, UIImage, UISwitch, UISearch, UIButtonX, UILabelX, UISliderX, UIInputX, UIRenderer];
 
 		protected static const DEBUG_SCALE:Number = -1.0;
 
@@ -91,11 +92,12 @@ package com.danielfreeman.madcomponents {
  * Create the user interface
  */	
 		public static function create(screen:Sprite, xml:XML, width:Number = -1, height:Number = -1):Sprite {
-			if (_root)
+			if (_root) {
 				clear();
+			}
 			
 			screen.stage.stageFocusRect = false;
-			_simulated = width<0 && (Capabilities.playerType == "PlugIn" || Capabilities.playerType == "ActiveX" || Capabilities.playerType == "External");
+			_simulated = width<0 && (Capabilities.playerType == "StandAlone" || Capabilities.playerType == "PlugIn" || Capabilities.playerType == "ActiveX" || Capabilities.playerType == "External");
 			if (xml.@clickColour.length()>0)
 				UIList.HIGHLIGHT = toColourValue(xml.@clickColour[0].toString());
 			
@@ -155,7 +157,8 @@ package com.danielfreeman.madcomponents {
 			screen.addChild(_windowLayer = new Sprite());
 			_windowLayer.scaleX = _windowLayer.scaleY = _scale;
 			
-			_activityIndicator = new UIActivity(screen, width/2, height/2);
+			_activityIndicator = new UIActivity(screen, width/2, height/2, false, (xml.@activityIndicatorColour.length() > 0) ? UI.toColourValue(xml.@activityIndicatorColour) : 0xFFFFFF);
+			_activityIndicator.scaleX = _activityIndicator.scaleY = UI.scale / 2;
 			if (_simulated) {
 				resize(new Event("dummy"));
 			}
@@ -182,7 +185,7 @@ package com.danielfreeman.madcomponents {
  * Convert #rrggbb string to uint
  */
 		public static function toColourValue(value:String):uint {
-			value.replace(/ /gi,"");
+			value = value.replace(/ /gi,"");
 			if (value.substr(0,1)=="#")
 				return parseInt(value.substr(1,6),16);
 			else if (value.substr(0,1)>="0" && value.substr(0,1)<="9")
@@ -195,7 +198,7 @@ package com.danielfreeman.madcomponents {
  * Convert a comma seperated list of #rrggbb string colour values to a uint vector
  */
 		public static function toColourVector(value:String):Vector.<uint> {
-			value.replace(/ /gi,"");
+			value = value.replace(/ /gi,"");
 			var splitValues:Array = value.split(",");
 			var result:Vector.<uint> = new Vector.<uint>;
 			for each (var colour:String in splitValues) {
@@ -246,8 +249,9 @@ package com.danielfreeman.madcomponents {
 				var result:DisplayObject = new _classes[idx](screen, xml, attributes);
 				result.x=attributes.x;
 				result.y=attributes.y;
-				if (xml.@id.length()>0)
+				if (xml.@id.length()>0) {
 					result.name = xml.@id[0];
+				}
 				return result;
 			}
 			else {
@@ -293,28 +297,34 @@ package com.danielfreeman.madcomponents {
  * Rearrange the UI for a new screen size
  */	
 		public static function layout(width:Number = -1, height:Number = -1):void {
-			_width = width; _height = height;
-			_attributes = newAttributes(width, height);
-			_attributes.parse(_xml);
-			var container:Boolean = isContainer(_xml.localName());
-			if (container) {
-				IContainerUI(_root).layout(_attributes);
-			}
-			if (!container && (_xml.@border.length()==0 || _xml.@border[0]=="true")) {
-				_attributes.x=PADDING;
-				_attributes.y=PADDING;
-				_attributes.width-=2*PADDING;
-				_attributes.height-=2*PADDING;
-				_attributes.hasBorder = true;
-			}
-			if (!container) {
-				FormClass(_root).layout(_attributes);
-			}
-			if (!_root.mouseEnabled) {
-				dimUI();
-			}
-			drawStageBackground();
-			centrePopUps();
+		//	if (_root) {
+				if (width < 0) {
+					width = _screen.stage.stageWidth;
+					height = _screen.stage.stageHeight;
+				}
+				_width = width; _height = height;
+				_attributes = newAttributes(width, height);
+				_attributes.parse(_xml);
+				var container:Boolean = isContainer(_xml.localName());
+				if (_root && container) {
+					IComponentUI(_root).layout(_attributes);
+				}
+				if (!container && (_xml.@border.length()==0 || _xml.@border[0]=="true")) {
+					_attributes.x=PADDING;
+					_attributes.y=PADDING;
+					_attributes.width-=2*PADDING;
+					_attributes.height-=2*PADDING;
+					_attributes.hasBorder = true;
+				}
+				if (!container && _root) {
+					FormClass(_root).layout(_attributes);
+				}
+				if (_root && !_root.mouseEnabled) {
+					dimUI();
+				}
+				drawStageBackground();
+				centrePopUps();
+		//	}
 		}
 		
 		
@@ -478,6 +488,7 @@ package com.danielfreeman.madcomponents {
 			}
 			if (item==_root && _root) {
 				_screen.removeChild(_root);
+				_root = null;
 			}
 		}
 	}
