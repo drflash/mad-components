@@ -32,7 +32,7 @@ package com.danielfreeman.extendedMadness
 	import flash.events.MouseEvent;
 	import flash.geom.Matrix;
 	
-	public class UITabButtonRow extends MadSprite
+	public class UITabButtonRow extends MadSprite implements IComponentUI
 	{
 		public static const OFF_COLOUR:uint = 0x999999;
 		public static const ON_COLOUR:uint = 0xF9F9F9;
@@ -75,8 +75,14 @@ package com.danielfreeman.extendedMadness
 				if (colours.length > 1)
 					_offColour = colours[1];
 			}
-			screen.addChild(this);
-			_numButtons = xml.children().length();
+		//	screen.addChild(this);
+			super(screen, attributes);
+			_numButtons = 0;
+			for each(var child:XML in xml.children()) {
+				if (child.nodeKind() != "text" && child.localName() != "data") {
+					_numButtons++;
+				}
+			}
 			addChild(_pressed  = new Sprite());
 			addChild(_highlight  = new Sprite());
 			buttonMode = useHandCursor = true;
@@ -137,7 +143,8 @@ package com.danielfreeman.extendedMadness
 		}
 		
 		
-		public function layout(attributes:Attributes):void {
+		override public function layout(attributes:Attributes):void {
+			super.layout(attributes);
 			_width = attributes.width;
 			_buttonWidth = _width / _numButtons;
 			refresh();

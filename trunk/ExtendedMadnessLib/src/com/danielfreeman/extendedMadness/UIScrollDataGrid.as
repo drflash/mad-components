@@ -87,7 +87,7 @@ package com.danielfreeman.extendedMadness {
 		protected var _dataGridXML:XML;
 		protected var _fixedColumns:int = 0;
 		protected var _fixedColumnColours:Vector.<uint> = null;
-		protected var _dataGrid:UIFastDataGrid;
+		protected var _dataGrid:UISimpleDataGrid;
 		protected var _fixedColumnPosition:Number = 0;
 		protected var _columnSlideTimer:Timer = new Timer(50, STEPS);
 		protected var _slideFixedColumns:Boolean = false;
@@ -169,11 +169,11 @@ package com.danielfreeman.extendedMadness {
 /**
  *  Render the row background colours for fixed columns
  */
-		protected function colourFixedColumns(dataGrid:UIFastDataGrid, flag:Boolean = false):void {
+		protected function colourFixedColumns(dataGrid:UISimpleDataGrid, flag:Boolean = false):void {
 			if (_fixedColumns > 0 && dataGrid.tableCells.length > 0) {
 				
 			//	var rowIndex:int = 0;
-				var start:int = dataGrid.hasHeader  ? 1 : 0;
+			//	var start:int = dataGrid.hasHeader  ? 1 : 0;
 				if (flag) {
 					for (var i:int = 0; i < dataGrid.tableCells.length; i++) {
 						var tableRow:Vector.<UICell> = dataGrid.tableCells[i];
@@ -197,7 +197,7 @@ package com.danielfreeman.extendedMadness {
 /**
  *  Put headers, fixed columns, and grid cells all within their appropriate layers
  */
-		protected function sliceTable(dataGrid:UIFastDataGrid):void {
+		protected function sliceTable(dataGrid:UISimpleDataGrid):void {
 			if (!_headerSlider) {
 				addChild(_headerSlider = new Sprite());
 				_headerSlider.name ="_headerSlider";
@@ -238,7 +238,15 @@ package com.danielfreeman.extendedMadness {
  */	
 		override protected function createSlider(xml:XML, attributes:Attributes):void {
 			var gridAttributes:Attributes = attributes.copy(_dataGridXML);
-			_slider = _dataGrid = new UIFastDataGrid(this, _dataGridXML, gridAttributes);
+			if (xml.@datagrid == "simple") {
+				_slider = _dataGrid = new UISimpleDataGrid(this, _dataGridXML, gridAttributes);
+			}
+			else if (xml.@datagrid == "special") {
+				_slider = _dataGrid = new UISpecialDataGrid(this, _dataGridXML, gridAttributes);
+			}
+			else {
+				_slider = _dataGrid = new UIFastDataGrid(this, _dataGridXML, gridAttributes);
+			}
 			_slider.name = "-";
 			sliceTable(_dataGrid);
 			adjustMaximumSlide();
@@ -284,9 +292,10 @@ package com.danielfreeman.extendedMadness {
 		}
 		
 		
-		override protected function pressButton():DisplayObject {
+		override protected function pressButton(show:Boolean = true):DisplayObject {
 			return null;
 		}
+		
 		
 		override protected function doSearchHit():void {
 		}
@@ -341,11 +350,16 @@ package com.danielfreeman.extendedMadness {
 			adjustMaximumSlide();
 		}
 		
-/**
- * Refresh datagrid with new data
- */
-		public function set dataProvider(value:Array):void {
-			_dataGrid.dataProvider = value;
+///**
+// * Refresh datagrid with new data
+// */
+//		public function set dataProvider(value:Array):void {
+//			_dataGrid.dataProvider = value;
+//		}
+		
+		
+		override public function clear():void {
+			_dataGrid.clear();
 		}
 		
 /**
@@ -358,12 +372,12 @@ package com.danielfreeman.extendedMadness {
 			_fixedColumns = value;
 		}
 		
-/**
- * Refresh datagrid
- */
-		public function invalidate(readGrid:Boolean = false):void {
-			_dataGrid.invalidate(readGrid);
-		}
+///**
+// * Refresh datagrid
+// */
+//		public function invalidate(readGrid:Boolean = false):void {
+//			_dataGrid.invalidate(readGrid);
+//		}
 
 /**
  * Render datagrid with padding for every column
@@ -389,20 +403,20 @@ package com.danielfreeman.extendedMadness {
 		
 		
 		public function set textSize(value:Number):void {
-			_dataGrid.textSize = value;
+			UIFastDataGrid(_dataGrid).textSize = value;
 			adjustMaximumSlide();
 			sliceTable(_dataGrid);
 		}
 		
 		
-		protected function fixedHeaderLine(dataGrid:UIFastDataGrid):void {
+		protected function fixedHeaderLine(dataGrid:UISimpleDataGrid):void {
 			var colour:uint = dataGrid.hasHeader ? dataGrid.headerColour : Colour.darken(dataGrid.colours[0], DARKEN);
 			var index:int = dataGrid.hasHeader ? 0 : 1;
 			_headerSlider.graphics.clear();
 			_headerSlider.graphics.beginFill(colour);
 			_headerSlider.graphics.drawRect(_headerSlider.getBounds(this).left, _headerSlider.getBounds(this).top, _headerSlider.width, _headerSlider.height);
 			_headerSlider.graphics.endFill();
-			if (_headerFixedColumnSlider) {
+			if (_headerFixedColumnSlider && _fixedColumnSlider) {
 				_headerFixedColumnSlider.graphics.clear();
 				_headerFixedColumnSlider.graphics.beginFill(colour);
 				_headerFixedColumnSlider.graphics.drawRect(0, _headerFixedColumnSlider.getBounds(this).top, _fixedColumnSlider.width, _headerFixedColumnSlider.height);
@@ -438,7 +452,8 @@ package com.danielfreeman.extendedMadness {
  *  Rearrange the layout to new screen dimensions
  */	
 		override public function layout(attributes:Attributes):void {
-			if (_fastLayout) {  //fastLayout is yet implemented in this release
+			_attributes = attributes;
+			if (_fastLayout) {  //fastLayout is not yet implemented in this release
 				adjustMaximumSlide();
 				refreshMasking();
 			}
@@ -512,7 +527,7 @@ package com.danielfreeman.extendedMadness {
 /**
  * Direct access to the UIFastDataGrid class
  */
-		public function get dataGrid():UIFastDataGrid {
+		public function get dataGrid():UISimpleDataGrid {
 			return _dataGrid;
 		}
 		

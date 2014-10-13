@@ -40,9 +40,7 @@ package com.danielfreeman.madcomponents {
 			skipSpaces();
 			switch (_json.charAt(_pos)) {
 				case "{": return parseKeyValueList();
-						break;
 				case "[": return parseArray();
-						break;
 			}
 			return null;
 		}

@@ -50,7 +50,7 @@ package com.danielfreeman.extendedMadness
  * /&gt;
  * </pre>
  * */
-	public class UIMenu extends MyTextMenu implements IContainerUI {
+	public class UIMenu extends MyTextMenu implements IComponentUI {
 		
 		public static const SELECTED:String = "selected";
 		protected static const COLOUR:uint = 0xFEFEFE;
@@ -62,7 +62,8 @@ package com.danielfreeman.extendedMadness
 			
 		protected var _font:String = "";
 		protected var _attributes:Attributes;
-		protected var _xml:XML;
+		protected var _clickable:Boolean = true;
+		protected var _includeInLayout:Boolean = true;
 		protected var _colour:uint;
 		protected var _width:Number;
 
@@ -109,9 +110,9 @@ package com.danielfreeman.extendedMadness
 		}
 		
 		
-		public function get xml():XML {
-			return _xml;
-		}
+	//	public function get xml():XML {
+	//		return _xml;
+	//	}
 		
 		
 		public function get pages():Array {
@@ -156,22 +157,32 @@ package com.danielfreeman.extendedMadness
 		}
 		
 		
-		public function findViewById(id:String, row:int = -1, group:int = -1):DisplayObject {
-			return null;
+		public function touchCancel():void {
 		}
 		
 		
-		public function clear():void {
+		public function set clickable(value:Boolean):void {
+			_clickable = value;
 		}
 		
+		public function get clickable():Boolean {
+			return _clickable;
+		}
+		
+		public function set includeInLayout(value:Boolean):void {
+			_includeInLayout = value;
+		}
+		
+		public function get includeInLayout():Boolean {
+			return _includeInLayout;
+		}
 		
 		public function layout(attributes:Attributes):void {
 			_attributes = attributes;
 		}
 		
 		
-		public function destructor():void {
-			
+		public function destructor():void {	
 		}
 	}
 }

@@ -25,6 +25,8 @@
 
 package com.danielfreeman.extendedMadness
 {
+	import flash.display.PixelSnapping;
+	import flash.display.Bitmap;
 	import com.danielfreeman.madcomponents.*;
 	
 	import flash.display.DisplayObject;
@@ -164,8 +166,13 @@ package com.danielfreeman.extendedMadness
 					_buttonBar.removeChild(_icons[index]);
 				if (imageClass) {
 					var icon:Sprite = new Sprite();
+					if (_pixelSnapping) {
+						icon.scaleX = icon.scaleY = 1 / UI.scale;
+					}
 					_buttonBar.addChild(icon);
-					icon.addChild(new imageClass());
+					var iconBitmap:Bitmap = new imageClass();
+					iconBitmap.pixelSnapping = _pixelSnapping ? PixelSnapping.ALWAYS : PixelSnapping.NEVER;
+					icon.addChild(iconBitmap);
 					_icons[index] = icon;
 					icon.y = ICON_Y;
 					icon.x = index*buttonWidth+(buttonWidth-icon.width)/2;

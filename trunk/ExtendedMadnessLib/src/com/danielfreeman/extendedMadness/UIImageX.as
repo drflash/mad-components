@@ -51,18 +51,18 @@ package com.danielfreeman.extendedMadness
  * </pre>
  */
 	
-	public class UIImageX extends UIImage implements IContainerUI {
+	public class UIImageX extends UIImage implements IComponentUI {
 		
 		protected var _images:Vector.<Bitmap>;
 		protected var _pixelSnapping:Boolean;
-		protected var _attributes:Attributes;
-		protected var _xml:XML;
+	//	protected var _attributes:Attributes;
+	//	protected var _xml:XML;
 		
 		
 		public function UIImageX(screen:Sprite, xml:XML, attributes:Attributes)
 		{
-			_attributes = attributes;
-			_xml = xml;
+		//	_attributes = attributes;
+		//	_xml = xml;
 			_pixelSnapping = xml.@pixelSnapping == "true";
 			super(screen, xml, attributes);
 		}
@@ -123,39 +123,13 @@ package com.danielfreeman.extendedMadness
 		}
 		
 		
-		public function layout(attributes:Attributes):void {
+		override public function layout(attributes:Attributes):void {
+			super.layout(attributes);
 			_attributes = attributes;
 			_attributesWidth = attributes.widthH;
 			_attributesHeight = attributes.heightV;
 			scaleImage();
-		}
-		
-		
-		public function get attributes():Attributes {
-			return _attributes;
-		}
-		
-		
-		public function get xml():XML {
-			return _xml;
-		}
-		
-		
-		public function findViewById(id:String, row:int = -1, group:int = -1):DisplayObject {
-			return null;
-		}
-		
-		
-		public function clear():void {
-			graphics.clear();
-		}
-		
-		
-		public function get pages():Array {
-			return [];
-		}
-
-		
+		}		
 		
 /**
  *  Scale the image
@@ -182,13 +156,6 @@ package com.danielfreeman.extendedMadness
 				bestFit.pixelSnapping = _pixelSnapping ? PixelSnapping.ALWAYS : PixelSnapping.NEVER;
 			}
 		}
-		
-		
-		public function drawComponent():void {	
-		}
-		
-		
-		public function destructor():void {
-		}
+
 	}
 }

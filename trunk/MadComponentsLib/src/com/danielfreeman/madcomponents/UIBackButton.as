@@ -35,7 +35,7 @@ package com.danielfreeman.madcomponents {
 /**
  * Arrow button, as used in the navigation bar (for both forward and back buttons)
  */	
-	public class UIBackButton extends MadSprite {
+	public class UIBackButton extends Sprite {
 		
 		protected static const FORMAT:TextFormat = new TextFormat("Arial", 14, 0xFFFFFF);
 		protected static const SENSOR_HEIGHT : Number = 46.0;

@@ -75,18 +75,33 @@ package com.danielfreeman.extendedMadness
  */
 		override protected function mouseMove(event:TimerEvent):void {
 			if (!_noScroll) {
-				_delta = -_slider.x;
+				var delta:Number = -sliderX;
 				sliderX += (outsideSlideRangeX ? _dampen : 1.0) * (mouseX - _lastMouse.x);
-				_delta += _slider.x;
-				_distance += Math.abs(mouseX - _lastMouse.x);
+				delta += sliderX;
 				
+				if (Math.abs(delta) > DELTA_THRESHOLD) {
+					if (delta * _delta > 0) {
+						_delta = SMOOTH * _delta + (1 - SMOOTH) * delta;
+					}
+					else {
+						_delta = delta;
+					}
+					_noSwipeCount = 0;
+				}
+				else if (++_noSwipeCount > NO_SWIPE_THRESHOLD) {
+					_delta = 0;
+				}
+				_distance += Math.abs(mouseX - _lastMouse.x); // + Math.abs(mouseX - _startMouse.x);
 				_lastMouse.x = mouseX;
 				_lastMouse.y = mouseY;
 			}
 			if (!_noScroll && _distance > ABORT_THRESHOLD) {
 				showScrollBar();
 			}
-			else if (_classic && _distance < THRESHOLD && _touchTimer.currentCount == MAXIMUM_TICKS) {
+			else if (_touchTimer.currentCount == MAXIMUM_TICKS && _classic && _distance < THRESHOLD) {
+				pressButton();
+			}
+			else if (_touchTimer.currentCount == TOUCH_DELAY && !_classic && Math.abs(_delta) <= DELTA_THRESHOLD) {
 				pressButton();
 			}
 		}
@@ -114,20 +129,21 @@ package com.danielfreeman.extendedMadness
  *  Animate scrolling movement
  */
 		override protected function movement(event:TimerEvent):void {
-			if (_endSlider<FINISHED) {
-				_delta *= _decay;
-				sliderX = _slider.x + _delta;
+			if (_endSlider < FINISHED) {
+			//	_delta *= _decay;
+				_delta *= deltaToDecay(_delta);
+				sliderX = sliderX + _delta;
 				if (_distance > THRESHOLD) {
 					showScrollBar();
 				}
-				if (Math.abs(_delta) < _deltaThreshold || _slider.x > 0 || _slider.x < -_maximumSlide) {
+				if (Math.abs(_delta) < _deltaThreshold || sliderX > 0 || sliderX < -_maximumSlide) {
 					if (!startMovement0())
 						stopMovement();
 				}
 			}
 			else {
 				_delta = (-_endSlider - _slider.x) * BOUNCE;
-				sliderX = _slider.x + _delta;
+				sliderX = sliderX + _delta;
 				showScrollBar();
 				if (Math.abs(_delta) < _deltaThreshold) {
 					stopMovement();

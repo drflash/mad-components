@@ -201,6 +201,10 @@ package com.danielfreeman.madcomponents {
 		}
 		
 		
+		public function get rightButtonText():String {
+			return _rightButton ? _rightButton.text : "";
+		}
+		
 		
 		public function set leftButtonText(value:String):void {
 			if (_leftButton) {
@@ -212,6 +216,11 @@ package com.danielfreeman.madcomponents {
 			_leftButton.visible = value != "";
 			_leftButton.fixwidth = _attributes.width / 2 + _curve;
 			drawBackground();
+		}
+		
+		
+		public function get leftButtonText():String {
+			return _leftButton ? _leftButton.text : "";
 		}
 		
 		

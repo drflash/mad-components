@@ -91,7 +91,7 @@ package com.danielfreeman.madcomponents
 					if (_cellHeight<0)
 						_cellHeight = (_slider.height - _top - (_refresh ? TOP : 0)) / _count;
 					for (var i:uint = _count; i<value.length; i++) {
-						drawCell((i+1) * _cellHeight + _top, i, record.hasOwnProperty("$colour") ? record.$colour : uint.MAX_VALUE);
+						drawCell((i+1) * _cellHeight + _top, i, record);
 					}
 					_lazy = true;
 					return;
@@ -198,7 +198,7 @@ package com.danielfreeman.madcomponents
 /**
  *  Re-use a recyclable row, otherwise instanciate a new one
  */
-		override protected function newRow(rendererXML:XML):UIForm {
+		override protected function newRow(rendererXML:XML):DisplayObject {
 			if (_lazy && _recycle && _recycleList.length > 0) {
 				return _recycleList.pop();
 			}

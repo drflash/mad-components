@@ -77,9 +77,10 @@ package com.danielfreeman.extendedMadness
 		protected var _lockSides:Boolean;
 		protected var _lockTopBottom:Boolean;
 		
-		protected var _swipeTotalX:Number;
-		protected var _swipeDurationX:Number;
-		protected var _oldDeltaX:Number;
+	//	protected var _swipeTotalX:Number;
+	//	protected var _swipeDurationX:Number;
+	//	protected var _oldDeltaX:Number;
+	protected var _noSwipeCountX:int = 0;
 		protected var _scrollEnabledX:Boolean = true;
 		protected var _manhattan:Boolean;
 		
@@ -195,6 +196,15 @@ package com.danielfreeman.extendedMadness
 			adjustHorizontalSlide(sliderWidth);
 			hideScrollBar();
 		}
+		
+		
+		override protected function handleFlick():void {
+			if (_touchTimer.currentCount <= FLICK_THRESHOLD) {
+				var divisor:Number = ((_touchTimer.currentCount == 0) ? 1 : _touchTimer.currentCount);
+				_delta = (mouseY - _startMouse.y) / divisor;
+				_deltaX = (mouseX - _startMouse.x) / divisor;
+			}
+		}
 
 /**
  *  Touch move handler
@@ -214,16 +224,31 @@ package com.danielfreeman.extendedMadness
 					}
 					sliderX = xSlider;
 					deltaX += xSlider;	
-					
-					if (deltaX * _swipeTotalX < 0 || Math.abs(deltaX) < DELTA_THRESHOLD && Math.abs(_oldDeltaX) < DELTA_THRESHOLD) {
-						_swipeTotalX = 0;
-						_swipeDurationX = 0;
+
+				if (Math.abs(deltaX) > DELTA_THRESHOLD) {
+					if (deltaX * _deltaX > 0) {
+						_deltaX = SMOOTH * _deltaX + (1 - SMOOTH) * deltaX;
 					}
+					else {
+						_deltaX = deltaX;
+					}
+					_noSwipeCountX = 0;
+				}
+				else if (++_noSwipeCountX > NO_SWIPE_THRESHOLD) {
+					_deltaX = 0;
+				}
+//				_distanceX += Math.abs(mouseY - _lastMouse.y); // + Math.abs(mouseX - _startMouse.x);
+			//	_lastMouse.x = mouseX;
+			//	_lastMouse.y = mouseY;					
+//					if (deltaX * _swipeTotalX < 0 || Math.abs(deltaX) < DELTA_THRESHOLD && Math.abs(_oldDeltaX) < DELTA_THRESHOLD) {
+//						_swipeTotalX = 0;
+//						_swipeDurationX = 0;
+//					}
 					
-					_swipeTotalX += deltaX;
-					_swipeDurationX++;
-					_oldDeltaX = deltaX;
-					_deltaX = SWIPE_FACTOR * _swipeTotalX / _swipeDurationX;					
+//					_swipeTotalX += deltaX;
+//					_swipeDurationX++;
+//					_oldDeltaX = deltaX;
+//					_deltaX = SWIPE_FACTOR * _swipeTotalX / _swipeDurationX;					
 					
 				}
 
@@ -238,17 +263,20 @@ package com.danielfreeman.extendedMadness
 						ySlider = Math.max(Math.min(0, ySlider), -_maximumSlide);
 					}
 					sliderY = ySlider;
-					delta += sliderY;
+					delta += ySlider; //sliderY;
 					
-					if (delta * _swipeTotalY < 0 || Math.abs(delta) < DELTA_THRESHOLD && Math.abs(_oldDeltaY) < DELTA_THRESHOLD) {
-						_swipeTotalY = 0;
-						_swipeDurationY = 0;
+					if (Math.abs(delta) > DELTA_THRESHOLD) {
+						if (delta * _delta > 0) {
+							_delta = SMOOTH * _delta + (1 - SMOOTH) * delta;
+						}
+						else {
+							_delta = delta;
+						}
+						_noSwipeCount = 0;
 					}
-					
-					_swipeTotalY += delta;
-					_swipeDurationY++;
-					_oldDeltaY = delta;
-					_delta = SWIPE_FACTOR * _swipeTotalY / _swipeDurationY;					
+					else if (++_noSwipeCount > NO_SWIPE_THRESHOLD) {
+						_delta = 0;
+					}
 
 				}
 				
@@ -260,13 +288,15 @@ package com.danielfreeman.extendedMadness
 			}
 			_lastMouse.x = mouseX;
 			_lastMouse.y = mouseY;
-			if (!_noScroll && _scrollEnabledX && _distance > _scrollBarThreshold) {
+			if (!_noScroll && _scrollEnabledX && _distance > ABORT_THRESHOLD) {
 				showScrollBar();
 			}
-			else if (_classic && _distance < THRESHOLD && _touchTimer.currentCount == MAXIMUM_TICKS) {
+			else if (_touchTimer.currentCount == MAXIMUM_TICKS && _classic && _distance < THRESHOLD) {
 				pressButton();
 			}
-		//	super.mouseMove(event);
+			else if (_touchTimer.currentCount == TOUCH_DELAY && !_classic && Math.abs(_delta) <= DELTA_THRESHOLD) {
+				pressButton();
+			}
 		}
 		
 		
@@ -334,19 +364,19 @@ package com.danielfreeman.extendedMadness
 				var stopX:Boolean = false;
 				super.movement(event);
 				if (_endSliderX < FINISHED) {
-					_deltaX *= _decay;
-					sliderX = _slider.x + _deltaX;
+					_deltaX *= deltaToDecay(_deltaX);
+					sliderX = sliderX + _deltaX;
 					if (_distance > THRESHOLD) {
 						showScrollBar();
 					}
-					if (Math.abs(_deltaX) < _deltaThreshold || _slider.x > 0 || _slider.x < -_maximumSlideX) {
+					if (Math.abs(_deltaX) < _deltaThreshold || sliderX > 0 || sliderX < -_maximumSlideX) {
 						if (!startMovement0())
 							stopX = true;
 					}
 				}
 				else {
-					_deltaX = (-_endSliderX - _slider.x) * BOUNCE;
-					sliderX = _slider.x + _deltaX;
+					_deltaX = (-_endSliderX - sliderX) * BOUNCE;
+					sliderX = sliderX + _deltaX;
 					showScrollBar();
 					if (Math.abs(_deltaX) < _deltaThreshold) {
 						stopX = true;

@@ -45,7 +45,7 @@ package com.danielfreeman.extendedMadness {
  * /&gt;
  * </pre>
  */	
-	public class UIStarRating extends MadSprite
+	public class UIStarRating extends MadSprite implements IComponentUI
 	{
 		protected static const STARS:int=5;
 		protected static const ALT_SIZE:Number=18;
@@ -63,7 +63,8 @@ package com.danielfreeman.extendedMadness {
 			var onColour:uint = attributes.backgroundColours.length>0 ? attributes.backgroundColours[0] : Star.FRONT_COLOUR;
 			var offColour:uint = attributes.backgroundColours.length>1 ? attributes.backgroundColours[1] : Star.BACK_COLOUR;
 			
-			screen.addChild(this);
+		//	screen.addChild(this);
+			super(screen, attributes);
 			for (var i:int=0;i<STARS;i++) {
 				var star:Star=new Star(this,i*(Star.GAP+size), 0, size, onColour, offColour);
 				star.name=i.toString();
@@ -125,7 +126,8 @@ package com.danielfreeman.extendedMadness {
 		}
 		
 		
-		public function destructor():void {
+		override public function destructor():void {
+			super.destructor();
 			removeEventListener(MouseEvent.MOUSE_DOWN, mouseDown);
 			stage.removeEventListener(MouseEvent.MOUSE_MOVE, mouseMove);
 			stage.removeEventListener(MouseEvent.MOUSE_UP, mouseUp);

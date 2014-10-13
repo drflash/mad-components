@@ -15,7 +15,7 @@ package com.danielfreeman.extendedMadness {
 		
 		protected const FORMAT:TextFormat = new TextFormat('Arial', 13, 0x000066, true);
 		
-		public function UICell(screen:Sprite, xx:int, yy:int, txt:String = "", wdth:Number = 0, format:TextFormat=null, multiLine:Boolean = false, borderColour:uint = 0x666666, border:Boolean = true) {
+		public function UICell(screen:Sprite, xx:int, yy:int, txt:String = "", wdth:Number = 0, format:TextFormat=null, multiLine:Boolean = false, wordWrap:Boolean = false, borderColour:uint = 0x666666, border:Boolean = true) {
 			if (!format) {
 				format = FORMAT;
 				format.leftMargin = 4.0;
@@ -23,7 +23,8 @@ package com.danielfreeman.extendedMadness {
 			super(screen, xx, yy, txt, format);
 			this.border = border;
 			borderColor = borderColour;
-			multiline = wordWrap = multiLine;
+			multiline = multiLine;
+			this.wordWrap = wordWrap;
 			setTextFormat(format);
 			defaultTextFormat = format;
 			if (wdth > 0) {

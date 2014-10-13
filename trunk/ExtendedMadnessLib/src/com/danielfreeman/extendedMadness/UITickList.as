@@ -67,10 +67,12 @@ package com.danielfreeman.extendedMadness {
 		protected static const TICK_COLOUR:uint = 0x9999AA;
 		
 		protected var _tickColour:uint = TICK_COLOUR;
+		protected var _saveTicks:Vector.<Boolean>;
 		
 		public function UITickList(screen:Sprite, xml:XML, attributes:Attributes) {
-			if (xml.@tickColour.length()>0)
+			if (xml.@tickColour.length() > 0) {
 				_tickColour = UI.toColourValue(xml.@tickColour[0].toString());
+			}
 			super(screen, xml, attributes);
 		}
 		
@@ -83,9 +85,11 @@ package com.danielfreeman.extendedMadness {
 				tick.x = _width-_attributes.paddingH-UITick.SIZE;
 			}
 			else {
-				tick = new UITick(_slider, _width-_attributes.paddingH-UITick.SIZE, _cellTop + 2 * _attributes.paddingV + 3, _tickColour);
+				var cell:DisplayObject = _slider.getChildByName("label_"+count.toString());
+				var yPosition:Number = (cell.y + position - UITick.SIZE) / 2 - (_simple ? 1.0 : 0.5) * _attributes.paddingV;
+				tick = new UITick(_slider, _width-_attributes.paddingH-UITick.SIZE, yPosition, _tickColour);//_cellTop + 2 * _attributes.paddingV + 3,
 				tick.name = "tick_"+count.toString();
-				tick.visible = false;
+				tick.visible = record.hasOwnProperty("$tick") ? record.$tick : false;
 			}
 			super.drawCell(position, count, record);
 		}
@@ -104,11 +108,12 @@ package com.danielfreeman.extendedMadness {
 			if (tick) {
 				tick.visible = !tick.visible;
 			}
+			_filteredData[_pressedCell].$tick = tick.visible;
 			dispatchEvent(new Event(Event.CHANGE));
 		}
 		
 		
-		override protected function pressButton():DisplayObject {
+		override protected function pressButton(show:Boolean = true):DisplayObject {
 			super.pressButton();
 			if (_classic && !_pressButton && _clickRow) {
 				doClick();
@@ -117,29 +122,30 @@ package com.danielfreeman.extendedMadness {
 		}
 		
 /**
+ *  Returns a Vector of data objects that have visible ticks.
+ *  (Note that $index is the original, unfiltered index position.)
+ */	
+		public function get tickData():Vector.<Object> {
+			var result:Vector.<Object> = new Vector.<Object>;
+			var ticks:Vector.<uint> = tickIndexes;
+			for each(var tick:uint in ticks) {
+				result.push(_filteredData[tick]);
+			}
+			return result;
+		}
+		
+/**
  *  Returns a Vector of list row indexes that have visible ticks
  */	
 		public function get tickIndexes():Vector.<uint> {
 			var result:Vector.<uint> = new Vector.<uint>;
 			var tick:UITick;
-			if (_simple) {
 				for (var i:int=0;i<_count;i++) {
 					tick = UITick(_slider.getChildByName("tick_"+i.toString()));
 					if (tick.visible) {
 						result.push(i);
 					}
 				}
-			}
-			else {
-				for (var j:int=0;j<_slider.numChildren - 1;j++) {
-					var cell:UIForm = UIForm(_slider.getChildAt(j+1));
-					if (cell && (tick=UITick(cell.getChildByName("tick")))) {
-						if (tick.visible) {
-							result.push(j);
-						}
-					}
-				}
-			}
 			return result;
 		}
 	}

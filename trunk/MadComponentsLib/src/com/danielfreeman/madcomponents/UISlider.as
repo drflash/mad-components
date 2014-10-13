@@ -54,7 +54,7 @@ package com.danielfreeman.madcomponents
  * /&gt;
  * </pre>
  */
-	public class UISlider extends MadSprite
+	public class UISlider extends MadSprite implements IComponentUI
 	{
 		protected static const WIDTH:Number = 120.0;
 		protected static const RADIUS:Number = 14.0;
@@ -86,7 +86,8 @@ package com.danielfreeman.madcomponents
 		
 		
 		public function UISlider(screen:Sprite, xx:Number, yy:Number, colours:Vector.<uint> = null, alt:Boolean = false, style7:Boolean = false) {
-			screen.addChild(this);
+		//	screen.addChild(this);
+			super(screen);
 			x=xx; y=yy;
 			
 			_style7 = style7;
@@ -104,6 +105,7 @@ package com.danielfreeman.madcomponents
 			createKnob();
 			value = _value;
 			_knob.buttonMode = _knob.useHandCursor = true;
+			drawComponent();
 		}
 
 
@@ -235,7 +237,8 @@ package com.danielfreeman.madcomponents
 		}
 		
 		
-		public function destructor():void {
+		override public function destructor():void {
+			super.destructor();
 			_knob.removeEventListener(MouseEvent.MOUSE_DOWN, mouseDown);
 			stage.removeEventListener(MouseEvent.MOUSE_MOVE, mouseMove);
 			stage.removeEventListener(MouseEvent.MOUSE_UP, mouseUp);

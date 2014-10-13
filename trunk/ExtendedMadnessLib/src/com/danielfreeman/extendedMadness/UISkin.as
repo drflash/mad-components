@@ -85,19 +85,24 @@ package com.danielfreeman.extendedMadness
 		
 		
 		protected function drawSkin():void {
-			if (!_skin)
-				return;
+			graphics.clear();
 			if (_skinBitmap) {
 				removeChild(_skinBitmap);
 			}
-			_skin.width = _attributes.widthH+2*_attributes.paddingH;
-			_skin.height = _attributes.heightV+2*_attributes.paddingV;
-			var myBitmapData:BitmapData = new BitmapData(_skin.width, _skin.height, true, 0x00FFFFFF);
-			myBitmapData.draw(_skinContainer);
-			addChild(_skinBitmap = new Bitmap(myBitmapData));
-			_skinBitmap.smoothing = true;
-			_skinBitmap.x = -_attributes.paddingH;
-			_skinBitmap.y = -_attributes.paddingV;			
+			if (!_skin) {
+				graphics.beginFill(_colour);
+				graphics.drawRect(-_attributes.paddingH, -_attributes.paddingV, _attributes.widthH+2*_attributes.paddingH, _attributes.height+2*_attributes.paddingV);
+			}
+			else {
+				_skin.width = _attributes.widthH+2*_attributes.paddingH;
+				_skin.height = _attributes.heightV+2*_attributes.paddingV;
+				var myBitmapData:BitmapData = new BitmapData(_skin.width, _skin.height, true, 0x00FFFFFF);
+				myBitmapData.draw(_skinContainer);
+				addChild(_skinBitmap = new Bitmap(myBitmapData));
+				_skinBitmap.smoothing = true;
+				_skinBitmap.x = -_attributes.paddingH;
+				_skinBitmap.y = -_attributes.paddingV;	
+			}		
 		}
 
 	}

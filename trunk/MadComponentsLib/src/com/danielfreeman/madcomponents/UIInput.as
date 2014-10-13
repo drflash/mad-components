@@ -66,7 +66,7 @@ package com.danielfreeman.madcomponents {
  * /&gt;
  * </pre>
  */
-	public class UIInput extends Sprite {
+	public class UIInput extends MadSprite implements IComponentUI {
 	
 		protected static const SHADOW_OFFSET:Number = 1.0;
 		protected static const WIDTH:Number = 80.0;
@@ -91,7 +91,8 @@ package com.danielfreeman.madcomponents {
 		
 	
 		public function UIInput(screen:Sprite, xx:Number, yy:Number, text:String, colours:Vector.<uint> = null, alt:Boolean = false, prompt:String="", promptColour:uint = 0x999999, style7:Boolean = false) {
-			screen.addChild(this);
+		//	screen.addChild(this);
+			super(screen, null);
 			x=xx;y=yy;
 			_alt = alt;
 			_style7 = style7;
@@ -236,7 +237,8 @@ package com.danielfreeman.madcomponents {
 		}
 		
 		
-		public function destructor():void {
+		override public function destructor():void {
+			super.destructor();
 			removeEventListener(MouseEvent.MOUSE_DOWN, mouseDown);
 			stage.removeEventListener(MouseEvent.MOUSE_UP, mouseUp);
 			_label.removeEventListener(Event.CHANGE,textChanged);
